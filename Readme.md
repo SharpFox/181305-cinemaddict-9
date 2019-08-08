@@ -1,7 +1,7 @@
 # Личный проект «Киноман» [![Build status][travis-image]][travis-url]
 
 * Студент: [Роман Вишневский](https://up.htmlacademy.ru/ecmascript/9/user/181305).
-* Наставник: `Неизвестно`.
+* Наставник: [Руфат Хасларов](https://up.htmlacademy.ru/ecmascript/9/user/372587).
 
 ---
 

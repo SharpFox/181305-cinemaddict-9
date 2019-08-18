@@ -1,5 +1,4 @@
-
-const filmTitlesArr = [
+const filmTitles = [
   {
     title: `All movies. Upcoming`,
     isVisuallyHidden: true,
@@ -23,13 +22,13 @@ const filmTitlesArr = [
   }
 ];
 
-const sortTypeObj = {
+const sortType = {
   'default': true,
   'date': false,
   'rating': false
 };
 
 export {
-  sortTypeObj,
-  filmTitlesArr
+  sortType,
+  filmTitles
 };

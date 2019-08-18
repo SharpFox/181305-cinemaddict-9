@@ -1,9 +1,8 @@
-
 /**
  * Return template for button "show more".
  * @return {string}
  */
-const buttonShowMoreTemplate = () => {
+const getButtonShowMoreTemplate = () => {
   return `
   <button class="films-list__show-more">
     Show more
@@ -11,5 +10,5 @@ const buttonShowMoreTemplate = () => {
 };
 
 export {
-  buttonShowMoreTemplate
+  getButtonShowMoreTemplate
 };

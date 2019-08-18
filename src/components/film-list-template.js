@@ -1,8 +1,8 @@
 import {
-  buttonShowMoreTemplate
+  getButtonShowMoreTemplate
 } from './button-show-more-template.js';
 import {
-  filmCardTemplate
+  getFilmCardTemplate
 } from './film-card-template.js';
 
 /**
@@ -10,7 +10,7 @@ import {
  * @param {object} obj
  * @return {string}
  */
-const filmListTemplate = (obj) => {
+const getFilmsListTemplate = (obj) => {
   return `
   <section class="films-list${obj.isExtra ? `--extra` : ``}">
     <h2 class="films-list__title 
@@ -18,12 +18,12 @@ const filmListTemplate = (obj) => {
       ${obj.title}
     </h2>
     <div class="films-list__container">
-      ${obj.films.map(() => filmCardTemplate().trim()).join(``)}
+      ${obj.films.map(() => getFilmCardTemplate().trim()).join(``)}
     </div>
-    ${obj.isButton ? buttonShowMoreTemplate() : ``}
+    ${obj.isButton ? getButtonShowMoreTemplate() : ``}
   </section>`;
 };
 
 export {
-  filmListTemplate
+  getFilmsListTemplate
 };

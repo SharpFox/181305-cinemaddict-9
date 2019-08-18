@@ -2,7 +2,7 @@
  * Return template for profile.
  * @return {string}
  */
-const profileTemplate = () => {
+const getProfileTemplate = () => {
   return `
     <p class="profile__rating">
       Movie Buff
@@ -16,6 +16,5 @@ const profileTemplate = () => {
 };
 
 export {
-  profileTemplate
+  getProfileTemplate
 };
-

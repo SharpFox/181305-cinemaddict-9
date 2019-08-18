@@ -1,10 +1,8 @@
-
-
 /**
  * Return template for statistic.
  * @return {string}
  */
-const statisticTemplate = () => {
+const getStatisticTemplate = () => {
   return `
   <p class="statistic__rank">
     Your rank
@@ -113,6 +111,5 @@ const statisticTemplate = () => {
 };
 
 export {
-  statisticTemplate
+  getStatisticTemplate
 };
-

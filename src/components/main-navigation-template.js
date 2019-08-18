@@ -2,7 +2,7 @@
  * Return template for main-navigation.
  * @return {string}
  */
-const mainNavigationTemplate = () => {
+const getMainNavigationTemplate = () => {
   return `
     <a href="#all"
       class="main-navigation__item">
@@ -33,6 +33,5 @@ const mainNavigationTemplate = () => {
 };
 
 export {
-  mainNavigationTemplate
+  getMainNavigationTemplate
 };
-

@@ -2,7 +2,7 @@
  * Return template for details of film.
  * @return {string}
  */
-const filmDetailsTemplate = () => {
+const getFilmDetailsTemplate = () => {
   return `
   <form class="film-details__inner"
     action=""
@@ -333,5 +333,5 @@ const filmDetailsTemplate = () => {
 };
 
 export {
-  filmDetailsTemplate
+  getFilmDetailsTemplate
 };

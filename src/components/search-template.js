@@ -2,7 +2,7 @@
  * Return template for search.
  * @return {string}
  */
-const searchTemplate = () => {
+const getSearchTemplate = () => {
   return `
     <input type="text"
       name="search"
@@ -35,5 +35,5 @@ const searchTemplate = () => {
 };
 
 export {
-  searchTemplate
+  getSearchTemplate
 };

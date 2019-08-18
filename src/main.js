@@ -1,28 +1,31 @@
 import {
-  searchTemplate
+  getSearchTemplate
 } from './components/search-template.js';
 import {
-  profileTemplate
+  getProfileTemplate
 } from './components/profile-template.js';
 import {
-  mainNavigationTemplate
+  getMainNavigationTemplate
 } from './components/main-navigation-template.js';
 import {
-  sortTemplate
+  getSortTemplate
 } from './components/sort-template.js';
 import {
-  statisticTemplate
+  getStatisticTemplate
 } from './components/statistic-template.js';
 import {
-  filmListTemplate
+  getFilmsListTemplate
 } from './components/film-list-template.js';
 import {
-  filmDetailsTemplate
+  getFilmDetailsTemplate
 } from './components/film-details-template.js';
 import {
-  sortTypeObj,
-  filmTitlesArr
-} from './components/data.js';
+  createElement
+} from './utils.js';
+import {
+  sortType,
+  filmTitles
+} from './data.js';
 
 const header = document.body.querySelector(`.header`);
 const search = header.querySelector(`.search`);
@@ -32,29 +35,34 @@ const mainNavigation = main.querySelector(`.main-navigation`);
 const statistic = main.querySelector(`.statistic`);
 const sort = main.querySelector(`.sort`);
 const films = main.querySelector(`.films`);
-
 const filmsDetails = document.body.querySelector(`.film-details`);
-filmsDetails.insertAdjacentHTML(`beforeend`, filmDetailsTemplate());
-const filmDetailsCloseBtn = filmsDetails.querySelector(`.film-details__close-btn`);
 
-search.insertAdjacentHTML(`beforeend`, searchTemplate());
-profile.insertAdjacentHTML(`beforeend`, profileTemplate());
-
-mainNavigation.insertAdjacentHTML(`beforeend`, mainNavigationTemplate());
-statistic.insertAdjacentHTML(`beforeend`, statisticTemplate());
-sort.insertAdjacentHTML(`beforeend`, sortTemplate(sortTypeObj));
-
-filmTitlesArr.forEach((obj)=> {
-  films.insertAdjacentHTML(`beforeend`, filmListTemplate(obj));
-});
-
-const filmCard = films.querySelectorAll(`.film-card`);
-filmCard.forEach((node) => {
-  node.addEventListener(`click`, () => {
-    filmsDetails.classList.remove(`visually-hidden`);
+/**
+ * Add cards of film.
+ */
+const addFilmsCards = () => {
+  const filmsCards = films.querySelectorAll(`.film-card`);
+  filmsCards.forEach((node) => {
+    node.addEventListener(`click`, () => {
+      filmsDetails.classList.remove(`visually-hidden`);
+    });
   });
-});
+};
 
+createElement(filmsDetails, getFilmDetailsTemplate());
+const filmDetailsCloseBtn = filmsDetails.querySelector(`.film-details__close-btn`);
 filmDetailsCloseBtn.addEventListener(`click`, () => {
   filmsDetails.classList.add(`visually-hidden`);
 });
+
+createElement(search, getSearchTemplate());
+createElement(profile, getProfileTemplate());
+createElement(mainNavigation, getMainNavigationTemplate());
+createElement(statistic, getStatisticTemplate());
+createElement(sort, getSortTemplate(sortType));
+
+filmTitles.forEach((obj) => {
+  createElement(films, getFilmsListTemplate(obj));
+});
+
+addFilmsCards();

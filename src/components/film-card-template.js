@@ -1,9 +1,8 @@
-
 /**
  * Return template for card of film.
  * @return {string}
  */
-const filmCardTemplate = () => {
+const getFilmCardTemplate = () => {
   return `
   <article class="film-card">
   <h3 class="film-card__title">
@@ -41,5 +40,5 @@ const filmCardTemplate = () => {
 };
 
 export {
-  filmCardTemplate
+  getFilmCardTemplate
 };

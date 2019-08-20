@@ -1,8 +1,11 @@
 /**
  * Return template for statistic.
+ * @param {number} userRating
+ * @param {array} filters
+ * @param {array} textList
  * @return {string}
  */
-const getStatisticTemplate = () => {
+const getStatisticTemplate = (userRating, filters, textList) => {
   return `
   <p class="statistic__rank">
     Your rank
@@ -11,7 +14,7 @@ const getStatisticTemplate = () => {
       alt="Avatar"
       width="35" height="35">
     <span class="statistic__rank-label">
-      Sci-Fighter
+      ${userRating}
     </span>
   </p>
   <form action="https://echo.htmlacademy.ru/"
@@ -20,88 +23,28 @@ const getStatisticTemplate = () => {
 
     <p class="statistic__filters-description">
       Show stats:
-    </p>
-
-    <input type="radio"
-      class="statistic__filters-input visually-hidden"
-      name="statistic-filter"
-      id="statistic-all-time"
-      value="all-time"
-      checked
-    >
-    <label for="statistic-all-time"
-      class="statistic__filters-label">
-      All time
-    </label>
-
-    <input type="radio"
-      class="statistic__filters-input visually-hidden"
-      name="statistic-filter"
-      id="statistic-today"
-      value="today"
-    >
-    <label for="statistic-today"
-      class="statistic__filters-label">
-      Today
-    </label>
-
-    <input type="radio"
-      class="statistic__filters-input visually-hidden"
-      name="statistic-filter"
-      id="statistic-week"
-      value="week"
-    >
-    <label for="statistic-week"
-      class="statistic__filters-label">
-      Week
-    </label>
-
-    <input type="radio"
-      class="statistic__filters-input visually-hidden"
-      name="statistic-filter"
-      id="statistic-month"
-      value="month"
-    >
-    <label for="statistic-month"
-      class="statistic__filters-label">
-      Month
-    </label>
-
-    <input type="radio"
-      class="statistic__filters-input visually-hidden"
-      name="statistic-filter"
-      id="statistic-year"
-      value="year"
-    >
-    <label for="statistic-year"
-      class="statistic__filters-label">
-      Year
-    </label>    
+    </p>${filters.map((obj) => (`<input type="radio"
+        class="statistic__filters-input visually-hidden"
+        name="statistic-filter"
+        id="statistic-${obj.attribute}"
+        value="${obj.attribute}"
+        ${obj.checked ? `checked` : ``}
+      >
+      <label for="statistic-${obj.attribute}"
+        class="statistic__filters-label">
+        ${obj.title}
+      </label>`).trim()).join(``)} 
   </form>
 
-  <ul class="statistic__text-list">
-    <li class="statistic__text-item">
-      <h4 class="statistic__item-title">You watched</h4>
+  <ul class="statistic__text-list">${textList.map((obj) => (
+    `<li class="statistic__text-item">
+      <h4 class="statistic__item-title">${obj.title}</h4>
       <p class="statistic__item-text">
-        22 
-        <span class="statistic__item-description">movies</span>
+      ${obj.texts.map((textObj) => (
+      textObj.isDescription ? `<span class="statistic__item-description">
+        ${textObj.title}</span>` : `${textObj.title}`).trim()).join(``)}
       </p>
-    </li>
-
-    <li class="statistic__text-item">
-      <h4 class="statistic__item-title">Total duration</h4>
-      <p class="statistic__item-text">
-        130
-        <span class="statistic__item-description">h</span>
-        22
-        <span class="statistic__item-description">m</span>
-      </p>
-    </li>
-    
-    <li class="statistic__text-item">
-      <h4 class="statistic__item-title">Top genre</h4>
-      <p class="statistic__item-text">Sci-Fi</p>
-    </li>
+    </li>`).trim()).join(``)}
   </ul>
 
   <div class="statistic__chart-wrap">

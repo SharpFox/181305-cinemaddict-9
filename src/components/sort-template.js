@@ -9,7 +9,7 @@ const getSortTemplate = (obj) => {
       <a href="#" class="sort__button${obj[key] ? ` sort__button--active` : ``}">
         Sort by ${key}
       </a>
-    </li>`.trim())).join(``);
+    </li>`).trim()).join(``);
 };
 
 export {

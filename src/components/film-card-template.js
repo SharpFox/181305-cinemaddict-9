@@ -1,29 +1,30 @@
 /**
  * Return template for card of film.
+ * @param {object} obj
  * @return {string}
  */
-const getFilmCardTemplate = () => {
+const getFilmCardTemplate = (obj) => {
   return `
   <article class="film-card">
   <h3 class="film-card__title">
-    The Dance of Life
+    ${obj.title}
   </h3>
   <p class="film-card__rating">
-    8.3
+    ${obj.rating}
   </p>
   <p class="film-card__info">
-    <span class="film-card__year">1929</span>
-    <span class="film-card__duration">1h 55m</span>
-    <span class="film-card__genre">Musical</span>
+    <span class="film-card__year">${obj.year}</span>
+    <span class="film-card__duration">${obj.duration}</span>
+    <span class="film-card__genre">${obj.genres[0]}</span>
   </p>
-  <img src="./images/posters/the-dance-of-life.jpg"
+  <img src="${obj.img}"
     alt="" class="film-card__poster"
   >
   <p class="film-card__description">
-    Burlesque comic Ralph "Skid" Johnson (Skelly), and specialty dancer Bonny Lee King (Carroll), end up together on a cold, rainy night at a tr…
+    ${obj.description}
   </p>
   <a class="film-card__comments">
-    5 comments
+    ${obj.countComments} comment${obj.countComments === 1 ? `` : `s`}   
   </a>
   <form class="film-card__controls">
     <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist">

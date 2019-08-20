@@ -18,7 +18,7 @@ const getFilmsListTemplate = (obj) => {
       ${obj.title}
     </h2>
     <div class="films-list__container">
-      ${obj.films.map(() => getFilmCardTemplate().trim()).join(``)}
+      ${obj.films.map((value) => getFilmCardTemplate(value).trim()).join(``)}
     </div>
     ${obj.isButton ? getButtonShowMoreTemplate() : ``}
   </section>`;

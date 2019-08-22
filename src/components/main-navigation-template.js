@@ -1,18 +1,18 @@
 /**
  * Return template for main-navigation.
- * @param {array} arr
+ * @param {array} menuTypes
  * @return {string}
  */
-const getMainNavigationTemplate = (arr) => {
-  return arr.map((obj) => (`
-    <a href="#${obj.href}"
+const getMainNavigationTemplate = (menuTypes) => {
+  return menuTypes.map(({link, modifiers, title, filmsCount}) => (`
+    <a href="#${link}"
       class="main-navigation__item
-      ${obj.modifiers.map((value) => (
-      `main-navigation__item--` + value
+      ${modifiers.map((modifier) => (
+      `main-navigation__item--` + modifier
     ).trim()).join(` `)}">
-      ${obj.title}
-      ${obj.count ? `<span class="main-navigation__item-count">`
-      + obj.count + `</span>` : ``}
+      ${title}
+      ${filmsCount ? `<span class="main-navigation__item-count">`
+      + filmsCount + `</span>` : ``}
     </a>`).trim()).join(``);
 };
 

@@ -29,17 +29,17 @@ import {
   createElement
 } from './utils.js';
 import {
-  sortType,
+  sortTypes,
   controlsTypes,
   emojiList,
-  menuType,
+  menuTypes,
   statisticFilters,
   statisticTextList,
   filmTitles,
   filmCards,
   countFilmCards,
   randomFilmCard,
-  userRating,
+  userRating
 } from './data.js';
 
 const body = document.querySelector(`body`);
@@ -59,8 +59,8 @@ const footer = body.querySelector(`.footer`);
  */
 const addFilmsCards = () => {
   const filmsCards = films.querySelectorAll(`.film-card`);
-  filmsCards.forEach((node) => {
-    node.addEventListener(`click`, () => {
+  filmsCards.forEach((filmsCard) => {
+    filmsCard.addEventListener(`click`, () => {
       filmsDetails.classList.remove(`visually-hidden`);
     });
   });
@@ -74,12 +74,12 @@ filmDetailsCloseBtn.addEventListener(`click`, () => {
 
 createElement(search, getSearchTemplate());
 createElement(profile, getProfileTemplate(userRating));
-createElement(mainNavigation, getMainNavigationTemplate(menuType));
+createElement(mainNavigation, getMainNavigationTemplate(menuTypes));
 createElement(statistic, getStatisticTemplate(userRating, statisticFilters, statisticTextList));
-createElement(sort, getSortTemplate(sortType));
+createElement(sort, getSortTemplate(sortTypes));
 
-filmTitles.forEach((obj) => {
-  createElement(films, getFilmsListTemplate(obj));
+filmTitles.forEach((filmTitle) => {
+  createElement(films, getFilmsListTemplate(filmTitle));
 });
 
 addFilmsCards();
@@ -92,8 +92,8 @@ const filmsListShowMore = films.querySelector(`.films-list__show-more`);
  * Add more card.
  */
 const addMoreCards = () => {
-  filmCards.slice(5, 10).forEach((obj) => {
-    createElement(filmsListContainer, getFilmCardTemplate(obj));
+  filmCards.slice(5, 10).forEach((filmCard) => {
+    createElement(filmsListContainer, getFilmCardTemplate(filmCard));
   });
   filmsListShowMore.classList.add(`visually-hidden`);
   filmsListShowMore.removeEventListener(`click`, addMoreCards);

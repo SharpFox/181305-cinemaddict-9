@@ -3,7 +3,7 @@ import {
   compareRandom
 } from './utils.js';
 
-const sortType = {
+const sortTypes = {
   default: true,
   date: false,
   rating: false
@@ -46,7 +46,7 @@ const titles = [
   `It`
 ];
 
-const duration = [
+const durationList = [
   `1h 55m`,
   `54m`,
   `1h 59m`,
@@ -82,7 +82,8 @@ const descriptions = [
   `Aliquam id orci ut lectus varius viverra`,
   `Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante`,
   `Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum`,
-  `Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui`,
+  `Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus
+   nunc ante ut dui`,
   `Sed sed nisi sed augue convallis suscipit in sed felis`,
   `Aliquam erat volutpat`,
   `Nunc fermentum tortor ac porta dapibus`,
@@ -176,8 +177,6 @@ const comments = [
   }
 ];
 
-const userRating = getRandomValueMinMax(0, titles.length);
-
 /**
  * Return random rating for interval from 1 to 10.
  * @return {number}
@@ -198,7 +197,7 @@ const getFilmCard = () => {
     year: years[getRandomValueMinMax(0, years.length - 1)],
     title: titles[getRandomValueMinMax(0, titles.length - 1)],
     rating: getRating(),
-    duration: duration[getRandomValueMinMax(0, duration.length - 1)],
+    duration: durationList[getRandomValueMinMax(0, durationList.length - 1)],
     img: `./images/posters/`
       + posters[getRandomValueMinMax(0, posters.length - 1)],
     description: descriptions.sort(compareRandom).slice(0,
@@ -218,20 +217,21 @@ const getFilmCard = () => {
 
 /**
  * Return array of cards of films.
- * @param {number} count
+ * @param {number} filmsCount
  * @return {array}
  */
-const getFilmCards = (count) => {
-  const arr = [];
-  for (let i = 0; i < count; i++) {
-    arr.push(getFilmCard());
+const getFilmCards = (filmsCount) => {
+  const filmCards = [];
+  for (let i = 0; i < filmsCount; i++) {
+    filmCards.push(getFilmCard());
   }
-  return arr;
+  return filmCards;
 };
 
 const filmCards = getFilmCards(titles.length);
-const randomFilmCard = filmCards.sort(compareRandom).slice(0, 1)[0];
+const randomFilmCard = filmCards.sort(compareRandom)[0];
 const countFilmCards = filmCards.length;
+const userRating = getRandomValueMinMax(0, titles.length);
 
 const filmTitles = [
   {
@@ -257,35 +257,35 @@ const filmTitles = [
   }
 ];
 
-const menuType = [
+const menuTypes = [
   {
     'title': `All movies`,
-    'href': `all`,
-    'count': getRandomValueMinMax(0, titles.length),
+    'link': `all`,
+    'filmsCount': getRandomValueMinMax(0, titles.length),
     'modifiers': []
   },
   {
     'title': `Watchlist`,
-    'href': `watchlist`,
-    'count': getRandomValueMinMax(0, titles.length),
+    'link': `watchlist`,
+    'filmsCount': getRandomValueMinMax(0, titles.length),
     'modifiers': []
   },
   {
     'title': `History`,
-    'href': `history`,
-    'count': getRandomValueMinMax(0, titles.length),
+    'link': `history`,
+    'filmsCount': getRandomValueMinMax(0, titles.length),
     'modifiers': []
   },
   {
     'title': `Favorites`,
-    'href': `favorites`,
-    'count': getRandomValueMinMax(0, titles.length),
+    'link': `favorites`,
+    'filmsCount': getRandomValueMinMax(0, titles.length),
     'modifiers': []
   },
   {
     'title': `Stats`,
-    'href': `stats`,
-    'count': userRating,
+    'link': `stats`,
+    'filmsCount': userRating,
     'modifiers': [
       `additional`,
       `active`
@@ -297,27 +297,27 @@ const statisticFilters = [
   {
     attribute: `all-time`,
     title: `All time`,
-    checked: true
+    isChecked: true
   },
   {
     attribute: `today`,
     title: `Today`,
-    checked: false
+    isChecked: false
   },
   {
     attribute: `week`,
     title: `Week`,
-    checked: false
+    isChecked: false
   },
   {
     attribute: `month`,
     title: `Month`,
-    checked: false
+    isChecked: false
   },
   {
     attribute: `year`,
     title: `Year`,
-    checked: false
+    isChecked: false
   }
 ];
 
@@ -326,11 +326,11 @@ const statisticTextList = [
     title: `You watched`,
     texts: [
       {
-        title: userRating,
+        textTitle: userRating,
         isDescription: false
       },
       {
-        title: `movies`,
+        textTitle: `movies`,
         isDescription: true
       }
     ]
@@ -339,19 +339,19 @@ const statisticTextList = [
     title: `Total duration`,
     texts: [
       {
-        title: `130`,
+        textTitle: `130`,
         isDescription: false
       },
       {
-        title: `h`,
+        textTitle: `h`,
         isDescription: true
       },
       {
-        title: `22`,
+        textTitle: `22`,
         isDescription: false
       },
       {
-        title: `m`,
+        textTitle: `m`,
         isDescription: true
       }
     ]
@@ -360,7 +360,7 @@ const statisticTextList = [
     title: `Top genre`,
     texts: [
       {
-        title: genres[getRandomValueMinMax(0, genres.length - 1)],
+        textTitle: genres[getRandomValueMinMax(0, genres.length - 1)],
         isDescription: false
       }
     ]
@@ -368,11 +368,11 @@ const statisticTextList = [
 ];
 
 export {
-  sortType,
+  sortTypes,
   controlsTypes,
   emojiList,
   filmTitles,
-  menuType,
+  menuTypes,
   statisticFilters,
   statisticTextList,
   filmCards,

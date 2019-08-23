@@ -1,15 +1,16 @@
 /**
  * Return template for sorting.
- * @param {object} obj
+ * @param {object} sortType
  * @return {string}
  */
-const getSortTemplate = (obj) => {
-  return Object.keys(obj).map((key) => (
-    `<li>
-      <a href="#" class="sort__button${obj[key] ? ` sort__button--active` : ``}">
-        Sort by ${key}
+const getSortTemplate = (sortType) => {
+  return Object.keys(sortType).map((type) => (`
+    <li>
+      <a href="#" class="sort__button
+      ${sortType[type] ? ` sort__button--active` : ``}">
+        Sort by ${type}
       </a>
-    </li>`.trim())).join(``);
+    </li>`).trim()).join(``);
 };
 
 export {

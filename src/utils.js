@@ -1,11 +1,37 @@
+const KEYS = {
+  'ESC': 27,
+  'ENTER': 13
+};
+
+/**
+ * Add new HTML element.
+ * @param {HTMLElement} container
+ * @param {HTMLElement} template
+ */
+const addElement = (container, template) => {
+  container.appendChild(template);
+};
+
 /**
  * Create new HTML element.
- * @param {HTMLElement} container
  * @param {string} template
- * @param {string} position
+ * @return {HTMLElement}
  */
-const createElement = (container, template, position = `beforeend`) => {
-  container.insertAdjacentHTML(position, template);
+const createElement = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template;
+
+  return newElement;
+};
+
+/**
+ * Remove element.
+ * @param {HTMLElement} element
+ * @return {null}
+ */
+const removeElement = (element) => {
+  element = null;
+  return element;
 };
 
 /**
@@ -30,7 +56,10 @@ const compareRandom = () => {
 };
 
 export {
+  KEYS,
+  addElement,
   createElement,
+  removeElement,
   getRandomValueMinMax,
   compareRandom
 };

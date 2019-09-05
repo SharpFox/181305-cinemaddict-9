@@ -1,46 +1,33 @@
+import ButtonShowMore from './components/button-show-more.js';
+import FilmCard from './components/film-card.js';
+import FilmDetails from './components/film-details.js';
+import FilmList from './components/film-list.js';
+import Footer from './components/footer.js';
+import MainNavigation from './components/main-navigation.js';
+import Profile from './components/profile.js';
+import Search from './components/search.js';
+import Sort from './components/sort.js';
+import Statistic from './components/statistic.js';
 import {
-  getSearchTemplate
-} from './components/search-template.js';
-import {
-  getProfileTemplate
-} from './components/profile-template.js';
-import {
-  getMainNavigationTemplate
-} from './components/main-navigation-template.js';
-import {
-  getSortTemplate
-} from './components/sort-template.js';
-import {
-  getStatisticTemplate
-} from './components/statistic-template.js';
-import {
-  getFilmsListTemplate
-} from './components/film-list-template.js';
-import {
-  getFilmCardTemplate
-} from './components/film-card-template.js';
-import {
-  getFilmDetailsTemplate
-} from './components/film-details-template.js';
-import {
-  getFooterTemplate
-} from './components/footer-template.js';
-import {
-  createElement
+  addElement
 } from './utils.js';
 import {
   sortTypes,
   controlsTypes,
   emojiList,
+  filmLists,
   menuTypes,
   statisticFilters,
   statisticTextList,
-  filmTitles,
-  filmCards,
+  filmsCards,
   countFilmCards,
-  randomFilmCard,
-  userRating
+  userRating,
+  filmsCategoriesId,
+  getFilmsCardsPortion,
 } from './data.js';
+
+let totalFilmPortionNumber = 1;
+const getFilmsCards = getFilmsCardsPortion();
 
 const body = document.querySelector(`body`);
 const header = body.querySelector(`.header`);
@@ -54,50 +41,112 @@ const films = main.querySelector(`.films`);
 const filmsDetails = body.querySelector(`.film-details`);
 const footer = body.querySelector(`.footer`);
 
+const searchComponent = new Search();
+addElement(search, searchComponent.render());
+
+const profileComponent = new Profile(userRating);
+addElement(profile, profileComponent.render());
+
+const mainNavigationComponent = new MainNavigation(menuTypes);
+addElement(mainNavigation, mainNavigationComponent.render());
+
+const statisticComponent = new Statistic(userRating, statisticFilters,
+    statisticTextList);
+addElement(statistic, statisticComponent.render());
+
+const sortComponent = new Sort(sortTypes);
+addElement(sort, sortComponent.render());
+
+/**
+ * Add one card of film.
+ * @param {HTMLElement} filmsListContainer
+ * @param {HTMLElement} filmsListFilmsContainer
+ * @param {object} filmCard
+ */
+const addFilmCard = (filmsListContainer, filmsListFilmsContainer,
+    filmCard) => {
+  const filmCardComponent = new FilmCard(filmCard);
+  const filmDetailsComponent = new FilmDetails(filmCard, controlsTypes,
+      emojiList);
+
+  filmCard.categoriesId.forEach((category) => {
+    if (filmsListContainer.dataset.id === category) {
+      addElement(filmsListFilmsContainer, filmCardComponent.render());
+    }
+  });
+
+  filmCardComponent.onOpen = () => {
+    filmsDetails.classList.remove(`visually-hidden`);
+    addElement(filmsDetails, filmDetailsComponent.render());
+  };
+
+  filmDetailsComponent.onClose = () => {
+    filmsDetails.classList.add(`visually-hidden`);
+    filmsDetails.removeChild(filmDetailsComponent.element);
+    filmDetailsComponent.unrender();
+  };
+};
+
 /**
  * Add cards of film.
+ * @param {string} filmCategory
+ * @param {HTMLElement} filmsListContainer
+ * @param {HTMLElement} filmsListFilmsContainer
  */
-const addFilmsCards = () => {
-  const filmsCards = films.querySelectorAll(`.film-card`);
-  filmsCards.forEach((filmsCard) => {
-    filmsCard.addEventListener(`click`, () => {
-      filmsDetails.classList.remove(`visually-hidden`);
-    });
+const addFilmsCards = (filmCategory, filmsListContainer,
+    filmsListFilmsContainer) => {
+  const filmsCardsPortion = filmCategory === filmsCategoriesId.AllMoviesUpcoming
+    ? getFilmsCards() : filmsCards;
+  filmsCardsPortion.forEach((filmCard) => {
+    addFilmCard(filmsListContainer, filmsListFilmsContainer, filmCard);
   });
 };
-
-createElement(filmsDetails, getFilmDetailsTemplate(randomFilmCard, controlsTypes, emojiList));
-const filmDetailsCloseBtn = filmsDetails.querySelector(`.film-details__close-btn`);
-filmDetailsCloseBtn.addEventListener(`click`, () => {
-  filmsDetails.classList.add(`visually-hidden`);
-});
-
-createElement(search, getSearchTemplate());
-createElement(profile, getProfileTemplate(userRating));
-createElement(mainNavigation, getMainNavigationTemplate(menuTypes));
-createElement(statistic, getStatisticTemplate(userRating, statisticFilters, statisticTextList));
-createElement(sort, getSortTemplate(sortTypes));
-
-filmTitles.forEach((filmTitle) => {
-  createElement(films, getFilmsListTemplate(filmTitle));
-});
-
-addFilmsCards();
-
-const filmsListContainer = films.querySelector(`.films-list`)
-  .querySelector(`.films-list__container`);
-const filmsListShowMore = films.querySelector(`.films-list__show-more`);
 
 /**
- * Add more card.
+ * Add more cards of films.
  */
 const addMoreCards = () => {
-  filmCards.slice(5, 10).forEach((filmCard) => {
-    createElement(filmsListContainer, getFilmCardTemplate(filmCard));
+  const filmsCardsPortion = getFilmsCards();
+  totalFilmPortionNumber += 1;
+  filmsCardsPortion.forEach((filmCardPortion) => {
+    const filmsListContainer = document.getElementById(filmCardPortion.categoriesId[0]);
+    const filmsListFilmsContainer =
+      filmsListContainer.querySelector(`.films-list__container`);
+    addFilmCard(filmsListContainer, filmsListFilmsContainer, filmCardPortion);
   });
-  filmsListShowMore.classList.add(`visually-hidden`);
-  filmsListShowMore.removeEventListener(`click`, addMoreCards);
 };
 
-filmsListShowMore.addEventListener(`click`, addMoreCards);
-createElement(footer, getFooterTemplate(countFilmCards));
+/**
+ * Add film list.
+ * @param {string} filmCategory
+ */
+const addFilmList = (filmCategory) => {
+  const filmsListComponent = new FilmList(filmLists[filmCategory]);
+  addElement(films, filmsListComponent.render());
+  const filmsListElement = filmsListComponent.element.firstElementChild;
+  const filmsListContainer =
+    document.getElementById(filmsListElement.dataset.id);
+  const filmsListFilmsContainer =
+    filmsListContainer.querySelector(`.films-list__container`);
+  addFilmsCards(filmCategory, filmsListContainer, filmsListFilmsContainer);
+
+  if (filmsListElement.dataset.isbutton === `true`) {
+    const buttonShowMoreComponent = new ButtonShowMore();
+    addElement(filmsListContainer, buttonShowMoreComponent.render());
+
+    buttonShowMoreComponent.onOpen = () => {
+      addMoreCards();
+      if (totalFilmPortionNumber === 3) {
+        document.querySelector(`.films-list__show-more`).remove();
+        buttonShowMoreComponent.unrender();
+      }
+    };
+  }
+};
+
+addFilmList(filmsCategoriesId.AllMoviesUpcoming);
+addFilmList(filmsCategoriesId.TopRated);
+addFilmList(filmsCategoriesId.MostCommented);
+
+const footerComponent = new Footer(countFilmCards);
+addElement(footer, footerComponent.render());

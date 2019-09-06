@@ -4,15 +4,6 @@ const KEYS = {
 };
 
 /**
- * Add new HTML element.
- * @param {HTMLElement} container
- * @param {HTMLElement} template
- */
-const addElement = (container, template) => {
-  container.appendChild(template);
-};
-
-/**
  * Create new HTML element.
  * @param {string} template
  * @return {HTMLElement}
@@ -20,8 +11,12 @@ const addElement = (container, template) => {
 const createElement = (template) => {
   const newElement = document.createElement(`div`);
   newElement.innerHTML = template;
-
-  return newElement;
+  const fragment = document.createDocumentFragment();
+  const childrenCount = newElement.childNodes.length;
+  for (let i = 0; i < childrenCount; i++) {
+    fragment.appendChild(newElement.childNodes[0]);
+  }
+  return fragment;
 };
 
 /**
@@ -57,7 +52,6 @@ const compareRandom = () => {
 
 export {
   KEYS,
-  addElement,
   createElement,
   removeElement,
   getRandomValueMinMax,

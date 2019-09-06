@@ -284,21 +284,21 @@ const filmLists = {
     id: filmsCategoriesId.AllMoviesUpcoming,
     isVisuallyHidden: true,
     isExtra: false,
-    isButton: true
+    isButton: `true`
   },
   TopRated: {
     title: filmsCategories.TopRated,
     id: filmsCategoriesId.TopRated,
     isVisuallyHidden: false,
     isExtra: true,
-    isButton: false
+    isButton: ``
   },
   MostCommented: {
     title: filmsCategories.MostCommented,
     id: filmsCategoriesId.MostCommented,
     isVisuallyHidden: false,
     isExtra: true,
-    isButton: false
+    isButton: ``
   }
 };
 

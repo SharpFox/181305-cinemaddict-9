@@ -66,16 +66,16 @@ class ButtonShowMore {
    * Add event for element.
    */
   bind() {
-    this._element.firstElementChild.addEventListener(`click`, this._onOpenButton);
-    this._element.firstElementChild.addEventListener(`keydown`, this._onOpenButton);
+    this._element.addEventListener(`click`, this._onOpenButton);
+    this._element.addEventListener(`keydown`, this._onOpenButton);
   }
 
   /**
    * Remove event for element.
    */
   unbind() {
-    this._element.firstElementChild.removeEventListener(`click`, this._onOpenButton);
-    this._element.firstElementChild.removeEventListener(`keydown`, this._onOpenButton);
+    this._element.removeEventListener(`click`, this._onOpenButton);
+    this._element.removeEventListener(`keydown`, this._onOpenButton);
   }
 
   /**

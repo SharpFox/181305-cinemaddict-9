@@ -4,8 +4,7 @@ import {
 } from './button-show-more-template.js';
 import {
   KEYS,
-  createElement,
-  removeElement
+  createElement
 } from '../utils.js';
 
 /**
@@ -31,6 +30,7 @@ class ButtonShowMore {
 
   /**
    * Return HTML element.
+   * @return {DocumentFragment}
    */
   get element() {
     return this._element;
@@ -59,23 +59,53 @@ class ButtonShowMore {
    */
   unrender() {
     this.unbind();
-    removeElement(this._element);
+    this._element = null;
   }
 
   /**
-   * Add event for element.
+   * Add events for elements.
+   * @param {DocumentFragment} element
    */
-  bind() {
-    this._element.addEventListener(`click`, this._onOpenButton);
-    this._element.addEventListener(`keydown`, this._onOpenButton);
+  bind(element = null) {
+    this._bindOnOpenButton(element === null ? this._element : element);
   }
 
   /**
-   * Remove event for element.
+   * Remove events for elements.
+   * @param {DocumentFragment} element
    */
-  unbind() {
-    this._element.removeEventListener(`click`, this._onOpenButton);
-    this._element.removeEventListener(`keydown`, this._onOpenButton);
+  unbind(element = null) {
+    this._unbindOnOpenButton(element === null ? this._element : element);
+  }
+
+  /**
+   * Return deep clone of element with listeners.
+   * @return {DocumentFragment}
+   */
+  getCloneElement() {
+    const fragment = document.createDocumentFragment();
+    for (let node of this._element.childNodes) {
+      fragment.appendChild(node.cloneNode(true));
+    }
+    return fragment;
+  }
+
+  /**
+   * Add events for open button of element.
+   * @param {DocumentFragment} element
+   */
+  _bindOnOpenButton(element) {
+    element.firstElementChild.addEventListener(`click`, this._onOpenButton);
+    element.firstElementChild.addEventListener(`keydown`, this._onOpenButton);
+  }
+
+  /**
+   * Remove events for open button of element.
+   * @param {DocumentFragment} element
+   */
+  _unbindOnOpenButton(element) {
+    element.firstElementChild.removeEventListener(`click`, this._onOpenButton);
+    element.firstElementChild.removeEventListener(`keydown`, this._onOpenButton);
   }
 
   /**

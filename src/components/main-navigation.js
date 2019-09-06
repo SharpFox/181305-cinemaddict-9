@@ -3,8 +3,7 @@ import {
   getMainNavigationTemplate
 } from './main-navigation-template.js';
 import {
-  createElement,
-  removeElement
+  createElement
 } from '../utils.js';
 
 /**
@@ -30,6 +29,7 @@ class MainNavigation {
 
   /**
    * Return HTML element.
+   * @return {DocumentFragment}
    */
   get element() {
     return this._element;
@@ -48,7 +48,24 @@ class MainNavigation {
    * Delete element.
    */
   unrender() {
-    removeElement(this._element);
+    this._element = null;
+  }
+
+  /**
+   * Add events for element.
+   */
+  bind() {}
+
+  /**
+   * Return deep clone of element with listeners.
+   * @return {DocumentFragment}
+   */
+  getCloneElement() {
+    const fragment = document.createDocumentFragment();
+    for (let node of this._element.childNodes) {
+      fragment.appendChild(node.cloneNode(true));
+    }
+    return fragment;
   }
 }
 

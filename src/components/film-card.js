@@ -4,8 +4,7 @@ import {
 } from './film-card-template.js';
 import {
   KEYS,
-  createElement,
-  removeElement
+  createElement
 } from '../utils.js';
 
 /**
@@ -42,6 +41,7 @@ class FilmCard {
 
   /**
    * Return HTML element.
+   * @return {DocumentFragment}
    */
   get element() {
     return this._element;
@@ -70,23 +70,53 @@ class FilmCard {
    */
   unrender() {
     this.unbind();
-    removeElement(this._element);
+    this._element = null;
   }
 
   /**
-   * Add event for element.
+   * Add events for elements.
+   * @param {DocumentFragment} element
    */
-  bind() {
-    this._element.firstElementChild.addEventListener(`click`, this._onOpenDetails);
-    this._element.firstElementChild.addEventListener(`keydown`, this._onOpenDetails);
+  bind(element = null) {
+    this._bindOnOpenDetails(element === null ? this._element : element);
   }
 
   /**
-   * Remove event for element.
+   * Remove events for elements.
+   * @param {DocumentFragment} element
    */
-  unbind() {
-    this._element.firstElementChild.removeElement(`click`, this._onOpenDetails);
-    this._element.firstElementChild.removeElement(`keydown`, this._onOpenDetails);
+  unbind(element = null) {
+    this._unbindOnOpenDetails(element === null ? this._element : element);
+  }
+
+  /**
+   * Return deep clone of element with listeners.
+   * @return {DocumentFragment}
+   */
+  getCloneElement() {
+    const fragment = document.createDocumentFragment();
+    for (let node of this._element.childNodes) {
+      fragment.appendChild(node.cloneNode(true));
+    }
+    return fragment;
+  }
+
+  /**
+   * Add events for open details of element.
+   * @param {DocumentFragment} element
+   */
+  _bindOnOpenDetails(element) {
+    element.firstElementChild.addEventListener(`click`, this._onOpenDetails);
+    element.firstElementChild.addEventListener(`keydown`, this._onOpenDetails);
+  }
+
+  /**
+   * Remove events for open details of element.
+   * @param {DocumentFragment} element
+   */
+  _unbindOnOpenDetails(element) {
+    element.firstElementChild.removeEventListener(`click`, this._onOpenDetails);
+    element.firstElementChild.removeEventListener(`keydown`, this._onOpenDetails);
   }
 
   /**

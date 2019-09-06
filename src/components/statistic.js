@@ -3,8 +3,7 @@ import {
   getStatisticTemplate
 } from './statistic-template.js';
 import {
-  createElement,
-  removeElement
+  createElement
 } from '../utils.js';
 
 /**
@@ -35,6 +34,7 @@ class Statistic {
 
   /**
    * Return HTML element.
+   * @return {DocumentFragment}
    */
   get element() {
     return this._element;
@@ -53,7 +53,24 @@ class Statistic {
    * Delete element.
    */
   unrender() {
-    removeElement(this._element);
+    this._element = null;
+  }
+
+  /**
+   * Add events for element.
+   */
+  bind() {}
+
+  /**
+   * Return deep clone of element with listeners.
+   * @return {DocumentFragment}
+   */
+  getCloneElement() {
+    const fragment = document.createDocumentFragment();
+    for (let node of this._element.childNodes) {
+      fragment.appendChild(node.cloneNode(true));
+    }
+    return fragment;
   }
 }
 

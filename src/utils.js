@@ -4,6 +4,18 @@ const KEYS = {
 };
 
 /**
+ * Add cloned of component element to DOM.
+ * @param {HTMLElement} container
+ * @param {class} component
+ */
+const addElementDOM = (container, component) => {
+  component.render();
+  const cloneElement = component.getCloneElement();
+  component.bind(cloneElement);
+  container.append(cloneElement);
+};
+
+/**
  * Create new HTML element.
  * @param {string} template
  * @return {HTMLElement}
@@ -17,16 +29,6 @@ const createElement = (template) => {
     fragment.appendChild(newElement.childNodes[0]);
   }
   return fragment;
-};
-
-/**
- * Remove element.
- * @param {HTMLElement} element
- * @return {null}
- */
-const removeElement = (element) => {
-  element = null;
-  return element;
 };
 
 /**
@@ -53,7 +55,7 @@ const compareRandom = () => {
 export {
   KEYS,
   createElement,
-  removeElement,
   getRandomValueMinMax,
-  compareRandom
+  compareRandom,
+  addElementDOM
 };

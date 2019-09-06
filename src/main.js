@@ -9,6 +9,9 @@ import Search from './components/search.js';
 import Sort from './components/sort.js';
 import Statistic from './components/statistic.js';
 import {
+  addElementDOM
+} from './utils.js';
+import {
   sortTypes,
   controlsTypes,
   emojiList,
@@ -39,20 +42,20 @@ const filmsDetails = body.querySelector(`.film-details`);
 const footer = body.querySelector(`.footer`);
 
 const searchComponent = new Search();
-search.appendChild(searchComponent.render());
+addElementDOM(search, searchComponent);
 
 const profileComponent = new Profile(userRating);
-profile.appendChild(profileComponent.render());
+addElementDOM(profile, profileComponent);
 
 const mainNavigationComponent = new MainNavigation(menuTypes);
-mainNavigation.appendChild(mainNavigationComponent.render());
+addElementDOM(mainNavigation, mainNavigationComponent);
 
 const statisticComponent = new Statistic(userRating, statisticFilters,
     statisticTextList);
-statistic.appendChild(statisticComponent.render());
+addElementDOM(statistic, statisticComponent);
 
 const sortComponent = new Sort(sortTypes);
-sort.appendChild(sortComponent.render());
+addElementDOM(sort, sortComponent);
 
 /**
  * Add one card of film.
@@ -68,18 +71,18 @@ const addFilmCard = (filmsListContainer, filmsListFilmsContainer,
 
   filmCard.categoriesId.forEach((category) => {
     if (filmsListContainer.dataset.id === category) {
-      filmsListFilmsContainer.appendChild(filmCardComponent.render());
+      addElementDOM(filmsListFilmsContainer, filmCardComponent);
     }
   });
 
   filmCardComponent.onOpen = () => {
     filmsDetails.classList.remove(`visually-hidden`);
-    filmsDetails.appendChild(filmDetailsComponent.render());
+    addElementDOM(filmsDetails, filmDetailsComponent);
   };
 
   filmDetailsComponent.onClose = () => {
     filmsDetails.classList.add(`visually-hidden`);
-    filmsDetails.removeChild(filmDetailsComponent.element);
+    filmsDetails.firstElementChild.remove();
     filmDetailsComponent.unrender();
   };
 };
@@ -119,7 +122,7 @@ const addMoreCards = () => {
  */
 const createButtonShowMore = (filmsListContainer) => {
   const buttonShowMoreComponent = new ButtonShowMore();
-  filmsListContainer.appendChild(buttonShowMoreComponent.render());
+  addElementDOM(filmsListContainer, buttonShowMoreComponent);
 
   buttonShowMoreComponent.onOpen = () => {
     addMoreCards();
@@ -136,7 +139,7 @@ const createButtonShowMore = (filmsListContainer) => {
  * @return {HTMLElement}
  */
 const getFilmsListContainer = (filmsListElement) => {
-  return document.getElementById(filmsListElement.dataset.id);
+  return document.getElementById(filmsListElement.firstElementChild.dataset.id);
 };
 
 /**
@@ -154,7 +157,7 @@ const getFilmsListFilmsContainer = (filmsListContainer) => {
  */
 const addFilmList = (filmCategory) => {
   const filmsListComponent = new FilmList(filmLists[filmCategory]);
-  films.append(filmsListComponent.render());
+  addElementDOM(films, filmsListComponent);
 
   const filmsListElement = filmsListComponent.element;
   const filmsListContainer = getFilmsListContainer(filmsListElement);
@@ -162,7 +165,7 @@ const addFilmList = (filmCategory) => {
 
   addFilmsCards(filmCategory, filmsListContainer, filmsListFilmsContainer);
 
-  if (filmsListElement.dataset.isbutton) {
+  if (filmsListElement.firstElementChild.dataset.isbutton) {
     createButtonShowMore(filmsListContainer);
   }
 };
@@ -172,4 +175,4 @@ addFilmList(filmsCategoriesId.TopRated);
 addFilmList(filmsCategoriesId.MostCommented);
 
 const footerComponent = new Footer(countFilmCards);
-footer.appendChild(footerComponent.render());
+addElementDOM(footer, footerComponent);

@@ -4,8 +4,7 @@ import {
 } from './film-details-template.js';
 import {
   KEYS,
-  createElement,
-  removeElement
+  createElement
 } from '../utils.js';
 
 /**
@@ -52,6 +51,7 @@ class FilmDetails {
 
   /**
    * Return HTML element.
+   * @return {DocumentFragment}
    */
   get element() {
     return this._element;
@@ -80,23 +80,53 @@ class FilmDetails {
    */
   unrender() {
     this.unbind();
-    removeElement(this._element);
+    this._element = null;
   }
 
   /**
-   * Add event for element.
+   * Add events for elements.
+   * @param {DocumentFragment} element
    */
-  bind() {
-    const buttonContainer = this._element.querySelector(`.film-details__close-btn`);
+  bind(element = null) {
+    this._bindOnCloseButton(element === null ? this._element : element);
+  }
+
+  /**
+   * Remove events for elements.
+   * @param {DocumentFragment} element
+   */
+  unbind(element = null) {
+    this._unbindOnCloseButton(element === null ? this._element : element);
+  }
+
+  /**
+   * Return deep clone of element with listeners.
+   * @return {DocumentFragment}
+   */
+  getCloneElement() {
+    const fragment = document.createDocumentFragment();
+    for (let node of this._element.childNodes) {
+      fragment.appendChild(node.cloneNode(true));
+    }
+    return fragment;
+  }
+
+  /**
+   * Add events for close button of element.
+   * @param {DocumentFragment} element
+   */
+  _bindOnCloseButton(element) {
+    const buttonContainer = element.querySelector(`.film-details__close-btn`);
     buttonContainer.addEventListener(`click`, this._onCloseButton);
     buttonContainer.addEventListener(`keydown`, this._onCloseButton);
   }
 
   /**
-   * Remove event for element.
+   * Remove events for close button of element.
+   * @param {DocumentFragment} element
    */
-  unbind() {
-    const buttonContainer = this._element.querySelector(`.film-details__close-btn`);
+  _unbindOnCloseButton(element) {
+    const buttonContainer = element.querySelector(`.film-details__close-btn`);
     buttonContainer.removeEventListener(`click`, this._onCloseButton);
     buttonContainer.removeEventListener(`keydown`, this._onCloseButton);
   }

@@ -2,21 +2,20 @@
 import {
   getSortTemplate
 } from './sort-template.js';
-import {
-  createElement
-} from '../utils.js';
+import AbstractComponent from './abstract-component.js';
 
 /**
  * Class representaing sort.
+ * @extends AbstractComponent
  */
-class Sort {
+class Sort extends AbstractComponent {
   /**
    * Create sort.
    * @param {object} sortType
    */
   constructor(sortType) {
+    super();
     this._sortType = sortType;
-    this._element = null;
   }
 
   /**
@@ -25,47 +24,6 @@ class Sort {
    */
   get template() {
     return getSortTemplate(this._sortType);
-  }
-
-  /**
-   * Return HTML element.
-   * @return {DocumentFragment}
-   */
-  get element() {
-    return this._element;
-  }
-
-  /**
-   * Return result of create new element.
-   * @return {HTMLElement}
-   */
-  render() {
-    this._element = createElement(this.template);
-    return this._element;
-  }
-
-  /**
-   * Delete element.
-   */
-  unrender() {
-    this._element = null;
-  }
-
-  /**
-   * Add events for element.
-   */
-  bind() {}
-
-  /**
-   * Return deep clone of element with listeners.
-   * @return {DocumentFragment}
-   */
-  getCloneElement() {
-    const fragment = document.createDocumentFragment();
-    for (let node of this._element.childNodes) {
-      fragment.appendChild(node.cloneNode(true));
-    }
-    return fragment;
   }
 }
 

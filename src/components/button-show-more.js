@@ -3,19 +3,20 @@ import {
   getButtonShowMoreTemplate
 } from './button-show-more-template.js';
 import {
-  KEYS,
-  createElement
+  KEYS
 } from '../utils.js';
+import AbstractComponent from './abstract-component.js';
 
 /**
  * Class representaing button "Show more".
+ * @extends AbstractComponent
  */
-class ButtonShowMore {
+class ButtonShowMore extends AbstractComponent {
   /**
    * Create button "Showe more".
    */
   constructor() {
-    this._element = null;
+    super();
     this._onOpen = null;
     this._onOpenButton = this._onOpenButton.bind(this);
   }
@@ -29,37 +30,11 @@ class ButtonShowMore {
   }
 
   /**
-   * Return HTML element.
-   * @return {DocumentFragment}
-   */
-  get element() {
-    return this._element;
-  }
-
-  /**
    * Save the function.
    * @param {function} fn
    */
   set onOpen(fn) {
     this._onOpen = fn;
-  }
-
-  /**
-   * Return result of create new element.
-   * @return {HTMLElement}
-   */
-  render() {
-    this._element = createElement(this.template);
-    this.bind();
-    return this._element;
-  }
-
-  /**
-   * Delete element.
-   */
-  unrender() {
-    this.unbind();
-    this._element = null;
   }
 
   /**
@@ -76,18 +51,6 @@ class ButtonShowMore {
    */
   unbind(element = null) {
     this._unbindOnOpenButton(element === null ? this._element : element);
-  }
-
-  /**
-   * Return deep clone of element with listeners.
-   * @return {DocumentFragment}
-   */
-  getCloneElement() {
-    const fragment = document.createDocumentFragment();
-    for (let node of this._element.childNodes) {
-      fragment.appendChild(node.cloneNode(true));
-    }
-    return fragment;
   }
 
   /**

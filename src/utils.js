@@ -1,11 +1,34 @@
+const KEYS = {
+  'ESC': 27,
+  'ENTER': 13
+};
+
+/**
+ * Add cloned of component element to DOM.
+ * @param {HTMLElement} container
+ * @param {class} component
+ */
+const addElementDOM = (container, component) => {
+  component.render();
+  const cloneElement = component.getCloneElement();
+  component.bind(cloneElement);
+  container.append(cloneElement);
+};
+
 /**
  * Create new HTML element.
- * @param {HTMLElement} container
  * @param {string} template
- * @param {string} position
+ * @return {HTMLElement}
  */
-const createElement = (container, template, position = `beforeend`) => {
-  container.insertAdjacentHTML(position, template);
+const createElement = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template;
+  const fragment = document.createDocumentFragment();
+  const childrenCount = newElement.childNodes.length;
+  for (let i = 0; i < childrenCount; i++) {
+    fragment.appendChild(newElement.childNodes[0]);
+  }
+  return fragment;
 };
 
 /**
@@ -30,7 +53,9 @@ const compareRandom = () => {
 };
 
 export {
+  KEYS,
   createElement,
   getRandomValueMinMax,
-  compareRandom
+  compareRandom,
+  addElementDOM
 };

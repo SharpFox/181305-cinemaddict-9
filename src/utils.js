@@ -62,7 +62,7 @@ const removeContainerChildren = (container) => {
   for (let i = 0; i < totalChildren; i++) {
     children[0].remove();
   }
-}
+};
 
 export {
   KEYS,

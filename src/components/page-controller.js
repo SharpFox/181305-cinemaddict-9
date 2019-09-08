@@ -180,10 +180,10 @@ class PageController {
    * @param {object} filmCard
    */
   _addFilmCard(filmsListContainer, filmsListFilmsContainer,
-    filmCard) {
+      filmCard) {
     const filmCardComponent = new FilmCard(filmCard);
     const filmDetailsComponent = new FilmDetails(filmCard, controlsTypes,
-      emojiList);
+        emojiList);
 
     filmCard.categoriesId.forEach((category) => {
       if (filmsListContainer.dataset.id === category) {
@@ -210,7 +210,7 @@ class PageController {
     * @param {HTMLElement} filmsListFilmsContainer
     */
   _addFilmsCards(filmsCardsPortion, filmsListContainer,
-    filmsListFilmsContainer) {
+      filmsListFilmsContainer) {
     filmsCardsPortion.forEach((filmCard) => {
       this._addFilmCard(filmsListContainer, filmsListFilmsContainer, filmCard);
     });

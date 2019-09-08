@@ -2,28 +2,26 @@
 import {
   getFilmsListTemplate
 } from './film-list-template.js';
-import {
-  createElement
-} from '../utils.js';
+import AbstractComponent from './abstract-component.js';
 
 /**
  * Class representaing film list.
+ * @extends AbstractComponent
  */
-class FilmList {
+class FilmList extends AbstractComponent {
   /**
    * Create film list.
    * @param {object} filmTitle
    */
   constructor({isExtra, isVisuallyHidden, title, films,
     isButton, id}) {
+    super();
     this._isExtra = isExtra;
     this._isVisuallyHidden = isVisuallyHidden;
     this._title = title;
     this._films = films;
     this._isButton = isButton;
     this._id = id;
-
-    this._element = null;
   }
 
   /**
@@ -32,47 +30,6 @@ class FilmList {
    */
   get template() {
     return getFilmsListTemplate(this);
-  }
-
-  /**
-   * Return HTML element.
-   * @return {DocumentFragment}
-   */
-  get element() {
-    return this._element;
-  }
-
-  /**
-   * Return result of create new element.
-   * @return {HTMLElement}
-   */
-  render() {
-    this._element = createElement(this.template);
-    return this._element;
-  }
-
-  /**
-   * Delete element.
-   */
-  unrender() {
-    this._element = null;
-  }
-
-  /**
-   * Add events for element.
-   */
-  bind() {}
-
-  /**
-   * Return deep clone of element with listeners.
-   * @return {DocumentFragment}
-   */
-  getCloneElement() {
-    const fragment = document.createDocumentFragment();
-    for (let node of this._element.childNodes) {
-      fragment.appendChild(node.cloneNode(true));
-    }
-    return fragment;
   }
 }
 

@@ -3,20 +3,22 @@ import {
   getFilmCardTemplate
 } from './film-card-template.js';
 import {
-  KEYS,
-  createElement
+  KEYS
 } from '../utils.js';
+import AbstractComponent from './abstract-component.js';
 
 /**
  * Class representaing film card.
+ * @extends AbstractComponent
  */
-class FilmCard {
+class FilmCard extends AbstractComponent {
   /**
    * Create film card.
    * @param {object} filmCard
    */
   constructor({title, rating, year, duration, genres, img,
     description, countComments}) {
+    super();
     this._title = title;
     this._rating = rating;
     this._year = year;
@@ -26,7 +28,6 @@ class FilmCard {
     this._description = description;
     this._countComments = countComments;
 
-    this._element = null;
     this._onOpen = null;
     this._onOpenDetails = this._onOpenDetails.bind(this);
   }
@@ -40,37 +41,11 @@ class FilmCard {
   }
 
   /**
-   * Return HTML element.
-   * @return {DocumentFragment}
-   */
-  get element() {
-    return this._element;
-  }
-
-  /**
    * Save the function.
    * @param {function} fn
    */
   set onOpen(fn) {
     this._onOpen = fn;
-  }
-
-  /**
-   * Return result of create new element.
-   * @return {HTMLElement}
-   */
-  render() {
-    this._element = createElement(this.template);
-    this.bind();
-    return this._element;
-  }
-
-  /**
-   * Delete element.
-   */
-  unrender() {
-    this.unbind();
-    this._element = null;
   }
 
   /**
@@ -87,18 +62,6 @@ class FilmCard {
    */
   unbind(element = null) {
     this._unbindOnOpenDetails(element === null ? this._element : element);
-  }
-
-  /**
-   * Return deep clone of element with listeners.
-   * @return {DocumentFragment}
-   */
-  getCloneElement() {
-    const fragment = document.createDocumentFragment();
-    for (let node of this._element.childNodes) {
-      fragment.appendChild(node.cloneNode(true));
-    }
-    return fragment;
   }
 
   /**

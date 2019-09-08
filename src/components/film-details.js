@@ -3,14 +3,15 @@ import {
   getFilmDetailsTemplate
 } from './film-details-template.js';
 import {
-  KEYS,
-  createElement
+  KEYS
 } from '../utils.js';
+import AbstractComponent from './abstract-component.js';
 
 /**
  * Class representaing film details.
+ * @extends AbstractComponent
  */
-class FilmDetails {
+class FilmDetails extends AbstractComponent {
   /**
    * Create film details.
    * @param {object} filmCard
@@ -20,6 +21,7 @@ class FilmDetails {
   constructor({img, age, title, rating, director, writers,
     actors, year, duration, country, genres, description, comments},
   controlsTypes, emojiList) {
+    super();
     this._img = img;
     this._age = age;
     this._title = title;
@@ -36,7 +38,6 @@ class FilmDetails {
     this._controlsTypes = controlsTypes;
     this._emojiList = emojiList;
 
-    this._element = null;
     this._onClose = null;
     this._onCloseButton = this._onCloseButton.bind(this);
   }
@@ -50,37 +51,11 @@ class FilmDetails {
   }
 
   /**
-   * Return HTML element.
-   * @return {DocumentFragment}
-   */
-  get element() {
-    return this._element;
-  }
-
-  /**
    * Save the function.
    * @param {function} fn
    */
   set onClose(fn) {
     this._onClose = fn;
-  }
-
-  /**
-   * Return result of create new element.
-   * @return {HTMLElement}
-   */
-  render() {
-    this._element = createElement(this.template);
-    this.bind();
-    return this._element;
-  }
-
-  /**
-   * Delete element.
-   */
-  unrender() {
-    this.unbind();
-    this._element = null;
   }
 
   /**
@@ -97,18 +72,6 @@ class FilmDetails {
    */
   unbind(element = null) {
     this._unbindOnCloseButton(element === null ? this._element : element);
-  }
-
-  /**
-   * Return deep clone of element with listeners.
-   * @return {DocumentFragment}
-   */
-  getCloneElement() {
-    const fragment = document.createDocumentFragment();
-    for (let node of this._element.childNodes) {
-      fragment.appendChild(node.cloneNode(true));
-    }
-    return fragment;
   }
 
   /**

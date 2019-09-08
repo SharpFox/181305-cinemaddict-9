@@ -3,13 +3,11 @@ import Footer from './components/footer.js';
 import MainNavigation from './components/main-navigation.js';
 import Profile from './components/profile.js';
 import Search from './components/search.js';
-import Sort from './components/sort.js';
 import Statistic from './components/statistic.js';
 import {
   addElementDOM
 } from './utils.js';
 import {
-  sortTypes,
   menuTypes,
   statisticFilters,
   statisticTextList,
@@ -42,11 +40,8 @@ const statisticComponent = new Statistic(userRating, statisticFilters,
     statisticTextList);
 addElementDOM(statistic, statisticComponent);
 
-const sortComponent = new Sort(sortTypes);
-addElementDOM(sort, sortComponent);
-
-const pageControllerComponent = new PageController(films, filmsDetails);
-pageControllerComponent.init();
+const pageController = new PageController(films, filmsDetails, sort);
+pageController.init();
 
 const footerComponent = new Footer(countFilmCards);
 addElementDOM(footer, footerComponent);

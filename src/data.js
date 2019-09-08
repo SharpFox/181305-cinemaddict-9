@@ -9,6 +9,12 @@ const sortTypes = {
   rating: false
 };
 
+const sortTypesId = {
+  default: `default`,
+  date: `date`,
+  rating: `rating`
+};
+
 const controlsTypes = {
   watchlist: `Add to watchlist`,
   watched: `Already watched`,
@@ -414,6 +420,7 @@ const statisticTextList = [
 
 export {
   sortTypes,
+  sortTypesId,
   controlsTypes,
   emojiList,
   filmLists,

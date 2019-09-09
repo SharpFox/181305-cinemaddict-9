@@ -52,10 +52,23 @@ const compareRandom = () => {
   return Math.random() - 0.5;
 };
 
+/**
+  * Remove children in container.
+  * @param {HTMLElement} container
+  */
+const removeContainerChildren = (container) => {
+  const children = container.childNodes;
+  const totalChildren = children.length;
+  for (let i = 0; i < totalChildren; i++) {
+    children[0].remove();
+  }
+};
+
 export {
   KEYS,
   createElement,
   getRandomValueMinMax,
   compareRandom,
-  addElementDOM
+  addElementDOM,
+  removeContainerChildren
 };

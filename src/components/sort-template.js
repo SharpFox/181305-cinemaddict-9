@@ -3,14 +3,14 @@
  * @param {object} sortType
  * @return {string}
  */
-const getSortTemplate = (sortType) => {
-  return Object.keys(sortType).map((type) => (`
+const getSortTemplate = ([sortType, isActive]) => {
+  return `
     <li>
-      <a href="#" class="sort__button
-      ${sortType[type] ? ` sort__button--active` : ``}">
-        Sort by ${type}
+      <a href="#" data-sorttype="${sortType}" class="sort__button
+      ${isActive ? ` sort__button--active` : ``}">
+        Sort by ${sortType}
       </a>
-    </li>`).trim()).join(``);
+    </li>`;
 };
 
 export {

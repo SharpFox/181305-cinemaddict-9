@@ -61,31 +61,35 @@ class PageController {
         const currentCountFilmsCards = filmsListFilmsContainer.children.length;
         const filmsCardsForSort = this._getFilmsCardsForSort(currentCountFilmsCards);
         const currentSortType = sortComponent.getSortType();
-        switch (currentSortType) {
-          case sortTypesId.date:
-            removeContainerChildren(filmsListFilmsContainer);
-            filmsCardsForSort.sort((firstFilmCard, secondFilmCard) => {
-              return secondFilmCard.year - firstFilmCard.year;
-            });
-            this._addFilmsCards(filmsCardsForSort, filmsListContainer, filmsListFilmsContainer);
-            this._changeActiveSort(sortComponent);
-            break;
-          case sortTypesId.rating:
-            removeContainerChildren(filmsListFilmsContainer);
-            filmsCardsForSort.sort((firstFilmCard, secondFilmCard) => {
-              return secondFilmCard.rating - firstFilmCard.rating;
-            });
-            this._addFilmsCards(filmsCardsForSort, filmsListContainer, filmsListFilmsContainer);
-            this._changeActiveSort(sortComponent);
-            break;
-          default:
-            removeContainerChildren(filmsListFilmsContainer);
-            this._addFilmsCards(filmsCardsForSort, filmsListContainer, filmsListFilmsContainer);
-            this._changeActiveSort(sortComponent);
-            break;
-        }
+
+        removeContainerChildren(filmsListFilmsContainer);
+        this._sortFilmsCards(filmsCardsForSort, currentSortType);
+        this._addFilmsCards(filmsCardsForSort, filmsListContainer, filmsListFilmsContainer);
+        this._changeActiveSort(sortComponent);
       };
     });
+  }
+
+  /**
+   * Sort films card.
+   * @param {array} filmsCardsForSort
+   * @param {string} currentSortType
+   */
+  _sortFilmsCards(filmsCardsForSort, currentSortType) {
+    switch (currentSortType) {
+      case sortTypesId.date:
+        filmsCardsForSort.sort((firstFilmCard, secondFilmCard) => {
+          return secondFilmCard.year - firstFilmCard.year;
+        });
+        break;
+      case sortTypesId.rating:
+        filmsCardsForSort.sort((firstFilmCard, secondFilmCard) => {
+          return secondFilmCard.rating - firstFilmCard.rating;
+        });
+        break;
+      default:
+        break;
+    }
   }
 
   /**

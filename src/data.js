@@ -15,12 +15,6 @@ const sortTypesId = {
   rating: `rating`
 };
 
-const controlsTypes = {
-  watchlist: `Add to watchlist`,
-  watched: `Already watched`,
-  favorite: `Add to favorites`,
-};
-
 const genres = [
   `Drama`,
   `Mystery`,
@@ -183,6 +177,26 @@ const comments = [
   }
 ];
 
+const filmDetailsControlsTypes = {
+  watchlist: `Add to watchlist`,
+  watched: `Already watched`,
+  favorite: `Add to favorites`
+};
+
+const filmCardControlsTypes = {
+  watchlist: `add-to-watchlist`,
+  watched: `mark-as-watched`,
+  favorite: `favorite`
+};
+
+const filmControlsTypesId = {
+  watchlist: `watchlist`,
+  watched: `watched`,
+  favorite: `favorite`
+};
+
+const ratingScales = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
 const filmsCategories = {
   AllMoviesUpcoming: `All movies. Upcoming`,
   TopRated: `Top rated`,
@@ -196,12 +210,31 @@ const filmsCategoriesId = {
 };
 
 /**
+ * Return comments for film.
+ * @return {array}
+ */
+const getComments = () => {
+  return comments.sort(compareRandom).slice(0,
+      getRandomValueMinMax(1, comments.length - 1));
+};
+
+/**
+ * Return random film control types.
+ * @return {object}
+ */
+const getFilmControlsTypes = () => {
+  const filmControlsTypesKeys = Object.keys(filmDetailsControlsTypes);
+  return filmControlsTypesKeys.sort(compareRandom)
+      .slice(0, getRandomValueMinMax(1, filmControlsTypesKeys.length - 1));
+};
+
+/**
  * Return random rating for interval from 1 to 10.
  * @return {number}
  */
 const getRating = () => {
-  const rating = getRandomValueMinMax(1, 10, 1);
-  return rating > 10 ? Math.floor(rating) : rating;
+  const rating = getRandomValueMinMax(1, 9, 1);
+  return rating > 9 ? Math.floor(rating) : rating;
 };
 
 /**
@@ -209,7 +242,7 @@ const getRating = () => {
  * @return {array}
  */
 const getFilmCategoriesId = () => {
-  const categoriesId = [];
+  let categoriesId = [];
   categoriesId.push(filmsCategoriesId.AllMoviesUpcoming);
   if (getRandomValueMinMax(0, 1)) {
     categoriesId.push(Object.entries(filmsCategoriesId)
@@ -220,21 +253,25 @@ const getFilmCategoriesId = () => {
 
 /**
  * Return card of film.
+ * @param {number} id
  * @return {object}
  */
-const getFilmCard = () => {
+const getFilmCard = (id) => {
+  const filmComments = getComments();
   return {
+    id,
     genres: genres.sort(compareRandom).slice(0,
         getRandomValueMinMax(1, genres.length - 1)),
     year: years[getRandomValueMinMax(0, years.length - 1)],
     title: titles[getRandomValueMinMax(0, titles.length - 1)],
     rating: getRating(),
+    userRating: getRating(),
     duration: durationList[getRandomValueMinMax(0, durationList.length - 1)],
     img: `./images/posters/`
       + posters[getRandomValueMinMax(0, posters.length - 1)],
     description: descriptions.sort(compareRandom).slice(0,
         getRandomValueMinMax(1, descriptions.length - 1)),
-    countComments: getRandomValueMinMax(0, 465),
+    comments: filmComments,
     age: getRandomValueMinMax(6, 18),
     director: directors[getRandomValueMinMax(0, directors.length - 1)],
     writers: writers.sort(compareRandom).slice(0,
@@ -242,9 +279,8 @@ const getFilmCard = () => {
     actors: actors.sort(compareRandom).slice(0,
         getRandomValueMinMax(1, actors.length - 1)),
     country: countries[getRandomValueMinMax(0, countries.length - 1)],
-    comments: comments.sort(compareRandom).slice(0,
-        getRandomValueMinMax(1, comments.length - 1)),
-    categoriesId: getFilmCategoriesId()
+    categoriesId: getFilmCategoriesId(),
+    controlsTypes: getFilmControlsTypes()
   };
 };
 
@@ -256,7 +292,7 @@ const getFilmCard = () => {
 const getFilmCards = (filmsCount) => {
   const filmCards = [];
   for (let i = 0; i < filmsCount; i++) {
-    filmCards.push(getFilmCard());
+    filmCards.push(getFilmCard(i));
   }
   return filmCards;
 };
@@ -281,7 +317,69 @@ const getFilmsCardsPortion = () => {
   };
 };
 
-const userRating = getRandomValueMinMax(0, titles.length);
+/**
+ * Return amount of watched films.
+ * @return {number}
+ */
+const getWatchedFilmsAmount = () => {
+  let filmsAmount = 0;
+  filmsCards.forEach((filmCard) => {
+    filmCard.controlsTypes.forEach((controlType) => {
+      if (controlType === filmControlsTypesId.watched) {
+        filmsAmount++;
+      }
+    });
+  });
+  return filmsAmount;
+};
+
+/**
+ * Return a top genre.
+ * @return {string}
+ */
+const getTopGenre = () => {
+  let topGenre = null;
+  const allGenres = [];
+  filmsCards.forEach((filmCard) => {
+    filmCard.genres.forEach((genre) => allGenres.push(genre));
+  });
+  const uniqGenres = {};
+  allGenres.forEach((genre) => {
+    if (uniqGenres[genre] === undefined) {
+      uniqGenres[genre] = 1;
+    } else {
+      uniqGenres[genre]++;
+    }
+  });
+  const maxGenreAmount = Math.max(...Object.values(uniqGenres));
+  const uniqGenresTotal = Object.entries(uniqGenres);
+  for (let [genre, amount] of uniqGenresTotal) {
+    if (amount === maxGenreAmount) {
+      topGenre = genre;
+      break;
+    }
+  }
+  return topGenre;
+};
+
+/**
+ * Return object of films amount by categories.
+ * @param {string} category
+ * @return {number}
+ */
+const getFilmsAmountByCategories = (category) => {
+  let filmsAmount = 0;
+  filmsCards.forEach((filmCard) => {
+    filmCard.controlsTypes.forEach((controlType) => {
+      if (controlType === category) {
+        filmsAmount++;
+      }
+    });
+  });
+  return filmsAmount;
+};
+
+const userTotalRating = getWatchedFilmsAmount();
 const countFilmCards = filmsCards.length;
 
 const filmLists = {
@@ -308,38 +406,50 @@ const filmLists = {
   }
 };
 
+const menuTypesId = {
+  'all': `all`,
+  'watchlist': `watchlist`,
+  'history': `history`,
+  'favorites': `favorites`,
+  'stats': `stats`
+};
+
 const menuTypes = [
   {
     'title': `All movies`,
-    'link': `all`,
-    'filmsCount': getRandomValueMinMax(0, titles.length),
+    'id': menuTypesId.all,
+    'isActive': true,
+    'filmsCount': countFilmCards,
     'modifiers': []
   },
   {
     'title': `Watchlist`,
-    'link': `watchlist`,
-    'filmsCount': getRandomValueMinMax(0, titles.length),
+    'id': menuTypesId.watchlist,
+    'isActive': false,
+    'filmsCount': getFilmsAmountByCategories(filmControlsTypesId.watchlist),
     'modifiers': []
   },
   {
     'title': `History`,
-    'link': `history`,
-    'filmsCount': getRandomValueMinMax(0, titles.length),
+    'id': menuTypesId.history,
+    'isActive': false,
+    'filmsCount': getFilmsAmountByCategories(filmControlsTypesId.watched),
     'modifiers': []
   },
   {
     'title': `Favorites`,
-    'link': `favorites`,
-    'filmsCount': getRandomValueMinMax(0, titles.length),
+    'id': menuTypesId.favorites,
+    'isActive': false,
+    'filmsCount': getFilmsAmountByCategories(filmControlsTypesId.favorite),
     'modifiers': []
   },
   {
     'title': `Stats`,
-    'link': `stats`,
-    'filmsCount': userRating,
+    'id': menuTypesId.stats,
+    'isActive': false,
+    'filmsCount': 0,
     'modifiers': [
-      `additional`,
-      `active`
+      `additional`
     ]
   }
 ];
@@ -377,7 +487,7 @@ const statisticTextList = [
     title: `You watched`,
     texts: [
       {
-        textTitle: userRating,
+        textTitle: getWatchedFilmsAmount(),
         isDescription: false
       },
       {
@@ -411,7 +521,7 @@ const statisticTextList = [
     title: `Top genre`,
     texts: [
       {
-        textTitle: genres[getRandomValueMinMax(0, genres.length - 1)],
+        textTitle: getTopGenre(),
         isDescription: false
       }
     ]
@@ -421,15 +531,19 @@ const statisticTextList = [
 export {
   sortTypes,
   sortTypesId,
-  controlsTypes,
+  filmCardControlsTypes,
+  filmDetailsControlsTypes,
+  filmControlsTypesId,
   emojiList,
   filmLists,
   menuTypes,
+  menuTypesId,
   statisticFilters,
   statisticTextList,
   filmsCards,
   countFilmCards,
-  userRating,
+  userTotalRating,
   filmsCategoriesId,
+  ratingScales,
   getFilmsCardsPortion
 };

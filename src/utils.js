@@ -16,6 +16,27 @@ const addElementDOM = (container, component) => {
 };
 
 /**
+ * Update element in DOM.
+ * @param {HTMLElement} oldElement
+ * @param {HTMLElement} newElement
+ * @param {HTMLElement} container
+ * @param {class} component
+ */
+const updateElementDOM = (oldElement, newElement, container, component) => {
+  const cloneElement = component.getCloneElement(newElement);
+  component.bind(cloneElement);
+  container.replaceChild(cloneElement, oldElement);
+};
+
+/**
+ * Remove element in DOM.
+ * @param {HTMLElement} container
+ */
+const removeElementDOM = (container) => {
+  container.remove();
+};
+
+/**
  * Create new HTML element.
  * @param {string} template
  * @return {HTMLElement}
@@ -70,5 +91,7 @@ export {
   getRandomValueMinMax,
   compareRandom,
   addElementDOM,
+  removeElementDOM,
+  updateElementDOM,
   removeContainerChildren
 };

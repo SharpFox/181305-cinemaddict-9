@@ -11,11 +11,11 @@ import AbstractComponent from './abstract-component.js';
 class Profile extends AbstractComponent {
   /**
    * Create profile.
-   * @param {number} userRating
+   * @param {number} userTotalRating
    */
-  constructor(userRating) {
+  constructor(userTotalRating) {
     super();
-    this._userRating = userRating;
+    this._userTotalRating = userTotalRating;
   }
 
   /**
@@ -23,7 +23,7 @@ class Profile extends AbstractComponent {
    * @return {string}
    */
   get template() {
-    return getProfileTemplate(this._userRating);
+    return getProfileTemplate(this._userTotalRating);
   }
 }
 

@@ -42,7 +42,10 @@ class ButtonShowMore extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   bind(element = null) {
-    this._bindOnOpenButton(element === null ? this._element : element);
+    if (element === null) {
+      element = this._element;
+    }
+    this._bindOnOpenButton(element);
   }
 
   /**
@@ -50,7 +53,10 @@ class ButtonShowMore extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   unbind(element = null) {
-    this._unbindOnOpenButton(element === null ? this._element : element);
+    if (element === null) {
+      element = this._element;
+    }
+    this._unbindOnOpenButton(element);
   }
 
   /**
@@ -58,8 +64,12 @@ class ButtonShowMore extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   _bindOnOpenButton(element) {
-    element.firstElementChild.addEventListener(`click`, this._onOpenButton);
-    element.firstElementChild.addEventListener(`keydown`, this._onOpenButton);
+    const buttonContainer = element.firstElementChild;
+    if (buttonContainer === null) {
+      return;
+    }
+    buttonContainer.addEventListener(`click`, this._onOpenButton);
+    buttonContainer.addEventListener(`keydown`, this._onOpenButton);
   }
 
   /**
@@ -67,8 +77,12 @@ class ButtonShowMore extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   _unbindOnOpenButton(element) {
-    element.firstElementChild.removeEventListener(`click`, this._onOpenButton);
-    element.firstElementChild.removeEventListener(`keydown`, this._onOpenButton);
+    const buttonContainer = element.firstElementChild;
+    if (buttonContainer === null) {
+      return;
+    }
+    buttonContainer.removeEventListener(`click`, this._onOpenButton);
+    buttonContainer.removeEventListener(`keydown`, this._onOpenButton);
   }
 
   /**
@@ -76,8 +90,8 @@ class ButtonShowMore extends AbstractComponent {
    * @param {event} evt
    */
   _onOpenButton(evt) {
-    if ((evt.keyCode !== KEYS.ENTER || evt.type !== `click`)
-      || (typeof this._onCLose !== `function`)) {
+    if ((evt.keyCode === KEYS.ENTER || evt.type === `click`)
+      && (typeof this._onCLose !== `function`)) {
       this._onOpen();
     }
   }

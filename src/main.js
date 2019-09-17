@@ -1,4 +1,4 @@
-import PageController from './components/page-controller.js';
+import PageController from './controllers/page-controller.js';
 import Footer from './components/footer.js';
 import MainNavigation from './components/main-navigation.js';
 import Profile from './components/profile.js';
@@ -9,10 +9,11 @@ import {
 } from './utils.js';
 import {
   menuTypes,
+  menuTypesId,
   statisticFilters,
   statisticTextList,
   countFilmCards,
-  userRating
+  userTotalRating
 } from './data.js';
 
 const body = document.querySelector(`body`);
@@ -30,13 +31,48 @@ const footer = body.querySelector(`.footer`);
 const searchComponent = new Search();
 addElementDOM(search, searchComponent);
 
-const profileComponent = new Profile(userRating);
+const profileComponent = new Profile(userTotalRating);
 addElementDOM(profile, profileComponent);
 
-const mainNavigationComponent = new MainNavigation(menuTypes);
+const mainNavigationComponent = new MainNavigation(menuTypes, menuTypesId);
 addElementDOM(mainNavigation, mainNavigationComponent);
 
-const statisticComponent = new Statistic(userRating, statisticFilters,
+/**
+ * Select films by category.
+ * @param {event} evt
+ */
+mainNavigationComponent.selectFilms = (evt) => {
+  const mainNavigationItemContainer = evt.currentTarget;
+  if (!mainNavigationItemContainer.classList
+      .contains(`main-navigation__item--active`)) {
+    const mainNavigationItems =
+      mainNavigation.querySelectorAll(`.main-navigation__item`);
+    mainNavigationItems.forEach((itemContainer) => {
+      if (itemContainer.dataset.id !== menuTypesId.stats) {
+        itemContainer.classList.remove(`main-navigation__item--active`);
+      }
+    });
+    mainNavigationItemContainer.classList.add(`main-navigation__item--active`);
+  }
+};
+
+/**
+ * Open/close state
+ * @param {event} evt
+ */
+mainNavigationComponent.openCloseState = (evt) => {
+  const mainNavigationItemContainer = evt.currentTarget;
+  if (!mainNavigationItemContainer.classList
+    .contains(`main-navigation__item--active`)) {
+    mainNavigationItemContainer.classList.add(`main-navigation__item--active`);
+    statistic.classList.remove(`visually-hidden`);
+  } else {
+    mainNavigationItemContainer.classList.remove(`main-navigation__item--active`);
+    statistic.classList.add(`visually-hidden`);
+  }
+};
+
+const statisticComponent = new Statistic(userTotalRating, statisticFilters,
     statisticTextList);
 addElementDOM(statistic, statisticComponent);
 

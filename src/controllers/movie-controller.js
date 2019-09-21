@@ -1,17 +1,12 @@
 import FilmCard from '../components/film-card.js';
 import FilmDetails from '../components/film-details.js';
 import {
-  emojiList,
-  ratingScales,
-  filmCardControlsTypes,
-  filmDetailsControlsTypes,
-  filmControlsTypesId,
-  userTotalRating
-} from '../data.js';
-import {
   addElementDOM,
   updateElementDOM
 } from '../utils.js';
+import {
+  emojiList,
+} from '../data.js';
 
 /**
  * Class representaing controller of move.+
@@ -24,20 +19,25 @@ class MovieController {
    * @param {HTMLElement} filmsListFilmsContainer
    * @param {HTMLElement} filmsDetailsContainer
    * @param {function} onDataChange
-   * @param {function} onChangeView
    */
   constructor(filmCard, filmsListContainer, filmsListFilmsContainer,
-      filmsDetailsContainer, onDataChange, onChangeView) {
+      filmsDetailsContainer, onDataChange) {
+    this._id = filmCard.id;
     this._filmCard = filmCard;
     this._filmsListContainer = filmsListContainer;
     this._filmsListFilmsContainer = filmsListFilmsContainer;
     this._filmsDetailsContainer = filmsDetailsContainer;
-    this._filmCardComponent = new FilmCard(this._filmCard, filmCardControlsTypes, onDataChange);
+    this._filmCardComponent = new FilmCard(this._filmCard, onDataChange);
     this._filmDetailsComponent = new FilmDetails(this._filmsDetailsContainer,
-        this._filmCard, emojiList, ratingScales, filmDetailsControlsTypes,
-        filmControlsTypesId, userTotalRating);
+        this._filmCard, onDataChange);
+  }
 
-    this._onChangeView = onChangeView;
+  /**
+   * Return id of film card.
+   * @return {number}
+   */
+  get id() {
+    return this._id;
   }
 
   /**
@@ -46,6 +46,15 @@ class MovieController {
   init() {
     this._addFilmCard();
     this._addFilmDetails();
+  }
+
+  /**
+   * Open film details.
+   */
+  openFilmDetails() {
+    this._filmsDetailsContainer.classList.remove(`visually-hidden`);
+    addElementDOM(this._filmsDetailsContainer, this._filmDetailsComponent);
+    this._filmsDetailsContainer.firstElementChild.focus();
   }
 
   /**
@@ -64,9 +73,9 @@ class MovieController {
    */
   _addFilmDetails() {
     this._filmCardComponent.onOpen = () => {
-      this._filmsDetailsContainer.classList.remove(`visually-hidden`);
-      addElementDOM(this._filmsDetailsContainer, this._filmDetailsComponent);
-      this._filmsDetailsContainer.firstElementChild.focus();
+      if (document.body.querySelector(`.film-details__inner`) === null) {
+        this.openFilmDetails();
+      }
     };
 
     /**
@@ -98,27 +107,53 @@ class MovieController {
      * @param {event} evt
      */
     this._filmDetailsComponent.addEmoji = (evt) => {
-      const emojiId = evt.currentTarget.htmlFor;
-      this._filmDetailsComponent.addEmojiToElement(emojiId);
-      const oldElement =
-        this._filmsDetailsContainer
-        .querySelector(`.film-details__add-emoji-label`);
-      const newElement =
-        this._filmDetailsComponent
-        .getElementPart(`film-details__add-emoji-label`);
-      const replacementСontainer =
-        this._filmsDetailsContainer.querySelector(`.film-details__new-comment`);
-      updateElementDOM(oldElement, newElement, replacementСontainer,
-          this._filmDetailsComponent);
+      this._addEmojiToFilmDetailsElement(evt.currentTarget.htmlFor);
+      this._updateEmojiInFilmDetailsContainer();
+      evt.currentTarget.control.checked = true;
+      evt.currentTarget.focus();
     };
+  }
 
-    /**
-     * Add new comment.
-     * @param {event} evt
-     */
-    this._filmDetailsComponent.addComment = (evt) => {
-      //
-    };
+  /**
+   * Add emoji to element of film details component.
+   * @param {string} emojiId
+   */
+  _addEmojiToFilmDetailsElement(emojiId) {
+    let emojiPath = null;
+    emojiList.forEach((emoji) => {
+      if (emojiId === emoji.id) {
+        emojiPath = emoji.img;
+      }
+    });
+    const addEmojiLabelContainer =
+      this._filmDetailsComponent.element
+      .querySelector(`.film-details__add-emoji-label`);
+    const imgElement = document.createElement(`img`);
+    imgElement.src = emojiPath;
+    imgElement.width = 55;
+    imgElement.height = 55;
+    imgElement.alt = `emoji`;
+    imgElement.id = `add-emoji`;
+    if (addEmojiLabelContainer.firstElementChild !== null) {
+      addEmojiLabelContainer.firstElementChild.remove();
+    }
+    addEmojiLabelContainer.appendChild(imgElement);
+  }
+
+  /**
+   * Update emoji in film details container.
+   */
+  _updateEmojiInFilmDetailsContainer() {
+    const oldElement =
+    this._filmsDetailsContainer
+    .querySelector(`.film-details__add-emoji-label`);
+    const newElement =
+      this._filmDetailsComponent
+      .getElementPart(`film-details__add-emoji-label`);
+    const replacementСontainer =
+      this._filmsDetailsContainer.querySelector(`.film-details__new-comment`);
+    updateElementDOM(oldElement, newElement, replacementСontainer,
+        this._filmDetailsComponent);
   }
 }
 

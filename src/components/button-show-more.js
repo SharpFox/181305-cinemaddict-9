@@ -65,11 +65,10 @@ class ButtonShowMore extends AbstractComponent {
    */
   _bindOnOpenButton(element) {
     const buttonContainer = element.firstElementChild;
-    if (buttonContainer === null) {
-      return;
+    if (buttonContainer !== null) {
+      buttonContainer.addEventListener(`click`, this._onOpenButton);
+      buttonContainer.addEventListener(`keydown`, this._onOpenButton);
     }
-    buttonContainer.addEventListener(`click`, this._onOpenButton);
-    buttonContainer.addEventListener(`keydown`, this._onOpenButton);
   }
 
   /**
@@ -78,11 +77,10 @@ class ButtonShowMore extends AbstractComponent {
    */
   _unbindOnOpenButton(element) {
     const buttonContainer = element.firstElementChild;
-    if (buttonContainer === null) {
-      return;
+    if (buttonContainer !== null) {
+      buttonContainer.removeEventListener(`click`, this._onOpenButton);
+      buttonContainer.removeEventListener(`keydown`, this._onOpenButton);
     }
-    buttonContainer.removeEventListener(`click`, this._onOpenButton);
-    buttonContainer.removeEventListener(`keydown`, this._onOpenButton);
   }
 
   /**

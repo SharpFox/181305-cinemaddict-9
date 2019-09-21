@@ -1,10 +1,21 @@
+import {
+  filmDetailsControlsTypes,
+  filmControlsTypesId,
+  ratingScales,
+  userTotalRating,
+  emojiList
+} from '../data.js';
+import {
+  getDuration
+} from '../utils.js';
+import moment from 'moment';
+
 /**
  * Return of rating activity.
  * @param {array} controlsTypes
- * @param {array} filmControlsTypesId
  * @return {boolean}
  */
-const ratingIsActive = (controlsTypes, filmControlsTypesId) => {
+const ratingIsActive = (controlsTypes) => {
   for (let type of controlsTypes) {
     if (type === filmControlsTypesId.watched) {
       return true;
@@ -18,10 +29,9 @@ const ratingIsActive = (controlsTypes, filmControlsTypesId) => {
  * @param {string} img
  * @param {string} title
  * @param {number} userRating
- * @param {array} ratingScales
  * @return {string}
  */
-const getFilmRatingTemplate = (img, title, userRating, ratingScales) => {
+const getFilmRatingTemplate = (img, title, userRating) => {
   return `
     <section class="film-details__user-rating-wrap">
       <div class="film-details__user-rating-controls">
@@ -68,10 +78,9 @@ const getFilmRatingTemplate = (img, title, userRating, ratingScales) => {
 
 /**
  * Return template emoji list.
- * @param {array} emojiList
  * @return {string}
  */
-const getEmojiListTemplate = (emojiList) => {
+const getEmojiListTemplate = () => {
   return `
     <div class="film-details__emoji-list">
       ${emojiList.map(({id, value, img}) => (`<input
@@ -101,7 +110,7 @@ const getEmojiListTemplate = (emojiList) => {
 const getCommentListTemplate = (comments) => {
   return `
     <ul class="film-details__comments-list">
-      ${comments.map(({img, text, author, day}) => (`<li
+      ${comments.map(({id, img, text, author, date}) => (`<li
         class="film-details__comment">
         <span class="film-details__comment-emoji">
           <img src="${img}"
@@ -119,10 +128,13 @@ const getCommentListTemplate = (comments) => {
               ${author}
             </span>
             <span class="film-details__comment-day">
-              ${day}
+              ${moment(date).fromNow()}
             </span>
             <button class="film-details__comment-delete"
-              tabindex="4">
+              tabindex="4"
+              type="submit"
+              value="${id}"
+              name="${id}">
               Delete
             </button>
           </p>
@@ -138,13 +150,10 @@ const getCommentListTemplate = (comments) => {
  */
 const getFilmDetailsTemplate = ({_img, _age, _title, _rating, _userRating,
   _director, _writers, _actors, _year, _duration, _country, _genres,
-  _description, _comments, _controlsTypes, _emojiList, _ratingScales,
-  _filmDetailsControlsTypes, _filmControlsTypesId, _userTotalRating}) => {
+  _description, _comments, _controlsTypes}) => {
   return `
     <form class="film-details__inner"
       tabindex="1"
-      action=""
-      method="get"
       >
       <div class="form-details__top-container">
         <div class="film-details__close">
@@ -174,7 +183,7 @@ const getFilmDetailsTemplate = ({_img, _age, _title, _rating, _userRating,
               </div>
               <div class="film-details__rating">
                 <p class="film-details__total-rating">${_rating}</p>
-                <p class="film-details__user-rating">Your rate ${_userTotalRating}</p>
+                <p class="film-details__user-rating">Your rate ${userTotalRating}</p>
               </div>
             </div>
             <table class="film-details__table">
@@ -203,7 +212,7 @@ const getFilmDetailsTemplate = ({_img, _age, _title, _rating, _userRating,
                   Release Date
                 </td>
                 <td class="film-details__cell">
-                ${_year}
+                ${moment(_year).format(`YYYY`)}
                 </td>
               </tr>
               <tr class="film-details__row">
@@ -211,7 +220,7 @@ const getFilmDetailsTemplate = ({_img, _age, _title, _rating, _userRating,
                   Runtime
                 </td>
                 <td class="film-details__cell">
-                  ${_duration}
+                  ${getDuration(_duration.start, _duration.end)}               
                 </td>
               </tr>
               <tr class="film-details__row">
@@ -238,24 +247,25 @@ const getFilmDetailsTemplate = ({_img, _age, _title, _rating, _userRating,
           </div>
         </div>
         <section class="film-details__controls">
-          ${Object.keys(_filmDetailsControlsTypes).map((type) => (`<input type="checkbox"
+          ${Object.keys(filmDetailsControlsTypes).map((type) => (`<input type="checkbox"
             class="film-details__control-input visually-hidden"
             tabindex="3"
+            value="${type}"
             id="${type}"
-            name="${type}"
+            name="${type}"            
             ${_controlsTypes.map((currentType) => (`${currentType === type ? `checked` : ``}`).trim())
             .join(``)}
           >
           <label for="${type}"
             class="film-details__control-label
               film-details__control-label--${type}">
-              ${_filmDetailsControlsTypes[type]}
-          </label>`)).join(``)}       
+              ${filmDetailsControlsTypes[type]}
+          </label>`)).join(``)}    
         </section>
       </div>
       <div class="form-details__middle-container
-        ${ratingIsActive(_controlsTypes, _filmControlsTypesId) ? `` : ` visually-hidden`}">
-        ${getFilmRatingTemplate(_img, _title, _userRating, _ratingScales)}
+        ${ratingIsActive(_controlsTypes, filmControlsTypesId) ? `` : ` visually-hidden`}">
+        ${getFilmRatingTemplate(_img, _title, _userRating, ratingScales)}
       </div>
       <div class="form-details__bottom-container">
         <section class="film-details__comments-wrap"> 
@@ -276,7 +286,7 @@ const getFilmDetailsTemplate = ({_img, _age, _title, _rating, _userRating,
                 placeholder="Select reaction below and write comment here" 
                 name="comment"></textarea>
             </label> 
-            ${getEmojiListTemplate(_emojiList)}         
+            ${getEmojiListTemplate()}         
           </div>
         </section>
       </div>

@@ -4,16 +4,21 @@ import MovieController from '../controllers/movie-controller.js';
 import Sort from '../components/sort.js';
 import {
   filmLists,
-  filmsCards,
+  filmsCardsCurrent,
   filmsCategoriesId,
   getFilmsCardsPortion,
   sortTypes,
-  sortTypesId
+  sortTypesId,
+  changefilmsCardsPortionCount,
+  updateServerData,
+  totalDownloadedFilmsCards,
+  setNumberDownloadedFilmsCards
 } from '../data.js';
 import {
   addElementDOM,
   removeContainerChildren
 } from '../utils.js';
+import moment from 'moment';
 
 /**
  * Class representaing controller of page.
@@ -30,7 +35,10 @@ class PageController {
     this._filmsDetailsContainer = filmsDetailsContainer;
     this._sort = sort;
     this._totalFilmPortionNumber = 1;
+    this._movieControllers = [];
     this._getFilmsCards = getFilmsCardsPortion();
+
+    this._onDataChange = this._onDataChange.bind(this);
   }
 
   /**
@@ -38,9 +46,17 @@ class PageController {
    */
   init() {
     this._renderSortComponent();
-    this._addFilmList(filmsCategoriesId.AllMoviesUpcoming);
-    this._addFilmList(filmsCategoriesId.TopRated);
-    this._addFilmList(filmsCategoriesId.MostCommented);
+    this._addFilmsLists();
+  }
+
+  /**
+   * Add films lists.
+   */
+  _addFilmsLists() {
+    this._movieControllers = [];
+    this._addFilmsList(filmsCategoriesId.AllMoviesUpcoming);
+    this._addFilmsList(filmsCategoriesId.TopRated);
+    this._addFilmsList(filmsCategoriesId.MostCommented);
   }
 
   /**
@@ -48,13 +64,28 @@ class PageController {
    * @param {object} newData
    */
   _onDataChange(newData) {
-    filmsCards.forEach((filmCard) => {
-      if (filmCard.id === newData.id) {
-        Object.entries(newData).forEach(([key, value]) => {
-          filmCard[key] = value;
-        });
+    updateServerData(newData);
+    changefilmsCardsPortionCount(totalDownloadedFilmsCards);
+    removeContainerChildren(this._films);
+    const containerfilmsDetailsHaveChildren =
+      this._filmsDetailsContainer.children.length;
+    removeContainerChildren(this._filmsDetailsContainer);
+    this._addFilmsLists();
+    this._renderFilmDetails(newData.id, containerfilmsDetailsHaveChildren);
+  }
+
+  /**
+   * Render film details.
+   * @param {number} id
+   * @param {boolean} containerfilmsDetailsHaveChildren
+   */
+  _renderFilmDetails(id, containerfilmsDetailsHaveChildren) {
+    for (const component of this._movieControllers) {
+      if ((component.id === id) && containerfilmsDetailsHaveChildren) {
+        component.openFilmDetails();
+        break;
       }
-    });
+    }
   }
 
   /**
@@ -90,7 +121,7 @@ class PageController {
     switch (currentSortType) {
       case sortTypesId.date:
         filmsCardsForSort.sort((firstFilmCard, secondFilmCard) => {
-          return secondFilmCard.year - firstFilmCard.year;
+          return moment(secondFilmCard.year) - moment(firstFilmCard.year);
         });
         break;
       case sortTypesId.rating:
@@ -113,8 +144,8 @@ class PageController {
     const sortButtonContainer = sortComponent.element.querySelector(`.sort__button`);
     const sorts = this._sort.children;
     for (let sort of sorts) {
-      if (sort.firstElementChild.dataset.sorttype
-        === sortButtonContainer.dataset.sorttype) {
+      if (sort.firstElementChild.dataset.sorttype ===
+          sortButtonContainer.dataset.sorttype) {
         sort.firstElementChild.classList.add(`sort__button--active`);
       }
     }
@@ -126,7 +157,7 @@ class PageController {
    * @return {array}
    */
   _getFilmsCardsForSort(currentCountFilmsCards) {
-    return filmsCards.slice(0, currentCountFilmsCards);
+    return filmsCardsCurrent.slice(0, currentCountFilmsCards);
   }
 
   /**
@@ -170,6 +201,7 @@ class PageController {
     addElementDOM(filmsListContainer, buttonShowMoreComponent);
 
     buttonShowMoreComponent.onOpen = () => {
+      setNumberDownloadedFilmsCards();
       this._addMoreCards();
       if (this._totalFilmPortionNumber === 3) {
         document.querySelector(`.films-list__show-more`).remove();
@@ -185,7 +217,7 @@ class PageController {
    */
   _getFilmsCardsPortion(filmCategory) {
     return filmCategory === filmsCategoriesId.AllMoviesUpcoming
-      ? this._getFilmsCards() : filmsCards;
+      ? this._getFilmsCards() : filmsCardsCurrent;
   }
 
   /**
@@ -200,6 +232,7 @@ class PageController {
         filmsListFilmsContainer, this._filmsDetailsContainer,
         this._onDataChange);
     movieController.init();
+    this._movieControllers.push(movieController);
   }
 
   /**
@@ -219,7 +252,7 @@ class PageController {
     * Add film lists.
     * @param {string} filmCategory
     */
-  _addFilmList(filmCategory) {
+  _addFilmsList(filmCategory) {
     const filmsListComponent = new FilmList(filmLists[filmCategory]);
     addElementDOM(this._films, filmsListComponent);
 
@@ -229,7 +262,8 @@ class PageController {
     const filmsCardsPortion = this._getFilmsCardsPortion(filmCategory);
     this._addFilmsCards(filmsCardsPortion, filmsListContainer, filmsListFilmsContainer);
 
-    if (filmsListElement.firstElementChild.dataset.isbutton) {
+    if ((filmsListElement.firstElementChild.dataset.isbutton)
+      && totalDownloadedFilmsCards < filmsCardsCurrent.length) {
       this._createButtonShowMore(filmsListContainer);
     }
   }

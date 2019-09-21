@@ -1,4 +1,3 @@
-
 import {
   getFilmCardTemplate
 } from './film-card-template.js';
@@ -15,13 +14,12 @@ class FilmCard extends AbstractComponent {
   /**
    * Create film card.
    * @param {object} filmCard
-   * @param {object} filmCardControlsTypes
    * @param {function} onDataChange
    */
-  constructor({title, rating, year, duration, genres, img,
-    description, comments, controlsTypes}, filmCardControlsTypes,
-  onDataChange) {
+  constructor({id, title, rating, year, duration, genres, img,
+    description, comments, controlsTypes}, onDataChange) {
     super();
+    this._id = id;
     this._title = title;
     this._rating = rating;
     this._year = year;
@@ -31,14 +29,11 @@ class FilmCard extends AbstractComponent {
     this._description = description;
     this._comments = comments;
     this._controlsTypes = controlsTypes;
-    this._filmCardControlsTypes = filmCardControlsTypes;
-    this._onDataChange = onDataChange.bind(this);
+    this._onDataChange = onDataChange;
 
     this._onOpen = null;
     this._onOpenDetails = this._onOpenDetails.bind(this);
-    this._onAddToWatchlist = this._onAddToWatchlist.bind(this);
-    this._onMarkAsWatched = this._onMarkAsWatched.bind(this);
-    this._onAddToFavorite = this._onAddToFavorite.bind(this);
+    this._onSendForm = this._onSendForm.bind(this);
   }
 
   /**
@@ -50,19 +45,11 @@ class FilmCard extends AbstractComponent {
   }
 
   /**
-   * Save the function.
+   * Save the function for open film details.
    * @param {function} fn
    */
   set onOpen(fn) {
     this._onOpen = fn;
-  }
-
-  /**
-   * UpdateCurrentComponent
-   * @param {object} newData
-   */
-  update(newData) {
-    //
   }
 
   /**
@@ -74,9 +61,7 @@ class FilmCard extends AbstractComponent {
       element = this._element;
     }
     this._bindOnOpenDetails(element);
-    this._bindOnAddToWatchlist(element);
-    this._bindOnMarkAsWatched(element);
-    this._bindOnAddToFavorite(element);
+    this._bindOnSendForm(element);
   }
 
   /**
@@ -88,9 +73,7 @@ class FilmCard extends AbstractComponent {
       element = this._element;
     }
     this._unbindOnOpenDetails(element);
-    this._unbindOnAddToWatchlist(element);
-    this._unbindOnMarkAsWatched(element);
-    this._unbindOnAddToFavorite(element);
+    this._unbindOnSendForm(element);
   }
 
   /**
@@ -98,54 +81,29 @@ class FilmCard extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   _bindOnOpenDetails(element) {
-    const filmCardContainer = element.firstElementChild;
-    if (filmCardContainer === null) {
-      return;
+    const posterContainer = element.querySelector(`.film-card__poster`);
+    if (posterContainer !== null) {
+      posterContainer.addEventListener(`click`, this._onOpenDetails);
+      posterContainer.addEventListener(`keydown`, this._onOpenDetails);
     }
-    filmCardContainer.addEventListener(`click`, this._onOpenDetails);
-    filmCardContainer.addEventListener(`keydown`, this._onOpenDetails);
+
+    const commentsContainer = element.querySelector(`.film-card__comments`);
+    if (commentsContainer !== null) {
+      commentsContainer.addEventListener(`click`, this._onOpenDetails);
+      commentsContainer.addEventListener(`keydown`, this._onOpenDetails);
+    }
   }
 
   /**
-   * Add events for button "Add to watchlist".
+   * Add events for send form.
    * @param {DocumentFragment} element
    */
-  _bindOnAddToWatchlist(element) {
-    const addToWatchlistContainer =
-      element.querySelector(`.film-card__controls-item--add-to-watchlist`);
-    if (addToWatchlistContainer === null) {
-      return;
+  _bindOnSendForm(element) {
+    const controlsContainer = element.querySelector(`.film-card__controls`);
+    if (controlsContainer !== null) {
+      controlsContainer.addEventListener(`click`, this._onSendForm);
+      controlsContainer.addEventListener(`keydown`, this._onSendForm);
     }
-    addToWatchlistContainer.addEventListener(`click`, this._onAddToWatchlist);
-    addToWatchlistContainer.addEventListener(`keydown`, this._onAddToWatchlist);
-  }
-
-  /**
-   * Add events for button "Mark as watched".
-   * @param {DocumentFragment} element
-   */
-  _bindOnMarkAsWatched(element) {
-    const markAsWatchedContainer =
-      element.querySelector(`.film-card__controls-item--mark-as-watched`);
-    if (markAsWatchedContainer === null) {
-      return;
-    }
-    markAsWatchedContainer.addEventListener(`click`, this._onMarkAsWatched);
-    markAsWatchedContainer.addEventListener(`keydown`, this._onMarkAsWatched);
-  }
-
-  /**
-   * Add events for button "Favorite".
-   * @param {DocumentFragment} element
-   */
-  _bindOnAddToFavorite(element) {
-    const favoriteContainer =
-      element.querySelector(`.film-card__controls-item--favorite`);
-    if (favoriteContainer === null) {
-      return;
-    }
-    favoriteContainer.addEventListener(`click`, this._onAddToFavorite);
-    favoriteContainer.addEventListener(`keydown`, this._onAddToFavorite);
   }
 
   /**
@@ -153,54 +111,29 @@ class FilmCard extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   _unbindOnOpenDetails(element) {
-    const filmCardContainer = element.firstElementChild;
-    if (filmCardContainer === null) {
-      return;
+    const posterContainer = element.querySelector(`.film-card__poster`);
+    if (posterContainer !== null) {
+      posterContainer.removeEventListener(`click`, this._onOpenDetails);
+      posterContainer.removeEventListener(`keydown`, this._onOpenDetails);
     }
-    filmCardContainer.removeEventListener(`click`, this._onOpenDetails);
-    filmCardContainer.removeEventListener(`keydown`, this._onOpenDetails);
+
+    const commentsContainer = element.querySelector(`.film-card__comments`);
+    if (commentsContainer !== null) {
+      commentsContainer.removeEventListener(`click`, this._onOpenDetails);
+      commentsContainer.removeEventListener(`keydown`, this._onOpenDetails);
+    }
   }
 
   /**
-   * Remove events for button "Add to watchlist".
+   * Remove events for sending form.
    * @param {DocumentFragment} element
    */
-  _unbindOnAddToWatchlist(element) {
-    const addToWatchlistContainer =
-      element.querySelector(`.film-card__controls-item--add-to-watchlist`);
-    if (addToWatchlistContainer === null) {
-      return;
+  _unbindOnSendForm(element) {
+    const controlsContainer = element.querySelector(`.film-card__controls`);
+    if (controlsContainer !== null) {
+      controlsContainer.removeEventListener(`click`, this._onSendForm);
+      controlsContainer.removeEventListener(`keydown`, this._onSendForm);
     }
-    addToWatchlistContainer.removeEventListener(`click`, this._onAddToWatchlist);
-    addToWatchlistContainer.removeEventListener(`keydown`, this._onAddToWatchlist);
-  }
-
-  /**
-   * Remove events for button "Mark as watched".
-   * @param {DocumentFragment} element
-   */
-  _unbindOnMarkAsWatched(element) {
-    const markAsWatchedContainer =
-      element.querySelector(`.film-card__controls-item--mark-as-watched`);
-    if (markAsWatchedContainer === null) {
-      return;
-    }
-    markAsWatchedContainer.removeEventListener(`click`, this._onMarkAsWatched);
-    markAsWatchedContainer.removeEventListener(`keydown`, this._onMarkAsWatched);
-  }
-
-  /**
-   * Remove events for button "Favorite".
-   * @param {DocumentFragment} element
-   */
-  _unbindOnAddToFavorite(element) {
-    const favoriteContainer =
-      element.querySelector(`.film-card__controls-item--favorite`);
-    if (favoriteContainer === null) {
-      return;
-    }
-    favoriteContainer.removeEventListener(`click`, this._onAddToFavorite);
-    favoriteContainer.removeEventListener(`keydown`, this._onAddToFavorite);
   }
 
   /**
@@ -215,69 +148,66 @@ class FilmCard extends AbstractComponent {
   }
 
   /**
-   * Call the fuction for add to watchlist.
+   * Call the fuction for send form.
    * @param {event} evt
    */
-  _onAddToWatchlist(evt) {
+  _onSendForm(evt) {
     if (evt.keyCode === KEYS.ENTER || evt.type === `click`) {
-      const newData = this._getNewDataForm(`film-card__controls`);
-      this.update(newData);
-      this._onDataChange(newData);
+      this._onDataChange(this._processForm(evt.target, this._id));
     }
   }
 
   /**
-   * Call the fuction for mark as watched.
-   * @param {event} evt
-   */
-  _onMarkAsWatched(evt) {
-    if (evt.keyCode === KEYS.ENTER || evt.type === `click`) {
-      const newData = this._getNewDataForm(`film-card__controls`);
-      this.update(newData);
-      this._onDataChange(newData);
-    }
-  }
-
-  /**
-   * Call the fuction for add to favorite.
-   * @param {event} evt
-   */
-  _onAddToFavorite(evt) {
-    if (evt.keyCode === KEYS.ENTER || evt.type === `click`) {
-      const newData = this._getNewDataForm(`film-card__controls`);
-      this.update(newData);
-      this._onDataChange(newData);
-    }
-  }
-
-  /**
-   * Return new data from form.
-   * @param {string} cssClass
-   * @return {object}
-   */
-  _getNewDataForm(cssClass) {
-    const formData = new FormData(this._element.querySelector(`.${cssClass}`));
-    return FilmCard.processForm(formData);
-  }
-
-  /**
-   * Return modified object.
+   * Return new data object.
    *
-   * @param {FormData} formData
+   * @param {event} target
+   * @param {number} filmCardId
    * @return {object}
    */
-  static processForm(formData) {
-    //
+  _processForm(target, filmCardId) {
+    const newData = {
+      id: filmCardId,
+      controlsTypes: []
+    };
+
+    const filmCardMapper = this._createMapper(newData);
+    const formContainer = document.getElementById(`form-film-card-controls-${filmCardId}`);
+    const childs = formContainer.children;
+    for (const buttonItem of childs) {
+      const isActive =
+        buttonItem.classList.contains(`film-card__controls-item--active`);
+      if (buttonItem.dataset.id === target.dataset.id) {
+        if (!isActive) {
+          filmCardMapper[buttonItem.name](buttonItem.value);
+        }
+      } else {
+        if (isActive) {
+          filmCardMapper[buttonItem.name](buttonItem.value);
+        }
+      }
+    }
+
+    return newData;
   }
 
   /**
    * Create map of object.
    *
-   * @param {DOM} target
+   * @param {DOM} newData
    * @return {object}
    */
-  static createMapper(target) {
-    //
+  _createMapper(newData) {
+    return {
+      'watchlist': (value) => {
+        newData.controlsTypes.push(value);
+      },
+      'watched': (value) => {
+        newData.controlsTypes.push(value);
+      },
+      'favorite': (value) => {
+        newData.controlsTypes.push(value);
+      }
+    };
   }
 }
 

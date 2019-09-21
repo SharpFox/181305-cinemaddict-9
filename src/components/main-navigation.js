@@ -81,14 +81,13 @@ class MainNavigation extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   _bindOnSelectFilms(element) {
-    if (element === null) {
-      return;
-    }
-    const mainNavigationItemsContainer = element.querySelectorAll(`.main-navigation__item`);
-    for (const mainNavigationItem of mainNavigationItemsContainer) {
-      if (mainNavigationItem.dataset.id !== this._menuTypesId.stats) {
-        mainNavigationItem.addEventListener(`click`, this._onSelectFilms);
-        mainNavigationItem.addEventListener(`keydown`, this._onSelectFilms);
+    if (element !== null) {
+      const itemsContainer = element.querySelectorAll(`.main-navigation__item`);
+      for (const itemContainer of itemsContainer) {
+        if (itemContainer.dataset.id !== this._menuTypesId.stats) {
+          itemContainer.addEventListener(`click`, this._onSelectFilms);
+          itemContainer.addEventListener(`keydown`, this._onSelectFilms);
+        }
       }
     }
   }
@@ -98,14 +97,13 @@ class MainNavigation extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   _bindOnOpenCloseState(element) {
-    if (element === null) {
-      return;
-    }
-    const mainNavigationItemsContainer = element.querySelectorAll(`.main-navigation__item`);
-    for (const mainNavigationItem of mainNavigationItemsContainer) {
-      if (mainNavigationItem.dataset.id === this._menuTypesId.stats) {
-        mainNavigationItem.addEventListener(`click`, this._onOpenCloseState);
-        mainNavigationItem.addEventListener(`keydown`, this._onOpenCloseState);
+    if (element !== null) {
+      const itemsContainer = element.querySelectorAll(`.main-navigation__item`);
+      for (const itemContainer of itemsContainer) {
+        if (itemContainer.dataset.id === this._menuTypesId.stats) {
+          itemContainer.addEventListener(`click`, this._onOpenCloseState);
+          itemContainer.addEventListener(`keydown`, this._onOpenCloseState);
+        }
       }
     }
   }
@@ -115,14 +113,13 @@ class MainNavigation extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   _unbindOnSelectFilms(element) {
-    if (element === null) {
-      return;
-    }
-    const mainNavigationItemsContainer = element.querySelectorAll(`.main-navigation__item`);
-    for (let mainNavigationItem of mainNavigationItemsContainer) {
-      if (mainNavigationItem.dataset.id !== this._menuTypesId.stats) {
-        mainNavigationItem.removeEventListener(`click`, this._onSelectFilms);
-        mainNavigationItem.removeEventListener(`keydown`, this._onSelectFilms);
+    if (element !== null) {
+      const itemsContainer = element.querySelectorAll(`.main-navigation__item`);
+      for (let itemContainer of itemsContainer) {
+        if (itemContainer.dataset.id !== this._menuTypesId.stats) {
+          itemContainer.removeEventListener(`click`, this._onSelectFilms);
+          itemContainer.removeEventListener(`keydown`, this._onSelectFilms);
+        }
       }
     }
   }
@@ -132,14 +129,13 @@ class MainNavigation extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   _unbindOnOpenCloseState(element) {
-    if (element === null) {
-      return;
-    }
-    const mainNavigationItemsContainer = element.querySelectorAll(`.main-navigation__item`);
-    for (const mainNavigationItem of mainNavigationItemsContainer) {
-      if (mainNavigationItem.dataset.id === this._menuTypesId.stats) {
-        mainNavigationItem.removeEventListener(`click`, this._onOpenCloseState);
-        mainNavigationItem.removeEventListener(`keydown`, this._onOpenCloseState);
+    if (element !== null) {
+      const itemsContainer = element.querySelectorAll(`.main-navigation__item`);
+      for (const itemContainer of itemsContainer) {
+        if (itemContainer.dataset.id === this._menuTypesId.stats) {
+          itemContainer.removeEventListener(`click`, this._onOpenCloseState);
+          itemContainer.removeEventListener(`keydown`, this._onOpenCloseState);
+        }
       }
     }
   }

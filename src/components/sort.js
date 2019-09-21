@@ -41,14 +41,6 @@ class Sort extends AbstractComponent {
   }
 
   /**
-   * Add events for elements.
-   * @param {DocumentFragment} element
-   */
-  bind(element = null) {
-    this._bindOnSortButton(element === null ? this._element : element);
-  }
-
-  /**
    * Return sort type of component.
    * @return {string}
    */
@@ -58,13 +50,43 @@ class Sort extends AbstractComponent {
   }
 
   /**
-   * Add events for close button of element.
+   * Add events for elements.
+   * @param {DocumentFragment} element
+   */
+  bind(element = null) {
+    this._bindOnSortButton(element === null ? this._element : element);
+  }
+
+  /**
+   * Remove events for elements.
+   * @param {DocumentFragment} element
+   */
+  unbind(element = null) {
+    this._unbindOnSortButton(element === null ? this._element : element);
+  }
+
+  /**
+   * Add events for sort button of element.
    * @param {DocumentFragment} element
    */
   _bindOnSortButton(element) {
     const buttonContainer = element.querySelector(`.sort__button`);
-    buttonContainer.addEventListener(`click`, this._onSortButton);
-    buttonContainer.addEventListener(`keydown`, this._onSortButton);
+    if (buttonContainer !== null) {
+      buttonContainer.addEventListener(`click`, this._onSortButton);
+      buttonContainer.addEventListener(`keydown`, this._onSortButton);
+    }
+  }
+
+  /**
+   * Remove events for sort button of element.
+   * @param {DocumentFragment} element
+   */
+  _unbindOnSortButton(element) {
+    const buttonContainer = element.querySelector(`.sort__button`);
+    if (buttonContainer !== null) {
+      buttonContainer.removeEventListener(`click`, this._onSortButton);
+      buttonContainer.removeEventListener(`keydown`, this._onSortButton);
+    }
   }
 
   /**
@@ -72,8 +94,8 @@ class Sort extends AbstractComponent {
    * @param {event} evt
    */
   _onSortButton(evt) {
-    if ((evt.keyCode !== KEYS.ESC || evt.type !== `click`)
-      || (typeof this._onClose !== `function`)) {
+    if ((evt.keyCode === KEYS.ENTER || evt.type === `click`)
+      && (typeof this._onSort === `function`)) {
       this._onSort();
     }
   }

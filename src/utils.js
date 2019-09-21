@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 const KEYS = {
   'ESC': 27,
   'ENTER': 13
@@ -85,6 +87,33 @@ const removeContainerChildren = (container) => {
   }
 };
 
+/**
+ * Return clone of object.
+ * @param {object} oldObject
+ * @return {object}
+ */
+const cloneDeep = (oldObject) => {
+  return JSON.parse(JSON.stringify(oldObject));
+};
+
+/**
+ * Return duration.
+ * @param {date} startDate
+ * @param {date} endDate
+ * @return {string}
+ */
+const getDuration = (startDate, endDate) => {
+  const duration = moment(endDate) - moment(startDate);
+  const durationFormat = moment(duration).utcOffset(0).format(`H[h] m[m]`);
+  for (let char of durationFormat) {
+    if (char === `0`) {
+      return durationFormat.substring(2, durationFormat.length);
+    }
+    break;
+  }
+  return durationFormat;
+};
+
 export {
   KEYS,
   createElement,
@@ -93,5 +122,7 @@ export {
   addElementDOM,
   removeElementDOM,
   updateElementDOM,
-  removeContainerChildren
+  removeContainerChildren,
+  cloneDeep,
+  getDuration
 };

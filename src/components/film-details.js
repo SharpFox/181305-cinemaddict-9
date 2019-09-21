@@ -5,6 +5,11 @@ import {
 import {
   KEYS
 } from '../utils.js';
+import {
+  userTotalRating,
+  filmControlsTypesId,
+  getEmojiImg
+} from '../data.js';
 import AbstractComponent from './abstract-component.js';
 
 /**
@@ -16,17 +21,13 @@ class FilmDetails extends AbstractComponent {
    * Create film details.
    * @param {HTMLElement} filmsDetailsContainer
    * @param {object} filmCard
-   * @param {array} emojiList
-   * @param {array} ratingScales
-   * @param {object} filmDetailsControlsTypes
-   * @param {object} filmControlsTypesId
-   * @param {object} userTotalRating
+   * @param {function} onDataChange
    */
-  constructor(filmsDetailsContainer, {img, age, title, rating, userRating,
+  constructor(filmsDetailsContainer, {id, img, age, title, rating, userRating,
     director, writers, actors, year, duration, country, genres, description,
-    comments, controlsTypes}, emojiList, ratingScales,
-  filmDetailsControlsTypes, filmControlsTypesId, userTotalRating) {
+    comments, controlsTypes}, onDataChange) {
     super();
+    this._id = id;
     this._filmsDetailsContainer = filmsDetailsContainer;
     this._img = img;
     this._age = age;
@@ -43,24 +44,14 @@ class FilmDetails extends AbstractComponent {
     this._description = description;
     this._comments = comments;
     this._controlsTypes = controlsTypes;
-
-    this._emojiList = emojiList;
-    this._ratingScales = ratingScales;
-    this._filmDetailsControlsTypes = filmDetailsControlsTypes;
-    this._filmControlsTypesId = filmControlsTypesId;
-    this._userTotalRating = userTotalRating;
+    this._onDataChange = onDataChange;
 
     this._onClose = null;
     this._addEmoji = null;
-    this._addComment = null;
     this._openCloseRating = null;
-    this._onCloseButton = this._onCloseButton.bind(this);
     this._onCloseForm = this._onCloseForm.bind(this);
-    this._onAddToWatchlist = this._onAddToWatchlist.bind(this);
-    this._onMarkAsWatched = this._onMarkAsWatched.bind(this);
-    this._onAddToFavorite = this._onAddToFavorite.bind(this);
+    this._onSendForm = this._onSendForm.bind(this);
     this._onAddEmoji = this._onAddEmoji.bind(this);
-    this._onAddComment = this._onAddComment.bind(this);
     this._onOpenCloseRating = this._onOpenCloseRating.bind(this);
   }
 
@@ -89,43 +80,11 @@ class FilmDetails extends AbstractComponent {
   }
 
   /**
-   * Save the function for add comment.
-   * @param {function} fn
-   */
-  set addComment(fn) {
-    this._addComment = fn;
-  }
-
-  /**
    * Save the function for open rating.
    * @param {function} fn
    */
   set openCloseRating(fn) {
     this._openCloseRating = fn;
-  }
-
-  /**
-   * Add emoji to element.
-   * @param {string} emojiId
-   */
-  addEmojiToElement(emojiId) {
-    let emojiPath = null;
-    this._emojiList.forEach((emoji) => {
-      if (emojiId === emoji.id) {
-        emojiPath = emoji.img;
-      }
-    });
-    const addEmojiLabelContainer =
-      this._element.querySelector(`.film-details__add-emoji-label`);
-    const imgElement = document.createElement(`img`);
-    imgElement.src = emojiPath;
-    imgElement.width = 55;
-    imgElement.height = 55;
-    imgElement.alt = `emoji`;
-    if (addEmojiLabelContainer.firstElementChild !== null) {
-      addEmojiLabelContainer.firstElementChild.remove();
-    }
-    addEmojiLabelContainer.appendChild(imgElement);
   }
 
   /**
@@ -136,12 +95,9 @@ class FilmDetails extends AbstractComponent {
     if (element === null) {
       element = this._element;
     }
-    this._bindOnCloseButton(element);
-    this._bindOnAddToWatchlist(element);
-    this._bindOnMarkAsWatched(element);
-    this._bindOnAddToFavorite(element);
+    this._bindOnCloseForm(element);
+    this._bindOnSendForm(element);
     this._bindOnAddEmoji(element);
-    this._bindOnAddComment(element);
     this._bindOnOpenCloseRating(element);
   }
 
@@ -153,69 +109,39 @@ class FilmDetails extends AbstractComponent {
     if (element === null) {
       element = this._element;
     }
-    this._unbindOnCloseButton(element);
-    this._unbindOnAddToWatchlist(element);
-    this._unbindOnMarkAsWatched(element);
-    this._unbindOnAddToFavorite(element);
+    this._unbindOnCloseForm(element);
+    this._unbindOnSendForm(element);
     this._unbindOnAddEmoji(element);
-    this._unbindOnAddComment(element);
     this._unbindOnOpenCloseRating(element);
   }
 
   /**
-   * Add events for close button of element.
+   * Add events for close from.
    * @param {DocumentFragment} element
    */
-  _bindOnCloseButton(element) {
-    const buttonContainer = element.querySelector(`.film-details__close-btn`);
-    if (buttonContainer === null) {
-      return;
+  _bindOnCloseForm(element) {
+    const closeBtnContainer = element.querySelector(`.film-details__close-btn`);
+    if (closeBtnContainer !== null) {
+      closeBtnContainer.addEventListener(`click`, this._onCloseForm);
+      closeBtnContainer.addEventListener(`keydown`, this._onCloseForm);
     }
-    buttonContainer.addEventListener(`click`, this._onCloseButton);
-    buttonContainer.addEventListener(`keydown`, this._onCloseButton);
-    element.firstElementChild.addEventListener(`keydown`, this._onCloseForm);
+
+    const formContainer = element.querySelector(`.film-details__inner`);
+    if (formContainer !== null) {
+      formContainer.addEventListener(`keydown`, this._onCloseForm);
+    }
   }
 
   /**
-   * Add events for button "Add to watchlist".
+   * Add events for send form.
    * @param {DocumentFragment} element
    */
-  _bindOnAddToWatchlist(element) {
-    const watchlistContainer =
-      element.querySelector(`.film-details__control-label--watchlist`);
-    if (watchlistContainer === null) {
-      return;
+  _bindOnSendForm(element) {
+    const formContainer = element.querySelector(`.film-details__inner`);
+    if (formContainer !== null) {
+      formContainer.addEventListener(`change`, this._onSendForm);
+      formContainer.addEventListener(`keydown`, this._onSendForm);
     }
-    watchlistContainer.addEventListener(`click`, this._onAddToWatchlist);
-    watchlistContainer.addEventListener(`keydown`, this._onAddToWatchlist);
-  }
-
-  /**
-   * Add events for button "Mark as watched".
-   * @param {DocumentFragment} element
-   */
-  _bindOnMarkAsWatched(element) {
-    const watchedContainer =
-      element.querySelector(`.film-details__control-label--watched`);
-    if (watchedContainer === null) {
-      return;
-    }
-    watchedContainer.addEventListener(`click`, this._onMarkAsWatched);
-    watchedContainer.addEventListener(`keydown`, this._onMarkAsWatched);
-  }
-
-  /**
-   * Add events for button "Favorite".
-   * @param {DocumentFragment} element
-   */
-  _bindOnAddToFavorite(element) {
-    const favoriteContainer =
-      element.querySelector(`.film-details__control-label--favorite`);
-    if (favoriteContainer === null) {
-      return;
-    }
-    favoriteContainer.addEventListener(`click`, this._onAddToFavorite);
-    favoriteContainer.addEventListener(`keydown`, this._onAddToFavorite);
   }
 
   /**
@@ -224,27 +150,13 @@ class FilmDetails extends AbstractComponent {
    */
   _bindOnAddEmoji(element) {
     const emojiListContainer = element.querySelector(`.film-details__emoji-list`);
-    if (emojiListContainer === null) {
-      return;
+    if (emojiListContainer !== null) {
+      const emojesContainer = emojiListContainer.querySelectorAll(`.film-details__emoji-label`);
+      for (let emoji of emojesContainer) {
+        emoji.addEventListener(`click`, this._onAddEmoji);
+        emoji.addEventListener(`keydown`, this._onAddEmoji);
+      }
     }
-    const emojesContainer = emojiListContainer.querySelectorAll(`.film-details__emoji-label`);
-    for (let emoji of emojesContainer) {
-      emoji.addEventListener(`click`, this._onAddEmoji);
-      emoji.addEventListener(`keydown`, this._onAddEmoji);
-    }
-  }
-
-  /**
-   * Add events for adding new comment.
-   * @param {DocumentFragment} element
-   */
-  _bindOnAddComment(element) {
-    const commentContainer = element.querySelector(`.film-details__add-emoji-label`);
-    if (commentContainer === null) {
-      return;
-    }
-    commentContainer.addEventListener(`click`, this._onAddComment);
-    commentContainer.addEventListener(`keydown`, this._onAddComment);
   }
 
   /**
@@ -252,67 +164,42 @@ class FilmDetails extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   _bindOnOpenCloseRating(element) {
-    const ratingContainer = element.querySelector(`.film-details__control-label--watched`);
-    if (ratingContainer === null) {
-      return;
-    }
-    ratingContainer.addEventListener(`click`, this._onOpenCloseRating);
-    ratingContainer.addEventListener(`keydown`, this._onOpenCloseRating);
-  }
-
-  /**
-   * Remove events for close button of element.
-   * @param {DocumentFragment} element
-   */
-  _unbindOnCloseButton(element) {
-    const buttonContainer = element.querySelector(`.film-details__close-btn`);
-    if (buttonContainer === null) {
-      return;
-    }
-    buttonContainer.removeEventListener(`click`, this._onCloseButton);
-    buttonContainer.removeEventListener(`keydown`, this._onCloseButton);
-  }
-
-  /**
-   * Remove events for button "Add to watchlist".
-   * @param {DocumentFragment} element
-   */
-  _unbindOnAddToWatchlist(element) {
-    const watchlistContainer =
-      element.querySelector(`.film-details__control-label--watchlist`);
-    if (watchlistContainer === null) {
-      return;
-    }
-    watchlistContainer.removeEventListener(`click`, this._onAddToWatchlist);
-    watchlistContainer.removeEventListener(`keydown`, this._onAddToWatchlist);
-  }
-
-  /**
-   * Remove events for button "Mark as watched".
-   * @param {DocumentFragment} element
-   */
-  _unbindOnMarkAsWatched(element) {
-    const watchedContainer =
+    const ratingContainer =
       element.querySelector(`.film-details__control-label--watched`);
-    if (watchedContainer === null) {
-      return;
+    if (ratingContainer !== null) {
+      ratingContainer.addEventListener(`click`, this._onOpenCloseRating);
+      ratingContainer.addEventListener(`keydown`, this._onOpenCloseRating);
     }
-    watchedContainer.removeEventListener(`click`, this._onMarkAsWatched);
-    watchedContainer.removeEventListener(`keydown`, this._onMarkAsWatched);
   }
 
   /**
-   * Remove events for button "Favorite".
+   * Remove events for close form.
    * @param {DocumentFragment} element
    */
-  _unbindOnAddToFavorite(element) {
-    const favoriteContainer =
-      element.querySelector(`.film-details__control-label--favorite`);
-    if (favoriteContainer === null) {
-      return;
+  _unbindOnCloseForm(element) {
+    const closeBtnContainer = element.querySelector(`.film-details__close-btn`);
+    if (closeBtnContainer !== null) {
+      closeBtnContainer.removeEventListener(`click`, this._onCloseForm);
+      closeBtnContainer.removeEventListener(`keydown`, this._onCloseForm);
     }
-    favoriteContainer.removeEventListener(`click`, this._onAddToFavorite);
-    favoriteContainer.removeEventListener(`keydown`, this._onAddToFavorite);
+
+    const formContainer = element.querySelector(`.film-details__inner`);
+    if (formContainer !== null) {
+      formContainer.removeEventListener(`keydown`, this._onCloseForm);
+    }
+  }
+
+  /**
+   * Remove events for send form.
+   * @param {DocumentFragment} element
+   */
+  _unbindOnSendForm(element) {
+    const formContainer = element.querySelector(`.film-details__inner`);
+    if (formContainer !== null) {
+      formContainer.removeEventListener(`change`, this._onSendForm);
+      formContainer.removeEventListener(`keydown`, this._onSendForm);
+      formContainer.removeEventListener(`submit`, this._onSendForm);
+    }
   }
 
   /**
@@ -321,27 +208,13 @@ class FilmDetails extends AbstractComponent {
    */
   _unbindOnAddEmoji(element) {
     const emojiListContainer = element.querySelector(`.film-details__emoji-list`);
-    if (emojiListContainer === null) {
-      return;
+    if (emojiListContainer !== null) {
+      const emojesContainer = emojiListContainer.querySelectorAll(`.film-details__emoji-label`);
+      for (let emoji of emojesContainer) {
+        emoji.removeEventListener(`click`, this._onAddEmoji);
+        emoji.removeEventListener(`keydown`, this._onAddEmoji);
+      }
     }
-    const emojesContainer = emojiListContainer.querySelectorAll(`.film-details__emoji-label`);
-    for (let emoji of emojesContainer) {
-      emoji.removeEventListener(`click`, this._onAddEmoji);
-      emoji.removeEventListener(`keydown`, this._onAddEmoji);
-    }
-  }
-
-  /**
-   * Remove events for adding new comment.
-   * @param {DocumentFragment} element
-   */
-  _unbindOnAddComment(element) {
-    const commentContainer = element.querySelector(`.film-details__add-emoji-label`);
-    if (commentContainer === null) {
-      return;
-    }
-    commentContainer.removeEventListener(`click`, this._onAddComment);
-    commentContainer.removeEventListener(`keydown`, this._onAddComment);
   }
 
   /**
@@ -349,22 +222,11 @@ class FilmDetails extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   _unbindOnOpenCloseRating(element) {
-    const ratingContainer = element.querySelector(`.film-details__control-label--watched`);
-    if (ratingContainer === null) {
-      return;
-    }
-    ratingContainer.removeEventListener(`click`, this._onOpenCloseRating);
-    ratingContainer.removeEventListener(`keydown`, this._onOpenCloseRating);
-  }
-
-  /**
-   * Call the fuction for close details of film.
-   * @param {event} evt
-   */
-  _onCloseButton(evt) {
-    if ((evt.keyCode === KEYS.ENTER || evt.type === `click`)
-      && (typeof this._onClose === `function`)) {
-      this._onClose();
+    const ratingContainer =
+      element.querySelector(`.film-details__control-label--watched`);
+    if (ratingContainer !== null) {
+      ratingContainer.removeEventListener(`click`, this._onOpenCloseRating);
+      ratingContainer.removeEventListener(`keydown`, this._onOpenCloseRating);
     }
   }
 
@@ -373,39 +235,9 @@ class FilmDetails extends AbstractComponent {
    * @param {event} evt
    */
   _onCloseForm(evt) {
-    if (evt.keyCode === KEYS.ESC
+    if ((evt.keyCode === KEYS.ESC || evt.type === `click`)
       && typeof this._onClose === `function`) {
       this._onClose();
-    }
-  }
-
-  /**
-   * Call the fuction for add to watchlist.
-   * @param {event} evt
-   */
-  _onAddToWatchlist(evt) {
-    if (evt.keyCode === KEYS.ENTER || evt.type === `click`) {
-      //
-    }
-  }
-
-  /**
-   * Call the fuction for mark as watched.
-   * @param {event} evt
-   */
-  _onMarkAsWatched(evt) {
-    if (evt.keyCode === KEYS.ENTER || evt.type === `click`) {
-      //
-    }
-  }
-
-  /**
-   * Call the function for add to favorite.
-   * @param {event} evt
-   */
-  _onAddToFavorite(evt) {
-    if (evt.keyCode === KEYS.ENTER || evt.type === `click`) {
-      //
     }
   }
 
@@ -421,17 +253,6 @@ class FilmDetails extends AbstractComponent {
   }
 
   /**
-   * Call the function for add new comment.
-   * @param {event} evt
-   */
-  _onAddComment(evt) {
-    if ((evt.keyCode === KEYS.ENTER || evt.type === `click`)
-      && (typeof this._addComment === `function`)) {
-      this._addComment(evt);
-    }
-  }
-
-  /**
    * Call the function for open/close rating.
    * @param {event} evt
    */
@@ -440,6 +261,172 @@ class FilmDetails extends AbstractComponent {
       && (typeof this._openCloseRating === `function`)) {
       this._openCloseRating();
     }
+  }
+
+  /**
+   * Call the fuction for send form.
+   * @param {event} evt
+   */
+  _onSendForm(evt) {
+    if (evt.keyCode === KEYS.ENTER || evt.type === `change`) {
+      const newData = this._getNewDataForm();
+      if (!this._isNecessarySendingDataToServer(evt.keyCode, newData, evt.target)) {
+        return;
+      }
+      this._resetUserRating(newData);
+      this._resetComment(evt.keyCode, newData, evt.target);
+      this._onDataChange(newData);
+    }
+  }
+
+  /**
+   * Returns the fact of the need to send data to the server.
+   * @param {number} keyCode
+   * @param {object} newData
+   * @param {HTMLElement} target
+   * @return {boolean}
+   */
+  _isNecessarySendingDataToServer(keyCode, newData, target) {
+    if ((keyCode !== KEYS.ENTER)
+      && target.classList.contains(`film-details__comment-input`)) {
+      return false;
+    }
+
+    if ((target.classList.contains(`film-details__comment-input`)
+      || target.classList.contains(`film-details__inner`))
+      && (newData.comment.img === null
+        || newData.comment.text === null)) {
+      return false;
+    }
+    if (target.classList.contains(`film-details__emoji-label`)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Reset comment in newData.
+   * @param {number} keyCode
+   * @param {object} newData
+   * @param {HTMLElement} target
+   */
+  _resetComment(keyCode, newData, target) {
+    if (keyCode !== KEYS.ENTER) {
+      newData.comment = this._getEmptyComment();
+      return;
+    }
+
+    if (newData.comment.img === null
+      || newData.comment.text === null) {
+      newData.comment = this._getEmptyComment();
+      return;
+    }
+
+    if (target.classList.contains(`film-details__emoji-label`)) {
+      newData.comment = this._getEmptyComment();
+    }
+  }
+
+  /**
+   * Return empty object "comment".
+   * @return {object}
+   */
+  _getEmptyComment() {
+    return {
+      id: null,
+      img: null,
+      text: null,
+      author: null,
+      date: null,
+    };
+  }
+
+  /**
+   * Reset userRating in newData.
+   * @param {object} newData
+   */
+  _resetUserRating(newData) {
+    let isContolTypeWatched = false;
+    newData.controlsTypes.forEach((contolType) => {
+      if (contolType === filmControlsTypesId.watched) {
+        isContolTypeWatched = true;
+      }
+    });
+    if (!isContolTypeWatched) {
+      newData.userRating = 0;
+    }
+  }
+
+  /**
+   * Return new data from form.
+   * @return {object}
+   */
+  _getNewDataForm() {
+    const formData = new FormData(document.querySelector(`.film-details__inner`));
+    return this._processForm(formData, this._id);
+  }
+
+  /**
+   * Return new data object.
+   *
+   * @param {FormData} formData
+   * @param {number} filmCardId
+   * @return {object}
+   */
+  _processForm(formData, filmCardId) {
+    const newData = {
+      id: filmCardId,
+      userRating: 0,
+      comment: {
+        id: null,
+        img: null,
+        text: null,
+        author: null,
+        date: null,
+      },
+      controlsTypes: []
+    };
+
+    const filmCardMapper = this._createMapper(newData);
+    for (const [key, value] of formData) {
+      if (filmCardMapper[key]) {
+        filmCardMapper[key](value);
+      }
+    }
+
+    return newData;
+  }
+
+  /**
+   * Create map of object.
+   *
+   * @param {DOM} newData
+   * @return {object}
+   */
+  _createMapper(newData) {
+    return {
+      'watchlist': (value) => {
+        newData.controlsTypes.push(value);
+      },
+      'watched': (value) => {
+        newData.controlsTypes.push(value);
+      },
+      'favorite': (value) => {
+        newData.controlsTypes.push(value);
+      },
+      'score': (value) => {
+        newData.userRating = Number(value);
+      },
+      'comment': (value) => {
+        newData.comment.text = value.trim();
+        newData.comment.author = userTotalRating;
+        newData.comment.date = new Date();
+      },
+      'comment-emoji': (value) => {
+        newData.comment.img = getEmojiImg(value);
+      }
+    };
   }
 }
 

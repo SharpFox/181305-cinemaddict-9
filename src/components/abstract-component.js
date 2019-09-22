@@ -35,12 +35,12 @@ class AbstractComponent {
   /**
    * Add events for elements.
    */
-  bind() {}
+  bind() { }
 
   /**
    * Remove events for elements.
    */
-  unbind() {}
+  unbind() { }
 
   /**
    * Return result of create new element.
@@ -62,13 +62,32 @@ class AbstractComponent {
 
   /**
    * Return deep clone of element with listeners.
+   * @param {DocumentFragment} element
    * @return {DocumentFragment}
    */
-  getCloneElement() {
+  getCloneElement(element = null) {
+    if (element === null) {
+      element = this._element;
+    }
     const fragment = document.createDocumentFragment();
-    for (let node of this._element.childNodes) {
+    for (let node of element.childNodes) {
       fragment.appendChild(node.cloneNode(true));
     }
+    return fragment;
+  }
+
+  /**
+   * Return part of element.
+   *
+   * @param {string} classCSS
+   * @return {DOM}
+   */
+  getElementPart(classCSS) {
+    const cloneElement = this.getCloneElement();
+    const elementPart = cloneElement.querySelector(`.${classCSS}`);
+    this.bind(elementPart);
+    const fragment = document.createDocumentFragment();
+    fragment.appendChild(elementPart);
     return fragment;
   }
 }

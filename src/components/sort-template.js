@@ -6,7 +6,7 @@
 const getSortTemplate = ([sortType, isActive]) => {
   return `
     <li>
-      <a href="#" data-sorttype="${sortType}" class="sort__button
+      <a data-sorttype="${sortType}" class="sort__button
       ${isActive ? ` sort__button--active` : ``}">
         Sort by ${sortType}
       </a>

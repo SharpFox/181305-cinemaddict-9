@@ -3,7 +3,7 @@
  * @param {object} statistic
  * @return {string}
  */
-const getStatisticTemplate = ({_userRating, _filters, _textList}) => {
+const getStatisticTemplate = ({_userTotalRating, _filters, _textList}) => {
   return `
     <p class="statistic__rank">
       Your rank
@@ -12,7 +12,7 @@ const getStatisticTemplate = ({_userRating, _filters, _textList}) => {
         alt="Avatar"
         width="35" height="35">
       <span class="statistic__rank-label">
-        ${_userRating}
+        ${_userTotalRating}
       </span>
     </p>
     <form action="https://echo.htmlacademy.ru/"

@@ -11,13 +11,13 @@ import AbstractComponent from './abstract-component.js';
 class Statistic extends AbstractComponent {
   /**
    * Create statistic.
-   * @param {number} userRating
+   * @param {number} userTotalRating
    * @param {array} filters
    * @param {array} textList
    */
-  constructor(userRating, filters, textList) {
+  constructor(userTotalRating, filters, textList) {
     super();
-    this._userRating = userRating;
+    this._userTotalRating = userTotalRating;
     this._filters = filters;
     this._textList = textList;
   }

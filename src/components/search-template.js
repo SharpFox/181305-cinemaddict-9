@@ -8,7 +8,7 @@ const getSearchTemplate = () => {
       name="search"
       class="search__field"
       placeholder="Search movies"
-      value="popeye"
+      value="Search movies"
     >
     <svg fill="#7171D8"
       class="search__film-icon"

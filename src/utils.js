@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 const KEYS = {
   'ESC': 27,
   'ENTER': 13
@@ -13,6 +15,27 @@ const addElementDOM = (container, component) => {
   const cloneElement = component.getCloneElement();
   component.bind(cloneElement);
   container.append(cloneElement);
+};
+
+/**
+ * Update element in DOM.
+ * @param {HTMLElement} oldElement
+ * @param {HTMLElement} newElement
+ * @param {HTMLElement} container
+ * @param {class} component
+ */
+const updateElementDOM = (oldElement, newElement, container, component) => {
+  const cloneElement = component.getCloneElement(newElement);
+  component.bind(cloneElement);
+  container.replaceChild(cloneElement, oldElement);
+};
+
+/**
+ * Remove element in DOM.
+ * @param {HTMLElement} container
+ */
+const removeElementDOM = (container) => {
+  container.remove();
 };
 
 /**
@@ -64,11 +87,42 @@ const removeContainerChildren = (container) => {
   }
 };
 
+/**
+ * Return clone of object.
+ * @param {object} oldObject
+ * @return {object}
+ */
+const cloneDeep = (oldObject) => {
+  return JSON.parse(JSON.stringify(oldObject));
+};
+
+/**
+ * Return duration.
+ * @param {date} startDate
+ * @param {date} endDate
+ * @return {string}
+ */
+const getDuration = (startDate, endDate) => {
+  const duration = moment(endDate) - moment(startDate);
+  const durationFormat = moment(duration).utcOffset(0).format(`H[h] m[m]`);
+  for (let char of durationFormat) {
+    if (char === `0`) {
+      return durationFormat.substring(2, durationFormat.length);
+    }
+    break;
+  }
+  return durationFormat;
+};
+
 export {
   KEYS,
   createElement,
   getRandomValueMinMax,
   compareRandom,
   addElementDOM,
-  removeContainerChildren
+  removeElementDOM,
+  updateElementDOM,
+  removeContainerChildren,
+  cloneDeep,
+  getDuration
 };

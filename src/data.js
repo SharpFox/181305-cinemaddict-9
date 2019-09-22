@@ -197,6 +197,7 @@ const getEmojiImg = (value) => {
       break;
     }
   }
+
   return valueEmoji;
 };
 
@@ -302,6 +303,7 @@ const getFilmCategoriesId = () => {
     categoriesId.push(Object.entries(filmsCategoriesId)
     .slice(1, 3)[getRandomValueMinMax(0, 1)][1]);
   }
+
   return categoriesId;
 };
 
@@ -356,6 +358,7 @@ const getFilmCardsMain = (filmsCount) => {
   for (let i = 0; i < filmsCount; i++) {
     filmCards.push(getFilmCard(i));
   }
+
   return filmCards;
 };
 
@@ -370,6 +373,7 @@ const cloneFilmCards = () => {
   filmsCardsMain.forEach((filmCard) => {
     filmsCards.push(cloneDeep(filmCard));
   });
+
   return filmsCards;
 };
 
@@ -426,8 +430,10 @@ const getFilmsCardsPortion = () => {
   return () => {
     const filmCardsPortion = filmsCardsCurrent.slice(filmsCardsPortionCount,
         filmsCardsPortionCount + stepFilmsCardsPortion);
+
     filmsCardsPortionCount += FILMS_CARDS_STEP;
     stepFilmsCardsPortion = FILMS_CARDS_STEP;
+
     return filmCardsPortion;
   };
 };
@@ -454,6 +460,7 @@ const getWatchedFilmsAmount = () => {
       }
     });
   });
+
   return filmsAmount;
 };
 
@@ -467,6 +474,7 @@ const getTopGenre = () => {
   filmsCardsCurrent.forEach((filmCard) => {
     filmCard.genres.forEach((genre) => allGenres.push(genre));
   });
+
   const uniqGenres = {};
   allGenres.forEach((genre) => {
     if (uniqGenres[genre] === undefined) {
@@ -475,6 +483,7 @@ const getTopGenre = () => {
       uniqGenres[genre]++;
     }
   });
+
   const maxGenreAmount = Math.max(...Object.values(uniqGenres));
   const uniqGenresTotal = Object.entries(uniqGenres);
   for (let [genre, amount] of uniqGenresTotal) {
@@ -483,6 +492,7 @@ const getTopGenre = () => {
       break;
     }
   }
+
   return topGenre;
 };
 
@@ -500,6 +510,7 @@ const getFilmsAmountByCategories = (category) => {
       }
     });
   });
+
   return filmsAmount;
 };
 

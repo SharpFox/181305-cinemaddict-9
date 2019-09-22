@@ -273,6 +273,7 @@ class FilmDetails extends AbstractComponent {
       if (!this._isNecessarySendingDataToServer(evt.keyCode, newData, evt.target)) {
         return;
       }
+
       this._resetUserRating(newData);
       this._resetComment(evt.keyCode, newData, evt.target);
       this._onDataChange(newData);
@@ -298,6 +299,7 @@ class FilmDetails extends AbstractComponent {
         || newData.comment.text === null)) {
       return false;
     }
+
     if (target.classList.contains(`film-details__emoji-label`)) {
       return false;
     }
@@ -353,6 +355,7 @@ class FilmDetails extends AbstractComponent {
         isContolTypeWatched = true;
       }
     });
+
     if (!isContolTypeWatched) {
       newData.userRating = 0;
     }

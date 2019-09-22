@@ -60,6 +60,7 @@ const activateMainNavigationItem = (mainNavigationItemContainer) => {
         itemContainer.classList.remove(`main-navigation__item--active`);
       }
     });
+
     mainNavigationItemContainer.classList.add(`main-navigation__item--active`);
   }
 };
@@ -84,6 +85,7 @@ const selectFilms = () => {
     removeContainerChildren(filmsContainer);
     removeContainerChildren(sortContainer);
     pageController.init();
+
     return;
   }
   selectfilmsCardsCurrent(currentType);

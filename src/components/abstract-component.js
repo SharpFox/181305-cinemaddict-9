@@ -49,6 +49,7 @@ class AbstractComponent {
   render() {
     this._element = createElement(this.template);
     this.bind();
+
     return this._element;
   }
 
@@ -69,10 +70,12 @@ class AbstractComponent {
     if (element === null) {
       element = this._element;
     }
+
     const fragment = document.createDocumentFragment();
     for (let node of element.childNodes) {
       fragment.appendChild(node.cloneNode(true));
     }
+
     return fragment;
   }
 
@@ -88,6 +91,7 @@ class AbstractComponent {
     this.bind(elementPart);
     const fragment = document.createDocumentFragment();
     fragment.appendChild(elementPart);
+
     return fragment;
   }
 }

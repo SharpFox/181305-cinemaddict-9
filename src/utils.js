@@ -51,6 +51,7 @@ const createElement = (template) => {
   for (let i = 0; i < childrenCount; i++) {
     fragment.appendChild(newElement.childNodes[0]);
   }
+
   return fragment;
 };
 
@@ -111,6 +112,7 @@ const getDuration = (startDate, endDate) => {
     }
     break;
   }
+
   return durationFormat;
 };
 

@@ -107,7 +107,7 @@ const getEmojiListTemplate = () => {
  * @param {array} comments
  * @return {string}
  */
-const getCommentListTemplate = (comments) => {
+const getCommentsListTemplate = (comments) => {
   return `
     <ul class="film-details__comments-list">
       ${comments.map(({id, img, text, author, date}) => (`<li
@@ -132,9 +132,7 @@ const getCommentListTemplate = (comments) => {
             </span>
             <button class="film-details__comment-delete"
               tabindex="4"
-              type="submit"
-              value="${id}"
-              name="${id}">
+              data-id="${id}">
               Delete
             </button>
           </p>
@@ -275,7 +273,7 @@ const getFilmDetailsTemplate = ({_img, _age, _title, _rating, _userRating,
               ${_comments.length}
             </span>
           </h3>
-          ${getCommentListTemplate(_comments)}
+          ${getCommentsListTemplate(_comments)}
           <div class="film-details__new-comment"> 
             <div for="add-emoji"
               class="film-details__add-emoji-label">

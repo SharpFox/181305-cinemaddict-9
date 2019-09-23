@@ -53,6 +53,7 @@ class FilmDetails extends AbstractComponent {
     this._onSendForm = this._onSendForm.bind(this);
     this._onAddEmoji = this._onAddEmoji.bind(this);
     this._onOpenCloseRating = this._onOpenCloseRating.bind(this);
+    this._onDeleteComment = this._onDeleteComment.bind(this);
   }
 
   /**
@@ -99,6 +100,7 @@ class FilmDetails extends AbstractComponent {
     this._bindOnSendForm(element);
     this._bindOnAddEmoji(element);
     this._bindOnOpenCloseRating(element);
+    this._bindOnDeleteComment(element);
   }
 
   /**
@@ -113,6 +115,7 @@ class FilmDetails extends AbstractComponent {
     this._unbindOnSendForm(element);
     this._unbindOnAddEmoji(element);
     this._unbindOnOpenCloseRating(element);
+    this._unbindOnDeleteComment(element);
   }
 
   /**
@@ -149,9 +152,8 @@ class FilmDetails extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   _bindOnAddEmoji(element) {
-    const emojiListContainer = element.querySelector(`.film-details__emoji-list`);
-    if (emojiListContainer !== null) {
-      const emojesContainer = emojiListContainer.querySelectorAll(`.film-details__emoji-label`);
+    if (element !== null) {
+      const emojesContainer = element.querySelectorAll(`.film-details__emoji-label`);
       for (let emoji of emojesContainer) {
         emoji.addEventListener(`click`, this._onAddEmoji);
         emoji.addEventListener(`keydown`, this._onAddEmoji);
@@ -169,6 +171,20 @@ class FilmDetails extends AbstractComponent {
     if (ratingContainer !== null) {
       ratingContainer.addEventListener(`click`, this._onOpenCloseRating);
       ratingContainer.addEventListener(`keydown`, this._onOpenCloseRating);
+    }
+  }
+
+  /**
+   * Add events for delete comments.
+   * @param {DocumentFragment} element
+   */
+  _bindOnDeleteComment(element) {
+    if (element !== null) {
+      const commentsDeleteContainer = element.querySelectorAll(`.film-details__comment-delete`);
+      for (let commentContainer of commentsDeleteContainer) {
+        commentContainer.addEventListener(`click`, this._onDeleteComment);
+        commentContainer.addEventListener(`keydown`, this._onDeleteComment);
+      }
     }
   }
 
@@ -198,7 +214,6 @@ class FilmDetails extends AbstractComponent {
     if (formContainer !== null) {
       formContainer.removeEventListener(`change`, this._onSendForm);
       formContainer.removeEventListener(`keydown`, this._onSendForm);
-      formContainer.removeEventListener(`submit`, this._onSendForm);
     }
   }
 
@@ -207,9 +222,8 @@ class FilmDetails extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   _unbindOnAddEmoji(element) {
-    const emojiListContainer = element.querySelector(`.film-details__emoji-list`);
-    if (emojiListContainer !== null) {
-      const emojesContainer = emojiListContainer.querySelectorAll(`.film-details__emoji-label`);
+    if (element !== null) {
+      const emojesContainer = element.querySelectorAll(`.film-details__emoji-label`);
       for (let emoji of emojesContainer) {
         emoji.removeEventListener(`click`, this._onAddEmoji);
         emoji.removeEventListener(`keydown`, this._onAddEmoji);
@@ -227,6 +241,20 @@ class FilmDetails extends AbstractComponent {
     if (ratingContainer !== null) {
       ratingContainer.removeEventListener(`click`, this._onOpenCloseRating);
       ratingContainer.removeEventListener(`keydown`, this._onOpenCloseRating);
+    }
+  }
+
+  /**
+   * Remove events for delete comments.
+   * @param {DocumentFragment} element
+   */
+  _unbindOnDeleteComment(element) {
+    if (element !== null) {
+      const commentsDeleteContainer = element.querySelectorAll(`.film-details__comment-delete`);
+      for (let commentContainer of commentsDeleteContainer) {
+        commentContainer.removeEventListener(`click`, this._onDeleteComment);
+        commentContainer.removeEventListener(`keydown`, this._onDeleteComment);
+      }
     }
   }
 
@@ -261,6 +289,32 @@ class FilmDetails extends AbstractComponent {
       && (typeof this._openCloseRating === `function`)) {
       this._openCloseRating();
     }
+  }
+
+  /**
+   * Call the function for delete comment.
+   * @param {event} evt
+   */
+  _onDeleteComment(evt) {
+    if (evt.keyCode === KEYS.ENTER || evt.type === `click`) {
+      evt.preventDefault();
+      this._onDataChange(
+          this._getNewDataForIdComment(
+              Number(evt.target.dataset.id)));
+    }
+  }
+
+  /**
+   * Return object newData for id comment.
+   * @param {number} commentId
+   * @return {object}
+   */
+  _getNewDataForIdComment(commentId) {
+    const newData = this._getEmptyNewData();
+    newData.id = this._id;
+    newData.comment.id = commentId;
+
+    return newData;
   }
 
   /**
@@ -331,20 +385,6 @@ class FilmDetails extends AbstractComponent {
   }
 
   /**
-   * Return empty object "comment".
-   * @return {object}
-   */
-  _getEmptyComment() {
-    return {
-      id: null,
-      img: null,
-      text: null,
-      author: null,
-      date: null,
-    };
-  }
-
-  /**
    * Reset userRating in newData.
    * @param {object} newData
    */
@@ -371,25 +411,43 @@ class FilmDetails extends AbstractComponent {
   }
 
   /**
+   * Return empty object "comment".
+   * @return {object}
+   */
+  _getEmptyComment() {
+    return {
+      id: null,
+      img: null,
+      text: null,
+      author: null,
+      date: null,
+    };
+  }
+
+  /**
+   * Return empty NewData.
+   * @return {object}
+   */
+  _getEmptyNewData() {
+    return {
+      isSendingForm: false,
+      id: null,
+      userRating: null,
+      comment: this._getEmptyComment(),
+      controlsTypes: []
+    };
+  }
+
+  /**
    * Return new data object.
-   *
    * @param {FormData} formData
    * @param {number} filmCardId
    * @return {object}
    */
   _processForm(formData, filmCardId) {
-    const newData = {
-      id: filmCardId,
-      userRating: 0,
-      comment: {
-        id: null,
-        img: null,
-        text: null,
-        author: null,
-        date: null,
-      },
-      controlsTypes: []
-    };
+    const newData = this._getEmptyNewData();
+    newData.isSendingForm = true;
+    newData.id = filmCardId;
 
     const filmCardMapper = this._createMapper(newData);
     for (const [key, value] of formData) {
@@ -398,12 +456,23 @@ class FilmDetails extends AbstractComponent {
       }
     }
 
+    const commentsDeleteCounter =
+      this._element.querySelectorAll(`.film-details__comment-delete`);
+    if (commentsDeleteCounter.length) {
+      const idList = [];
+      commentsDeleteCounter.forEach((commentDeleteContainer) => {
+        idList.push(Number(commentDeleteContainer.dataset.id));
+      });
+      newData.comment.id = idList.sort()[idList.length - 1] + 1;
+    } else {
+      newData.comment.id = 0;
+    }
+
     return newData;
   }
 
   /**
    * Create map of object.
-   *
    * @param {DOM} newData
    * @return {object}
    */

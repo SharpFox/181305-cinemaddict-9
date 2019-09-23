@@ -269,8 +269,10 @@ const filmsCategoriesId = {
  * @return {array}
  */
 const getComments = () => {
-  return comments.sort(compareRandom).slice(0,
+  const randomComments = comments.slice(0,
       getRandomValueMinMax(1, comments.length - 1));
+
+  return randomComments;
 };
 
 /**
@@ -313,7 +315,6 @@ const getFilmCategoriesId = () => {
  * @return {object}
  */
 const getFilmCard = (id) => {
-  const filmComments = getComments();
   const filmControlsTypes = getFilmControlsTypes();
 
   let filmUserRating = 0;
@@ -335,7 +336,7 @@ const getFilmCard = (id) => {
       + posters[getRandomValueMinMax(0, posters.length - 1)],
     description: descriptions.sort(compareRandom).slice(0,
         getRandomValueMinMax(1, descriptions.length - 1)),
-    comments: filmComments,
+    comments: getComments(),
     age: getRandomValueMinMax(6, 18),
     director: directors[getRandomValueMinMax(0, directors.length - 1)],
     writers: writers.sort(compareRandom).slice(0,
@@ -401,6 +402,19 @@ const selectfilmsCardsCurrent = (category) => {
         filmsCardsCurrent.push(filmCard);
         break;
       }
+    }
+  });
+};
+
+/**
+ * Find a film by the search line in FilmsCardsCurrent.
+ * @param {string} searchLine
+ */
+const findFilmsCardsCurrent = (searchLine) => {
+  filmsCardsCurrent = [];
+  filmsCardsMain.forEach((filmCard) => {
+    if (filmCard.title.toLowerCase().includes(searchLine.toLowerCase())) {
+      filmsCardsCurrent.push(filmCard);
     }
   });
 };
@@ -518,26 +532,63 @@ const userTotalRating = userRanks[getRandomValueMinMax(0, userRanks.length - 1)]
 const countFilmCards = filmsCardsCurrent.length;
 
 /**
+ * Update film card for sending form.
+ * @param {object} newData
+ * @param {object} filmCard
+ * @param {string} keyUpdate
+ * @param {different} value
+ */
+const updateServerDataForSendingForm = (newData, filmCard, keyUpdate, value) => {
+  if (keyUpdate !== `comments`) {
+    filmCard[keyUpdate] = value;
+    return;
+  }
+  if (newData.comment.text !== null) {
+    filmCard[keyUpdate].push(value);
+  }
+};
+
+/**
+ * Delete comment in server.
+ * @param {object} newData
+ * @param {object} filmCard
+ */
+const deleteCommentInServerData = (newData, filmCard) => {
+  const currentKey = `comments`;
+  const filmCardEntries = Object.keys(filmCard);
+  for (let key of filmCardEntries) {
+    if (key !== currentKey) {
+      continue;
+    }
+    const commentsCopy = Object.assign(filmCard[currentKey]);
+    filmCard[currentKey] = [];
+    for (const comment of commentsCopy) {
+      if (comment.id !== newData.comment.id) {
+        filmCard[currentKey].push(comment);
+      }
+    }
+  }
+};
+
+/**
  * Update data in teh server.
  * @param {object} newData
  */
 const updateServerData = (newData) => {
-  filmsCardsCurrent.forEach((filmCard) => {
-    if (filmCard.id === newData.id) {
-      Object.entries(newData).forEach(([key, value]) => {
-        const keyUpdate = key === `comment` ? `comments` : key;
-        if (filmCard[keyUpdate] !== undefined) {
-          if (keyUpdate === `comments`) {
-            if (newData.comment.text !== null) {
-              filmCard[keyUpdate].push(value);
-            }
-          } else {
-            filmCard[keyUpdate] = value;
-          }
-        }
-      });
+  for (const filmCard of filmsCardsCurrent) {
+    if (filmCard.id !== newData.id) {
+      continue;
     }
-  });
+    const newDataEntries = Object.entries(newData);
+    for (let [key, value] of newDataEntries) {
+      const keyUpdate = key === `comment` ? `comments` : key;
+      if (newData.isSendingForm) {
+        updateServerDataForSendingForm(newData, filmCard, keyUpdate, value);
+        continue;
+      }
+      deleteCommentInServerData(newData, filmCard, keyUpdate);
+    }
+  }
 };
 
 const filmLists = {
@@ -717,6 +768,7 @@ export {
   filmsCardsCurrent,
   countFilmCards,
   userTotalRating,
+  filmsCategories,
   filmsCategoriesId,
   ratingScales,
   totalDownloadedFilmsCards,
@@ -726,5 +778,6 @@ export {
   getEmojiImg,
   doDefaultFilmCardsCurrent,
   selectfilmsCardsCurrent,
-  setNumberDownloadedFilmsCards
+  setNumberDownloadedFilmsCards,
+  findFilmsCardsCurrent
 };

@@ -159,7 +159,6 @@ class FilmCard extends AbstractComponent {
 
   /**
    * Return new data object.
-   *
    * @param {event} target
    * @param {number} filmCardId
    * @return {object}
@@ -192,7 +191,6 @@ class FilmCard extends AbstractComponent {
 
   /**
    * Create map of object.
-   *
    * @param {DOM} newData
    * @return {object}
    */

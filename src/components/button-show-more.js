@@ -45,6 +45,9 @@ class ButtonShowMore extends AbstractComponent {
     if (element === null) {
       element = this._element;
     }
+    if (element === null) {
+      return;
+    }
     this._bindOnOpenButton(element);
   }
 
@@ -55,6 +58,9 @@ class ButtonShowMore extends AbstractComponent {
   unbind(element = null) {
     if (element === null) {
       element = this._element;
+    }
+    if (element === null) {
+      return;
     }
     this._unbindOnOpenButton(element);
   }

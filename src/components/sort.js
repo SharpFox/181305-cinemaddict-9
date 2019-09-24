@@ -54,7 +54,13 @@ class Sort extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   bind(element = null) {
-    this._bindOnSortButton(element === null ? this._element : element);
+    if (element === null) {
+      element = this._element;
+    }
+    if (element === null) {
+      return;
+    }
+    this._bindOnSortButton(element);
   }
 
   /**
@@ -62,7 +68,13 @@ class Sort extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   unbind(element = null) {
-    this._unbindOnSortButton(element === null ? this._element : element);
+    if (element === null) {
+      element = this._element;
+    }
+    if (element === null) {
+      return;
+    }
+    this._unbindOnSortButton(element);
   }
 
   /**

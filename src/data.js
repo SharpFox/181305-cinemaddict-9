@@ -479,27 +479,36 @@ const getWatchedFilmsAmount = () => {
 };
 
 /**
- * Return a top genre.
- * @return {string}
+ * Return unique genres from filmsCardsCurrent.
+ * @return {object}
  */
-const getTopGenre = () => {
-  let topGenre = null;
+const getUniqueGenres = () => {
   const allGenres = [];
   filmsCardsCurrent.forEach((filmCard) => {
     filmCard.genres.forEach((genre) => allGenres.push(genre));
   });
 
-  const uniqGenres = {};
+  const uniqueGenres = {};
   allGenres.forEach((genre) => {
-    if (uniqGenres[genre] === undefined) {
-      uniqGenres[genre] = 1;
+    if (uniqueGenres[genre] === undefined) {
+      uniqueGenres[genre] = 1;
     } else {
-      uniqGenres[genre]++;
+      uniqueGenres[genre]++;
     }
   });
 
-  const maxGenreAmount = Math.max(...Object.values(uniqGenres));
-  const uniqGenresTotal = Object.entries(uniqGenres);
+  return uniqueGenres;
+};
+
+/**
+ * Return a top genre.
+ * @return {string}
+ */
+const getTopGenre = () => {
+  let topGenre = null;
+  const uniqueGenres = getUniqueGenres();
+  const maxGenreAmount = Math.max(...Object.values(uniqueGenres));
+  const uniqGenresTotal = Object.entries(uniqueGenres);
   for (let [genre, amount] of uniqGenresTotal) {
     if (amount === maxGenreAmount) {
       topGenre = genre;
@@ -508,6 +517,19 @@ const getTopGenre = () => {
   }
 
   return topGenre;
+};
+
+/**
+ * Return total duration of all films.
+ * @return {number}
+ */
+const getTotalDuration = () => {
+  let totalDuration = 0;
+  durationList.forEach((duration) => {
+    totalDuration += moment(duration.end) - moment(duration.start);
+  });
+
+  return totalDuration;
 };
 
 /**
@@ -663,96 +685,112 @@ const menuTypes = [
   }
 ];
 
-const statisticFilters = [
-  {
-    attribute: `all-time`,
-    title: `All time`,
-    isChecked: true
-  },
-  {
-    attribute: `today`,
-    title: `Today`,
-    isChecked: false
-  },
-  {
-    attribute: `week`,
-    title: `Week`,
-    isChecked: false
-  },
-  {
-    attribute: `month`,
-    title: `Month`,
-    isChecked: false
-  },
-  {
-    attribute: `year`,
-    title: `Year`,
-    isChecked: false
-  }
-];
-
-/**
- * Return total duration of all films.
- * @return {number}
- */
-const getTotalDuration = () => {
-  let totalDuration = 0;
-  durationList.forEach((duration) => {
-    totalDuration += moment(duration.end) - moment(duration.start);
-  });
-
-  return totalDuration;
+const statisticFiltersId = {
+  'allTime': `all-time`,
+  'today': `today`,
+  'week': `week`,
+  'month': `month`,
+  'year': `year`
 };
 
-const totalDuration = getTotalDuration();
+/**
+ * Return statistic filters.
+ * @param {string} isCheckedCategory
+ * @return {array}
+ */
+const getStatisticFilters = (isCheckedCategory) => {
+  return [
+    {
+      id: statisticFiltersId.allTime,
+      title: `All time`,
+      isChecked:
+        isCheckedCategory === statisticFiltersId.allTime ? true : false
+    },
+    {
+      id: statisticFiltersId.today,
+      title: `Today`,
+      isChecked:
+        isCheckedCategory === statisticFiltersId.today ? true : false
+    },
+    {
+      id: statisticFiltersId.week,
+      title: `Week`,
+      isChecked:
+        isCheckedCategory === statisticFiltersId.week ? true : false
+    },
+    {
+      id: statisticFiltersId.month,
+      title: `Month`,
+      isChecked:
+        isCheckedCategory === statisticFiltersId.month ? true : false
+    },
+    {
+      id: statisticFiltersId.year,
+      title: `Year`,
+      isChecked:
+        isCheckedCategory === statisticFiltersId.year ? true : false
+    }
+  ];
+};
 
-const statisticTextList = [
-  {
-    title: `You watched`,
-    texts: [
-      {
-        textTitle: getWatchedFilmsAmount(),
-        isDescription: false
-      },
-      {
-        textTitle: `movies`,
-        isDescription: true
-      }
-    ]
-  },
-  {
-    title: `Total duration`,
-    texts: [
-      {
-        textTitle: moment(totalDuration).format(`H`),
-        isDescription: false
-      },
-      {
-        textTitle: `h`,
-        isDescription: true
-      },
-      {
-        textTitle: moment(totalDuration).format(`m`),
-        isDescription: false
-      },
-      {
-        textTitle: `m`,
-        isDescription: true
-      }
-    ]
-  },
-  {
-    title: `Top genre`,
-    texts: [
-      {
-        textTitle: getTopGenre(),
-        isDescription: false
-      }
-    ]
-  }
-];
+/**
+ * Return statistic list.
+ * @param {number} totalWatchedFilms
+ * @param {number} totalDuration
+ * @param {string} topGenre
+ * @return {array}
+ */
+const getStatisticList = (totalWatchedFilms, totalDuration,
+    topGenre) => {
+  return [
+    {
+      title: `You watched`,
+      texts: [
+        {
+          textTitle: totalWatchedFilms,
+          isDescription: false
+        },
+        {
+          textTitle: `movies`,
+          isDescription: true
+        }
+      ]
+    },
+    {
+      title: `Total duration`,
+      texts: [
+        {
+          textTitle: moment(totalDuration).format(`H`),
+          isDescription: false
+        },
+        {
+          textTitle: `h`,
+          isDescription: true
+        },
+        {
+          textTitle: moment(totalDuration).format(`m`),
+          isDescription: false
+        },
+        {
+          textTitle: `m`,
+          isDescription: true
+        }
+      ]
+    },
+    {
+      title: `Top genre`,
+      texts: [
+        {
+          textTitle: topGenre,
+          isDescription: false
+        }
+      ]
+    }
+  ];
+};
 
 export {
+  genres,
   sortTypes,
   sortTypesId,
   filmCardControlsTypes,
@@ -762,14 +800,14 @@ export {
   filmLists,
   menuTypes,
   menuTypesId,
-  statisticFilters,
-  statisticTextList,
+  getStatisticList,
   filmsCardsMain,
   filmsCardsCurrent,
   countFilmCards,
   userTotalRating,
   filmsCategories,
   filmsCategoriesId,
+  statisticFiltersId,
   ratingScales,
   totalDownloadedFilmsCards,
   getFilmsCardsPortion,
@@ -779,5 +817,10 @@ export {
   doDefaultFilmCardsCurrent,
   selectfilmsCardsCurrent,
   setNumberDownloadedFilmsCards,
-  findFilmsCardsCurrent
+  findFilmsCardsCurrent,
+  getTotalDuration,
+  getWatchedFilmsAmount,
+  getTopGenre,
+  getStatisticFilters,
+  getUniqueGenres
 };

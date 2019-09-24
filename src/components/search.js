@@ -55,6 +55,9 @@ class Search extends AbstractComponent {
     if (element === null) {
       element = this._element;
     }
+    if (element === null) {
+      return;
+    }
     this._bindOnSearchFilm(element);
     this._bindOnCloseSearch(element);
   }
@@ -66,6 +69,9 @@ class Search extends AbstractComponent {
   unbind(element = null) {
     if (element === null) {
       element = this._element;
+    }
+    if (element === null) {
+      return;
     }
     this._unbindOnSearchFilm(element);
     this._unbindOnCloseSearch(element);

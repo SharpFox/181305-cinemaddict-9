@@ -60,6 +60,9 @@ class FilmCard extends AbstractComponent {
     if (element === null) {
       element = this._element;
     }
+    if (element === null) {
+      return;
+    }
     this._bindOnOpenDetails(element);
     this._bindOnSendForm(element);
   }
@@ -71,6 +74,9 @@ class FilmCard extends AbstractComponent {
   unbind(element = null) {
     if (element === null) {
       element = this._element;
+    }
+    if (element === null) {
+      return;
     }
     this._unbindOnOpenDetails(element);
     this._unbindOnSendForm(element);
@@ -165,6 +171,7 @@ class FilmCard extends AbstractComponent {
    */
   _processForm(target, filmCardId) {
     const newData = {
+      isSendingForm: true,
       id: filmCardId,
       controlsTypes: []
     };

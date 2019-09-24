@@ -96,6 +96,9 @@ class FilmDetails extends AbstractComponent {
     if (element === null) {
       element = this._element;
     }
+    if (element === null) {
+      return;
+    }
     this._bindOnCloseForm(element);
     this._bindOnSendForm(element);
     this._bindOnAddEmoji(element);
@@ -111,6 +114,9 @@ class FilmDetails extends AbstractComponent {
     if (element === null) {
       element = this._element;
     }
+    if (element === null) {
+      return;
+    }
     this._unbindOnCloseForm(element);
     this._unbindOnSendForm(element);
     this._unbindOnAddEmoji(element);
@@ -123,7 +129,8 @@ class FilmDetails extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   _bindOnCloseForm(element) {
-    const closeBtnContainer = element.querySelector(`.film-details__close-btn`);
+    const closeBtnContainer =
+      element.querySelector(`.film-details__close-btn`);
     if (closeBtnContainer !== null) {
       closeBtnContainer.addEventListener(`click`, this._onCloseForm);
       closeBtnContainer.addEventListener(`keydown`, this._onCloseForm);
@@ -152,8 +159,9 @@ class FilmDetails extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   _bindOnAddEmoji(element) {
-    if (element !== null) {
-      const emojesContainer = element.querySelectorAll(`.film-details__emoji-label`);
+    const emojesContainer =
+      element.querySelectorAll(`.film-details__emoji-label`);
+    if (emojesContainer !== null) {
       for (let emoji of emojesContainer) {
         emoji.addEventListener(`click`, this._onAddEmoji);
         emoji.addEventListener(`keydown`, this._onAddEmoji);
@@ -179,8 +187,9 @@ class FilmDetails extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   _bindOnDeleteComment(element) {
-    if (element !== null) {
-      const commentsDeleteContainer = element.querySelectorAll(`.film-details__comment-delete`);
+    const commentsDeleteContainer =
+      element.querySelectorAll(`.film-details__comment-delete`);
+    if (commentsDeleteContainer !== null) {
       for (let commentContainer of commentsDeleteContainer) {
         commentContainer.addEventListener(`click`, this._onDeleteComment);
         commentContainer.addEventListener(`keydown`, this._onDeleteComment);
@@ -193,7 +202,8 @@ class FilmDetails extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   _unbindOnCloseForm(element) {
-    const closeBtnContainer = element.querySelector(`.film-details__close-btn`);
+    const closeBtnContainer =
+      element.querySelector(`.film-details__close-btn`);
     if (closeBtnContainer !== null) {
       closeBtnContainer.removeEventListener(`click`, this._onCloseForm);
       closeBtnContainer.removeEventListener(`keydown`, this._onCloseForm);
@@ -222,8 +232,9 @@ class FilmDetails extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   _unbindOnAddEmoji(element) {
-    if (element !== null) {
-      const emojesContainer = element.querySelectorAll(`.film-details__emoji-label`);
+    const emojesContainer =
+      element.querySelectorAll(`.film-details__emoji-label`);
+    if (emojesContainer !== null) {
       for (let emoji of emojesContainer) {
         emoji.removeEventListener(`click`, this._onAddEmoji);
         emoji.removeEventListener(`keydown`, this._onAddEmoji);
@@ -249,8 +260,9 @@ class FilmDetails extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   _unbindOnDeleteComment(element) {
-    if (element !== null) {
-      const commentsDeleteContainer = element.querySelectorAll(`.film-details__comment-delete`);
+    const commentsDeleteContainer =
+      element.querySelectorAll(`.film-details__comment-delete`);
+    if (commentsDeleteContainer !== null) {
       for (let commentContainer of commentsDeleteContainer) {
         commentContainer.removeEventListener(`click`, this._onDeleteComment);
         commentContainer.removeEventListener(`keydown`, this._onDeleteComment);
@@ -324,7 +336,8 @@ class FilmDetails extends AbstractComponent {
   _onSendForm(evt) {
     if (evt.keyCode === KEYS.ENTER || evt.type === `change`) {
       const newData = this._getNewDataForm();
-      if (!this._isNecessarySendingDataToServer(evt.keyCode, newData, evt.target)) {
+      if (!this._isNecessarySendingDataToServer(evt.keyCode, newData,
+          evt.target)) {
         return;
       }
 

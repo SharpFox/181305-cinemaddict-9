@@ -27,15 +27,16 @@ class PageController {
   /**
    * Create page controller.
    * @param {HTMLElement} filmsContainer
-   * @param {HTMLElement} filmsDetailsContainer
+   * @param {HTMLElement} filmDetailsContainer
    * @param {HTMLElement} sortContainer
    */
-  constructor(filmsContainer, filmsDetailsContainer, sortContainer) {
+  constructor(filmsContainer, filmDetailsContainer, sortContainer) {
     this._filmsContainer = filmsContainer;
-    this._filmsDetailsContainer = filmsDetailsContainer;
+    this._filmDetailsContainer = filmDetailsContainer;
     this._sortContainer = sortContainer;
     this._totalFilmPortionNumber = 1;
     this._movieControllers = [];
+    this._filmsListsComponents = [];
     this._getFilmsCards = getFilmsCardsPortion();
 
     this._onDataChange = this._onDataChange.bind(this);
@@ -56,6 +57,7 @@ class PageController {
    */
   addFilmsList(filmCategory, filmsCards) {
     const filmsListComponent = new FilmList(filmLists[filmCategory]);
+    this._filmsListsComponents.push(filmsListComponent);
     addElementDOM(this._filmsContainer, filmsListComponent);
     const filmsListContainer =
       this._getFilmsListContainer(filmsListComponent.element);
@@ -87,10 +89,29 @@ class PageController {
   }
 
   /**
+   * Unrender FilmCardComponent and FilmDetailsComponent.
+   */
+  unrenderComponentsMoviesControllers() {
+    this._movieControllers.forEach((movieController) => {
+      movieController.unrenderComponents();
+    });
+  }
+
+  /**
+   * Unrender films lists components.
+   */
+  unrenderFilmsListsComponents() {
+    this._filmsListsComponents.forEach((filmListComponent) => {
+      filmListComponent.unrender();
+    });
+  }
+
+  /**
    * Add films lists.
    */
   _addFilmsLists() {
     this._movieControllers = [];
+    this._filmsListsComponents = [];
     this.addFilmsList(filmsCategoriesId.AllMoviesUpcoming,
         this._getFilmsCards());
     this.addFilmsList(filmsCategoriesId.TopRated);
@@ -104,10 +125,15 @@ class PageController {
   _onDataChange(newData) {
     updateServerData(newData);
     changefilmsCardsPortionCount(totalDownloadedFilmsCards);
+
     removeContainerChildren(this._filmsContainer);
     const containerfilmsDetailsHaveChildren =
-      this._filmsDetailsContainer.children.length;
-    removeContainerChildren(this._filmsDetailsContainer);
+      this._filmDetailsContainer.children.length;
+    removeContainerChildren(this._filmDetailsContainer);
+
+    this.unrenderFilmsListsComponents();
+    this.unrenderComponentsMoviesControllers();
+
     this._addFilmsLists();
     this._renderFilmDetails(newData.id, containerfilmsDetailsHaveChildren);
   }
@@ -209,7 +235,7 @@ class PageController {
   _addFilmCard(filmsListContainer, filmsListFilmsContainer,
       filmCard) {
     const movieController = new MovieController(filmCard, filmsListContainer,
-        filmsListFilmsContainer, this._filmsDetailsContainer,
+        filmsListFilmsContainer, this._filmDetailsContainer,
         this._onDataChange);
     movieController.init();
     this._movieControllers.push(movieController);

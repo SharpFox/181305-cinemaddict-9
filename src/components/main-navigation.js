@@ -3,12 +3,11 @@ import {
   getMainNavigationTemplate
 } from './main-navigation-template.js';
 import {
-  menuTypes,
-  menuTypesId
-} from '../data.js';
-import {
   KEYS
 } from '../utils.js';
+import {
+  menuTypesId
+} from '../data.js';
 import AbstractComponent from './abstract-component.js';
 
 /**
@@ -21,8 +20,6 @@ class MainNavigation extends AbstractComponent {
    */
   constructor() {
     super();
-    this._menuTypes = menuTypes;
-    this._menuTypesId = menuTypesId;
 
     this._selectFilms = null;
     this._openCloseState = null;
@@ -35,7 +32,7 @@ class MainNavigation extends AbstractComponent {
    * @return {string}
    */
   get template() {
-    return getMainNavigationTemplate(this);
+    return getMainNavigationTemplate();
   }
 
   /**
@@ -62,6 +59,9 @@ class MainNavigation extends AbstractComponent {
     if (element === null) {
       element = this._element;
     }
+    if (element === null) {
+      return;
+    }
     this._bindOnSelectFilms(element);
     this._bindOnOpenCloseState(element);
   }
@@ -74,6 +74,9 @@ class MainNavigation extends AbstractComponent {
     if (element === null) {
       element = this._element;
     }
+    if (element === null) {
+      return;
+    }
     this._unbindOnSelectFilms(element);
     this._unbindOnOpenCloseState(element);
   }
@@ -83,8 +86,8 @@ class MainNavigation extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   _bindOnSelectFilms(element) {
-    if (element !== null) {
-      const itemsContainer = element.querySelectorAll(`.main-navigation__item`);
+    const itemsContainer = element.querySelectorAll(`.main-navigation__item`);
+    if (itemsContainer !== null) {
       for (const itemContainer of itemsContainer) {
         if (itemContainer.dataset.id !== menuTypesId.stats) {
           itemContainer.addEventListener(`click`, this._onSelectFilms);
@@ -99,8 +102,8 @@ class MainNavigation extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   _bindOnOpenCloseState(element) {
-    if (element !== null) {
-      const itemsContainer = element.querySelectorAll(`.main-navigation__item`);
+    const itemsContainer = element.querySelectorAll(`.main-navigation__item`);
+    if (itemsContainer !== null) {
       for (const itemContainer of itemsContainer) {
         if (itemContainer.dataset.id === menuTypesId.stats) {
           itemContainer.addEventListener(`click`, this._onOpenCloseState);
@@ -115,8 +118,8 @@ class MainNavigation extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   _unbindOnSelectFilms(element) {
-    if (element !== null) {
-      const itemsContainer = element.querySelectorAll(`.main-navigation__item`);
+    const itemsContainer = element.querySelectorAll(`.main-navigation__item`);
+    if (itemsContainer !== null) {
       for (let itemContainer of itemsContainer) {
         if (itemContainer.dataset.id !== menuTypesId.stats) {
           itemContainer.removeEventListener(`click`, this._onSelectFilms);
@@ -131,8 +134,8 @@ class MainNavigation extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   _unbindOnOpenCloseState(element) {
-    if (element !== null) {
-      const itemsContainer = element.querySelectorAll(`.main-navigation__item`);
+    const itemsContainer = element.querySelectorAll(`.main-navigation__item`);
+    if (itemsContainer !== null) {
       for (const itemContainer of itemsContainer) {
         if (itemContainer.dataset.id === menuTypesId.stats) {
           itemContainer.removeEventListener(`click`, this._onOpenCloseState);

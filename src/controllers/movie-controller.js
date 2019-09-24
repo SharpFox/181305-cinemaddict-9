@@ -17,18 +17,18 @@ class MovieController {
    * @param {object} filmCard
    * @param {HTMLElement} filmsListContainer
    * @param {HTMLElement} filmsListFilmsContainer
-   * @param {HTMLElement} filmsDetailsContainer
+   * @param {HTMLElement} filmDetailsContainer
    * @param {function} onDataChange
    */
   constructor(filmCard, filmsListContainer, filmsListFilmsContainer,
-      filmsDetailsContainer, onDataChange) {
+      filmDetailsContainer, onDataChange) {
     this._id = filmCard.id;
     this._filmCard = filmCard;
     this._filmsListContainer = filmsListContainer;
     this._filmsListFilmsContainer = filmsListFilmsContainer;
-    this._filmsDetailsContainer = filmsDetailsContainer;
+    this._filmDetailsContainer = filmDetailsContainer;
     this._filmCardComponent = new FilmCard(this._filmCard, onDataChange);
-    this._filmDetailsComponent = new FilmDetails(this._filmsDetailsContainer,
+    this._filmDetailsComponent = new FilmDetails(this._filmDetailsContainer,
         this._filmCard, onDataChange);
   }
 
@@ -52,9 +52,17 @@ class MovieController {
    * Open film details.
    */
   openFilmDetails() {
-    this._filmsDetailsContainer.classList.remove(`visually-hidden`);
-    addElementDOM(this._filmsDetailsContainer, this._filmDetailsComponent);
-    this._filmsDetailsContainer.firstElementChild.focus();
+    this._filmDetailsContainer.classList.remove(`visually-hidden`);
+    addElementDOM(this._filmDetailsContainer, this._filmDetailsComponent);
+    this._filmDetailsContainer.firstElementChild.focus();
+  }
+
+  /**
+   * Delete elements of FilmCardComponent and FilmDetailsComponent.
+   */
+  unrenderComponents() {
+    this._filmCardComponent.unrender();
+    this._filmDetailsComponent.unrender();
   }
 
   /**
@@ -82,9 +90,8 @@ class MovieController {
      * Close film details.
      */
     this._filmDetailsComponent.onClose = () => {
-      this._filmsDetailsContainer.classList.add(`visually-hidden`);
-      this._filmsDetailsContainer.firstElementChild.remove();
-      this._filmDetailsComponent.unrender();
+      this._filmDetailsContainer.classList.add(`visually-hidden`);
+      this._filmDetailsContainer.firstElementChild.remove();
     };
 
     /**
@@ -92,7 +99,7 @@ class MovieController {
      */
     this._filmDetailsComponent.openCloseRating = () => {
       const ratingContainer =
-        this._filmsDetailsContainer
+        this._filmDetailsContainer
         .querySelector(`.form-details__middle-container`);
       const watchedContainer = document.getElementById(`watched`);
       if (!watchedContainer.checked) {
@@ -145,13 +152,13 @@ class MovieController {
    */
   _updateEmojiInFilmDetailsContainer() {
     const oldElement =
-    this._filmsDetailsContainer
+    this._filmDetailsContainer
     .querySelector(`.film-details__add-emoji-label`);
     const newElement =
       this._filmDetailsComponent
       .getElementPart(`film-details__add-emoji-label`);
     const replacementСontainer =
-      this._filmsDetailsContainer.querySelector(`.film-details__new-comment`);
+      this._filmDetailsContainer.querySelector(`.film-details__new-comment`);
     updateElementDOM(oldElement, newElement, replacementСontainer,
         this._filmDetailsComponent);
   }

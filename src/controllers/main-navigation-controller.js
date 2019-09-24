@@ -57,17 +57,22 @@ class MainNavigationController {
     }
     if (currentType === menuTypesId.all) {
       doDefaultFilmCardsCurrent();
-      changefilmsCardsPortionCount(totalDownloadedFilmsCards);
-      removeContainerChildren(this._filmsContainer);
-      removeContainerChildren(this._sortContainer);
-      this._pageController.init();
-
+      this._rerenderFilmsLists();
       return;
     }
     selectfilmsCardsCurrent(currentType);
+    this._rerenderFilmsLists();
+  }
+
+  /**
+   * Rerender all films lists.
+   */
+  _rerenderFilmsLists() {
     changefilmsCardsPortionCount(totalDownloadedFilmsCards);
     removeContainerChildren(this._filmsContainer);
     removeContainerChildren(this._sortContainer);
+    this._pageController.unrenderFilmsListsComponents();
+    this._pageController.unrenderComponentsMoviesControllers();
     this._pageController.init();
   }
 

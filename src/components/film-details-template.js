@@ -2,8 +2,8 @@ import {
   filmDetailsControlsTypes,
   filmControlsTypesId,
   ratingScales,
-  userTotalRating,
-  emojiList
+  emojiList,
+  getImgPathEmoji
 } from '../data.js';
 import {
   getDuration
@@ -83,12 +83,12 @@ const getFilmRatingTemplate = (img, title, userRating) => {
 const getEmojiListTemplate = () => {
   return `
     <div class="film-details__emoji-list">
-      ${emojiList.map(({id, value, img}) => (`<input
+      ${emojiList.map(({id, img}) => (`<input
         class="film-details__emoji-item visually-hidden"
         name="comment-emoji"
         type="radio"
         id="${id}"
-        value="${value}"
+        value="${id}"
       >
       <label class="film-details__emoji-label"
         tabindex="6"
@@ -110,10 +110,10 @@ const getEmojiListTemplate = () => {
 const getCommentsListTemplate = (comments) => {
   return `
     <ul class="film-details__comments-list">
-      ${comments.map(({id, img, text, author, date}) => (`<li
+      ${comments.map(({id, type, text, author, date}) => (`<li
         class="film-details__comment">
         <span class="film-details__comment-emoji">
-          <img src="${img}"
+          <img src="${getImgPathEmoji(type)}"
             width="55"
             height="55"
             alt="emoji"
@@ -181,7 +181,7 @@ const getFilmDetailsTemplate = ({_img, _age, _title, _rating, _userRating,
               </div>
               <div class="film-details__rating">
                 <p class="film-details__total-rating">${_rating}</p>
-                <p class="film-details__user-rating">Your rate ${userTotalRating}</p>
+                <p class="film-details__user-rating">Your rate ${_userRating}</p>
               </div>
             </div>
             <table class="film-details__table">

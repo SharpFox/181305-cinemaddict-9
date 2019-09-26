@@ -23,7 +23,7 @@ class Footer extends AbstractComponent {
    * @return {string}
    */
   get template() {
-    return getFooterTemplate(this._countFilmCards);
+    return getFooterTemplate(this);
   }
 }
 

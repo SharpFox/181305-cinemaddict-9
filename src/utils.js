@@ -5,6 +5,17 @@ const KEYS = {
   'ENTER': 13
 };
 
+const METHODS = {
+  GET: `GET`,
+  POST: `POST`,
+  PUT: `PUT`,
+  DELETE: `DELETE`
+};
+
+const END_POINT = `https://htmlacademy-es-9.appspot.com/cinemaddict`;
+const ANIMATION_TIMEOUT = 600;
+const DEFAULT_FILM_ID = -1;
+
 /**
  * Add cloned of component element to DOM.
  * @param {HTMLElement} container
@@ -116,8 +127,51 @@ const getDuration = (startDate, endDate) => {
   return durationFormat;
 };
 
+/**
+ * Return response, if code >= 200 or < 300, else
+ * throws error.
+ * @param {ArrayBuffer|Blob|Document} response
+ * @return {ArrayBuffer|Blob|Document}
+ */
+const checkStatus = (response) => {
+  if (response.status >= 200 && response.status < 300) {
+    return response;
+  }
+  throw new Error(`${response.status}: ${response.statusText}`);
+};
+
+/**
+ * Return json from responce of request.
+ * @param {ArrayBuffer|Blob|Document} response
+ * @return {json}
+ */
+const toJSON = (response) => {
+  return response.json();
+};
+
+/**
+ * Return value of authorization by server.
+ * @return {string}
+ */
+const getAuthorizationValue = () => {
+  let result = ``;
+  const words = `0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM`;
+  const maxPosition = words.length - 1;
+  let position = 0;
+  for (let i = 0; i < 15; i++) {
+    position = Math.floor(Math.random() * maxPosition);
+    result += words.substring(position, position + 1);
+  }
+
+  return `Basic ${result}`;
+};
+
 export {
   KEYS,
+  METHODS,
+  END_POINT,
+  ANIMATION_TIMEOUT,
+  DEFAULT_FILM_ID,
   createElement,
   getRandomValueMinMax,
   compareRandom,
@@ -126,5 +180,8 @@ export {
   updateElementDOM,
   removeContainerChildren,
   cloneDeep,
-  getDuration
+  getDuration,
+  checkStatus,
+  toJSON,
+  getAuthorizationValue
 };

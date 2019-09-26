@@ -28,7 +28,7 @@ class Search extends AbstractComponent {
    * @return {string}
    */
   get template() {
-    return getSearchTemplate(this);
+    return getSearchTemplate();
   }
 
   /**

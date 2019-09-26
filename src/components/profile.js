@@ -2,6 +2,9 @@
 import {
   getProfileTemplate
 } from './profile-template.js';
+import {
+  getUserTotalRank
+} from '../data.js';
 import AbstractComponent from './abstract-component.js';
 
 /**
@@ -11,11 +14,10 @@ import AbstractComponent from './abstract-component.js';
 class Profile extends AbstractComponent {
   /**
    * Create profile.
-   * @param {number} userTotalRating
    */
-  constructor(userTotalRating) {
+  constructor() {
     super();
-    this._userTotalRating = userTotalRating;
+    this._userTotalRating = getUserTotalRank();
   }
 
   /**
@@ -23,7 +25,7 @@ class Profile extends AbstractComponent {
    * @return {string}
    */
   get template() {
-    return getProfileTemplate(this._userTotalRating);
+    return getProfileTemplate(this);
   }
 }
 

@@ -6,9 +6,7 @@ import {
   KEYS
 } from '../utils.js';
 import {
-  userTotalRating,
-  filmControlsTypesId,
-  getEmojiImg
+  filmControlsTypesId
 } from '../data.js';
 import AbstractComponent from './abstract-component.js';
 
@@ -362,7 +360,7 @@ class FilmDetails extends AbstractComponent {
 
     if ((target.classList.contains(`film-details__comment-input`)
       || target.classList.contains(`film-details__inner`))
-      && (newData.comment.img === null
+      && (newData.comment.type === null
         || newData.comment.text === null)) {
       return false;
     }
@@ -386,7 +384,7 @@ class FilmDetails extends AbstractComponent {
       return;
     }
 
-    if (newData.comment.img === null
+    if (newData.comment.type === null
       || newData.comment.text === null) {
       newData.comment = this._getEmptyComment();
       return;
@@ -430,10 +428,8 @@ class FilmDetails extends AbstractComponent {
   _getEmptyComment() {
     return {
       id: null,
-      img: null,
-      text: null,
-      author: null,
-      date: null,
+      type: null,
+      text: null
     };
   }
 
@@ -505,11 +501,9 @@ class FilmDetails extends AbstractComponent {
       },
       'comment': (value) => {
         newData.comment.text = value.trim();
-        newData.comment.author = userTotalRating;
-        newData.comment.date = new Date();
       },
       'comment-emoji': (value) => {
-        newData.comment.img = getEmojiImg(value);
+        newData.comment.type = value;
       }
     };
   }

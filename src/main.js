@@ -8,8 +8,7 @@ import {
   addElementDOM
 } from './utils.js';
 import {
-  countFilmCards,
-  userTotalRating
+  countFilmCards
 } from './data.js';
 
 const bodyContainer = document.querySelector(`body`);
@@ -39,7 +38,7 @@ searchController.init();
 const statisticController = new StatisticController(statisticContainer);
 statisticController.init();
 
-const profileComponent = new Profile(userTotalRating);
+const profileComponent = new Profile();
 addElementDOM(profileContainer, profileComponent);
 
 const footerComponent = new Footer(countFilmCards);

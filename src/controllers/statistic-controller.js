@@ -4,7 +4,6 @@ import {
   removeContainerChildren
 } from '../utils.js';
 import {
-  userTotalRating,
   getWatchedFilmsAmount,
   getTotalDuration,
   getTopGenre,
@@ -42,7 +41,7 @@ class StatisticController {
    */
   _addStatistic(statisticParams, filter) {
     this._statisticComponent = new Statistic(this._statisticContainer,
-        userTotalRating, statisticParams, filter, this.onUpdateStatistic);
+        statisticParams, filter, this.onUpdateStatistic);
     addElementDOM(this._statisticContainer, this._statisticComponent);
     this._statisticComponent.renderChart();
   }

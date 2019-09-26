@@ -19,12 +19,6 @@ const sortTypesId = {
   rating: `rating`
 };
 
-const userRanks = [
-  `Movie Buff`,
-  `Dilettante`,
-  `Сritic`
-];
-
 const genres = [
   `Drama`,
   `Mystery`,
@@ -161,76 +155,80 @@ const countries = [
   `Finland`
 ];
 
+const imgPathEmoji = {
+  smile: `./images/emoji/smile.png`,
+  sleeping: `./images/emoji/sleeping.png`,
+  puke: `./images/emoji/puke.png`,
+  angry: `./images/emoji/angry.png`
+};
+
+const emojiId = {
+  smile: `smile`,
+  sleeping: `sleeping`,
+  puke: `puke`,
+  angry: `angry`
+};
+
 const emojiList = [
   {
-    id: `emoji-smile`,
-    value: `sleeping`,
-    img: `./images/emoji/smile.png`
+    id: emojiId.smile,
+    img: imgPathEmoji.smile
   },
   {
-    id: `emoji-sleeping`,
-    value: `neutral-face`,
-    img: `./images/emoji/sleeping.png`
+    id: emojiId.sleeping,
+    img: imgPathEmoji.sleeping
   },
   {
-    id: `emoji-gpuke`,
-    value: `grinning`,
-    img: `./images/emoji/puke.png`
+    id: emojiId.puke,
+    img: imgPathEmoji.puke
   },
   {
-    id: `emoji-angry`,
-    value: `angry`,
-    img: `./images/emoji/angry.png`
+    id: emojiId.angry,
+    img: imgPathEmoji.angry
   }
 ];
 
 /**
- * Return path to img for emoji.
- * @param {string} value
+ * Return img path to emoji.
+ * @param {string} emojiType
  * @return {string}
  */
-const getEmojiImg = (value) => {
-  let valueEmoji = ``;
-  for (let emoji of emojiList) {
-    if (emoji.value === value) {
-      valueEmoji = emoji.img;
-      break;
-    }
-  }
-
-  return valueEmoji;
+const getImgPathEmoji = (emojiType) => {
+  return imgPathEmoji[emojiType];
 };
 
 const comments = [
   {
     id: 0,
-    img: `./images/emoji/smile.png`,
+    type: emojiId.smile,
     text: `Interesting setting and a good cast`,
     author: `Tim Macoveev`,
     date: `2019-09-15T12:05:55`
   },
   {
     id: 1,
-    img: `./images/emoji/sleeping.png`,
+    type: emojiId.sleeping,
     text: `Booooooooooring`,
     author: `John Doe`,
     date: `2019-09-17T18:01:35`
   },
   {
     id: 2,
-    img: `./images/emoji/puke.png`,
+    type: emojiId.puke,
     text: `Very very old. Meh`,
     author: `John Doe`,
     date: `2019-09-21T11:01:52`
   },
   {
     id: 3,
-    img: `./images/emoji/angry.png`,
+    type: emojiId.angry,
     text: `Almost two hours? Seriously?`,
     author: `John Doe`,
     date: `2019-09-19T02:01:12`
   }
 ];
+
+const ratingScales = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 const filmDetailsControlsTypes = {
   watchlist: `Add to watchlist`,
@@ -249,8 +247,6 @@ const filmControlsTypesId = {
   watched: `watched`,
   favorite: `favorite`
 };
-
-const ratingScales = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 const filmsCategories = {
   AllMoviesUpcoming: `All movies. Upcoming`,
@@ -295,21 +291,6 @@ const getFilmControlsTypes = () => {
 };
 
 /**
- * Return categories for film.
- * @return {array}
- */
-const getFilmCategoriesId = () => {
-  let categoriesId = [];
-  categoriesId.push(filmsCategoriesId.AllMoviesUpcoming);
-  if (getRandomValueMinMax(0, 1)) {
-    categoriesId.push(Object.entries(filmsCategoriesId)
-    .slice(1, 3)[getRandomValueMinMax(0, 1)][1]);
-  }
-
-  return categoriesId;
-};
-
-/**
  * Return card of film.
  * @param {number} id
  * @return {object}
@@ -344,7 +325,6 @@ const getFilmCard = (id) => {
     actors: actors.sort(compareRandom).slice(0,
         getRandomValueMinMax(1, actors.length - 1)),
     country: countries[getRandomValueMinMax(0, countries.length - 1)],
-    categoriesId: getFilmCategoriesId(),
     controlsTypes: filmControlsTypes
   };
 };
@@ -407,6 +387,38 @@ const selectfilmsCardsCurrent = (category) => {
 };
 
 /**
+ * Return sort of film cards by rating.
+ * @param {object} firstFilmCard
+ * @param {object} secondFilmCard
+ * @return {function}
+ */
+const getSortFunctionForFilmByRating = (firstFilmCard, secondFilmCard) => {
+  return secondFilmCard.rating - firstFilmCard.rating;
+};
+
+/**
+ * Return sort of film cards by date.
+ * @param {object} firstFilmCard
+ * @param {object} secondFilmCard
+ * @return {function}
+ */
+const getSortFunctionForFilmByDate = (firstFilmCard, secondFilmCard) => {
+  return secondFilmCard.year - firstFilmCard.year;
+};
+
+/**
+ * Return sort of film cards by comments.
+ * @param {object} firstFilmCard
+ * @param {object} secondFilmCard
+ * @return {function}
+ */
+const getSortFunctionForFilmByComments = (firstFilmCard, secondFilmCard) => {
+  return secondFilmCard.comments.length
+    - firstFilmCard.comments.length;
+};
+
+
+/**
  * Find a film by the search line in FilmsCardsCurrent.
  * @param {string} searchLine
  */
@@ -417,6 +429,93 @@ const findFilmsCardsCurrent = (searchLine) => {
       filmsCardsCurrent.push(filmCard);
     }
   });
+};
+
+/**
+ * Return 2 and less films by top rated.
+ * @return {array}
+ */
+const getExtraFilmsTopRated = () => {
+  let filmsCards =
+    cloneDeep(filmsCardsCurrent).sort(getSortFunctionForFilmByRating);
+  return getExtraFilms(filmsCards, `rating`);
+};
+
+/**
+ * Return 2 and less films by top rated.
+ * @return {array}
+ */
+const getExtraFilmsMostCommented = () => {
+  let filmsCards =
+    cloneDeep(filmsCardsCurrent).sort(getSortFunctionForFilmByComments);
+  return getExtraFilms(filmsCards, `comments`);
+};
+
+/**
+ * Return 2 and less films by extra films.
+ * @param {array} filmsCards
+ * @param {string} filmCardKey
+ * @return {array}
+ */
+const getExtraFilms = (filmsCards, filmCardKey) => {
+  if (!filmsCardsHaveSameValues(filmsCards, filmCardKey)) {
+    filmsCards = filmsCards.sort(compareRandom);
+  }
+  const maxNumberFilms = 2;
+  filmsCards = filmsCards.slice(0, maxNumberFilms);
+  return checkFilmsCardsByZero(filmsCards, filmCardKey, maxNumberFilms);
+};
+
+/**
+ * Check films cards for same values.
+ * @param {array} filmsCards
+ * @param {string} filmCardKey
+ * @return {boolean}
+ */
+const filmsCardsHaveSameValues = (filmsCards, filmCardKey) => {
+  let maxNumber = getValueOfFieldForFilmCard(filmsCards[0], filmCardKey);
+  const filmsCardsFilter = filmsCards.filter((filmCard) =>
+    maxNumber === getValueOfFieldForFilmCard(filmCard, filmCardKey));
+
+  return filmsCards.length - filmsCardsFilter.length;
+};
+
+/**
+ * Return films cards after checking for zero.
+ * @param {array} filmsCards
+ * @param {string} filmCardKey
+ * @param {number} maxNumberFilms
+ * @return {array}
+ */
+const checkFilmsCardsByZero = (filmsCards, filmCardKey, maxNumberFilms) => {
+  let numberFilmsByZero = 0;
+  filmsCards.forEach((filmCard) => {
+    if (!getValueOfFieldForFilmCard(filmCard, filmCardKey)) {
+      numberFilmsByZero += 1;
+    }
+  });
+  if (numberFilmsByZero === maxNumberFilms) {
+    filmsCards = [];
+  }
+
+  return filmsCards;
+};
+
+/**
+ * Return value for film card by same values.
+ * @param {object} filmCard
+ * @param {string} filmCardKey
+ * @return {number}
+ */
+const getValueOfFieldForFilmCard = (filmCard, filmCardKey) => {
+  let fieldValue = null;
+  if (filmCardKey === `rating`) {
+    fieldValue = filmCard[filmCardKey];
+  } else if (filmCardKey === `comments`) {
+    fieldValue = filmCard[filmCardKey].length;
+  }
+
+  return fieldValue;
 };
 
 let totalDownloadedFilmsCards = FILMS_CARDS_STEP;
@@ -550,7 +649,50 @@ const getFilmsAmountByCategories = (category) => {
   return filmsAmount;
 };
 
-const userTotalRating = userRanks[getRandomValueMinMax(0, userRanks.length - 1)];
+const userRanks = {
+  zero: ``,
+  novice: `Novice`,
+  fan: `Fan`,
+  movieBuff: `Movie Buff`
+};
+
+/**
+ * Return max number of watched film..
+ * @return {number}
+ */
+const getMaxNumberOfWatchedFilm = () => {
+  let filmsTotalWatched = 0;
+  filmsCardsMain.forEach((filmCard) => {
+    filmCard.controlsTypes.forEach((controlType) => {
+      if (controlType === filmControlsTypesId.watched) {
+        filmsTotalWatched += 1;
+      }
+    });
+  });
+
+  return filmsTotalWatched;
+};
+
+/**
+ * Return user total rank.
+ * @return {string}
+ */
+const getUserTotalRank = () => {
+  const maxNumber = getMaxNumberOfWatchedFilm();
+  let userTotalRank = null;
+  if (maxNumber === 0) {
+    userTotalRank = userRanks.zero;
+  } else if (maxNumber >= 1 && maxNumber <= 10) {
+    userTotalRank = userRanks.novice;
+  } else if (maxNumber >= 11 && maxNumber <= 20) {
+    userTotalRank = userRanks.fan;
+  } else if (maxNumber >= 21) {
+    userTotalRank = userRanks.movieBuff;
+  }
+
+  return userTotalRank;
+};
+
 const countFilmCards = filmsCardsCurrent.length;
 
 /**
@@ -790,6 +932,7 @@ const getStatisticList = (totalWatchedFilms, totalDuration,
 };
 
 export {
+  getImgPathEmoji,
   genres,
   sortTypes,
   sortTypesId,
@@ -804,7 +947,6 @@ export {
   filmsCardsMain,
   filmsCardsCurrent,
   countFilmCards,
-  userTotalRating,
   filmsCategories,
   filmsCategoriesId,
   statisticFiltersId,
@@ -813,7 +955,6 @@ export {
   getFilmsCardsPortion,
   changefilmsCardsPortionCount,
   updateServerData,
-  getEmojiImg,
   doDefaultFilmCardsCurrent,
   selectfilmsCardsCurrent,
   setNumberDownloadedFilmsCards,
@@ -822,5 +963,10 @@ export {
   getWatchedFilmsAmount,
   getTopGenre,
   getStatisticFilters,
-  getUniqueGenres
+  getUniqueGenres,
+  getUserTotalRank,
+  getExtraFilmsTopRated,
+  getExtraFilmsMostCommented,
+  getSortFunctionForFilmByRating,
+  getSortFunctionForFilmByDate
 };

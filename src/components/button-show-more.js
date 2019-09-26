@@ -26,7 +26,7 @@ class ButtonShowMore extends AbstractComponent {
    * @return {string}
    */
   get template() {
-    return getButtonShowMoreTemplate(this);
+    return getButtonShowMoreTemplate();
   }
 
   /**

@@ -2,6 +2,7 @@ import ButtonShowMore from '../components/button-show-more.js';
 import FilmList from '../components/film-list.js';
 import MovieController from '../controllers/movie-controller.js';
 import Sort from '../components/sort.js';
+import API from '../api.js';
 import {
   filmLists,
   filmsCardsCurrent,
@@ -12,13 +13,19 @@ import {
   changefilmsCardsPortionCount,
   updateServerData,
   totalDownloadedFilmsCards,
-  setNumberDownloadedFilmsCards
+  setNumberDownloadedFilmsCards,
+  getExtraFilmsTopRated,
+  getExtraFilmsMostCommented,
+  getSortFunctionForFilmByRating,
+  getSortFunctionForFilmByDate
 } from '../data.js';
 import {
+  END_POINT,
   addElementDOM,
-  removeContainerChildren
+  removeContainerChildren,
+  getAuthorizationValue,
+  createElement
 } from '../utils.js';
-import moment from 'moment';
 
 /**
  * Class representaing controller of page.
@@ -38,6 +45,7 @@ class PageController {
     this._movieControllers = [];
     this._filmsListsComponents = [];
     this._getFilmsCards = getFilmsCardsPortion();
+    this._api = new API(END_POINT, getAuthorizationValue());
 
     this._onDataChange = this._onDataChange.bind(this);
   }
@@ -46,6 +54,10 @@ class PageController {
    * Create lists of films with cards if films.
    */
   init() {
+    if (!filmsCardsCurrent.length) {
+      this._renderStringOfAbsenceFilms();
+      return;
+    }
     this._renderSortComponent();
     this._addFilmsLists();
   }
@@ -56,6 +68,9 @@ class PageController {
    * @param {string} filmsCards
    */
   addFilmsList(filmCategory, filmsCards) {
+    if (!filmsCards.length) {
+      return;
+    }
     const filmsListComponent = new FilmList(filmLists[filmCategory]);
     this._filmsListsComponents.push(filmsListComponent);
     addElementDOM(this._filmsContainer, filmsListComponent);
@@ -112,10 +127,22 @@ class PageController {
   _addFilmsLists() {
     this._movieControllers = [];
     this._filmsListsComponents = [];
+
     this.addFilmsList(filmsCategoriesId.AllMoviesUpcoming,
         this._getFilmsCards());
-    this.addFilmsList(filmsCategoriesId.TopRated);
-    this.addFilmsList(filmsCategoriesId.MostCommented);
+    this.addFilmsList(filmsCategoriesId.TopRated,
+        getExtraFilmsTopRated());
+    this.addFilmsList(filmsCategoriesId.MostCommented,
+        getExtraFilmsMostCommented());
+  }
+
+  /**
+   * Render string of absence films.
+   */
+  _renderStringOfAbsenceFilms() {
+    const element =
+      createElement(`<p>There are no movies in our database</p>`);
+    this._filmsContainer.appendChild(element);
   }
 
   /**
@@ -174,14 +201,10 @@ class PageController {
   _chooseSortFilmsCards(filmsCards, currentSortType) {
     switch (currentSortType) {
       case sortTypesId.date:
-        filmsCards.sort((firstFilmCard, secondFilmCard) => {
-          return moment(secondFilmCard.year) - moment(firstFilmCard.year);
-        });
+        filmsCards.sort(getSortFunctionForFilmByDate);
         break;
       case sortTypesId.rating:
-        filmsCards.sort((firstFilmCard, secondFilmCard) => {
-          return secondFilmCard.rating - firstFilmCard.rating;
-        });
+        filmsCards.sort(getSortFunctionForFilmByRating);
         break;
       default:
         break;
@@ -298,7 +321,7 @@ class PageController {
     const filmsCardsPortion = this._getFilmsCards();
     this._totalFilmPortionNumber += 1;
     filmsCardsPortion.forEach((filmCardPortion) => {
-      const filmsListContainer = document.getElementById(filmCardPortion.categoriesId[0]);
+      const filmsListContainer = document.getElementById(filmsCategoriesId.AllMoviesUpcoming);
       const filmsListFilmsContainer =
         filmsListContainer.querySelector(`.films-list__container`);
       this._addFilmCard(filmsListContainer, filmsListFilmsContainer, filmCardPortion);

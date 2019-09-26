@@ -69,11 +69,7 @@ class MovieController {
    * Add one card of film.
    */
   _addFilmCard() {
-    this._filmCard.categoriesId.forEach((category) => {
-      if (this._filmsListContainer.dataset.id === category) {
-        addElementDOM(this._filmsListFilmsContainer, this._filmCardComponent);
-      }
-    });
+    addElementDOM(this._filmsListFilmsContainer, this._filmCardComponent);
   }
 
   /**

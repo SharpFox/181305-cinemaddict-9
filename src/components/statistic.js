@@ -9,7 +9,8 @@ import {
   KEYS
 } from '../utils.js';
 import {
-  getUniqueGenres
+  getUniqueGenres,
+  getUserTotalRank
 } from '../data.js';
 
 /**
@@ -20,15 +21,14 @@ class Statistic extends AbstractComponent {
   /**
    * Create statistic.
    * @param {HTMLElement} statisticContainer
-   * @param {number} userTotalRating
    * @param {object} statisticParams
    * @param {string} filter
    * @param {function} onUpdateStatistic
    */
-  constructor(statisticContainer, userTotalRating, {totalWatchedFilms,
+  constructor(statisticContainer, {totalWatchedFilms,
     totalDuration, topGenre}, filter, onUpdateStatistic) {
     super();
-    this._userTotalRating = userTotalRating;
+    this._userTotalRating = getUserTotalRank();
     this._totalWatchedFilms = totalWatchedFilms;
     this._totalDuration = totalDuration;
     this._topGenre = topGenre;

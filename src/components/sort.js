@@ -29,7 +29,7 @@ class Sort extends AbstractComponent {
    * @return {string}
    */
   get template() {
-    return getSortTemplate(this._sortType);
+    return getSortTemplate(this);
   }
 
   /**

@@ -1,12 +1,12 @@
 /**
  * Return template for profile.
- * @param {number} userTotalRating
+ * @param {number} profile
  * @return {string}
  */
-const getProfileTemplate = (userTotalRating) => {
+const getProfileTemplate = ({_userTotalRating}) => {
   return `
     <p class="profile__rating">
-      ${userTotalRating}
+      ${_userTotalRating}
     </p>
     <img class="profile__avatar"
       src="images/bitmap@2x.png"

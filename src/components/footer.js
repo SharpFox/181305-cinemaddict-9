@@ -1,8 +1,11 @@
 
+import AbstractComponent from './abstract-component.js';
+import {
+  getTotalFilmsCards
+} from '../data.js';
 import {
   getFooterTemplate
 } from './footer-template.js';
-import AbstractComponent from './abstract-component.js';
 
 /**
  * Class representaing footer.
@@ -11,11 +14,10 @@ import AbstractComponent from './abstract-component.js';
 class Footer extends AbstractComponent {
   /**
    * Create footer.
-   * @param {number} countFilmCards
    */
-  constructor(countFilmCards) {
+  constructor() {
     super();
-    this._countFilmCards = countFilmCards;
+    this._countFilmCards = getTotalFilmsCards();
   }
 
   /**

@@ -1,8 +1,10 @@
 import FilmCard from '../components/film-card.js';
 import FilmDetails from '../components/film-details.js';
 import {
+  KEYS,
   addElementDOM,
-  updateElementDOM
+  updateElementDOM,
+  createElement
 } from '../utils.js';
 import {
   emojiList,
@@ -77,17 +79,22 @@ class MovieController {
    */
   _addFilmDetails() {
     this._filmCardComponent.onOpen = () => {
-      if (document.body.querySelector(`.film-details__inner`) === null) {
-        this.openFilmDetails();
+      if (document.body.querySelector(`.film-details__inner`) !== null) {
+        this._filmDetailsContainer.classList.add(`visually-hidden`);
+        this._filmDetailsContainer.firstElementChild.remove();
       }
+      this.openFilmDetails();
     };
 
     /**
      * Close film details.
+     * @param {event} evt
      */
-    this._filmDetailsComponent.onClose = () => {
-      this._filmDetailsContainer.classList.add(`visually-hidden`);
-      this._filmDetailsContainer.firstElementChild.remove();
+    this._filmDetailsComponent.onClose = (evt) => {
+      if (!evt.target.classList.contains(`film-details__comment-input`)) {
+        this._filmDetailsContainer.classList.add(`visually-hidden`);
+        this._filmDetailsContainer.firstElementChild.remove();
+      }
     };
 
     /**
@@ -110,10 +117,22 @@ class MovieController {
      * @param {event} evt
      */
     this._filmDetailsComponent.addEmoji = (evt) => {
-      this._addEmojiToFilmDetailsElement(evt.currentTarget.htmlFor);
+      if (evt.target.classList.contains(`film-details__inner`)) {
+        return;
+      }
+      let emojiId = null;
+      if (evt.keyCode === KEYS.ENTER) {
+        emojiId = evt.target.htmlFor;
+        evt.target.control.checked = true;
+      } else if (evt.type === `change`) {
+        emojiId = evt.target.id;
+        const labelsContainer = evt.target.labels;
+        for (let labelContainer of labelsContainer) {
+          labelContainer.focus();
+        }
+      }
+      this._addEmojiToFilmDetailsElement(emojiId);
       this._updateEmojiInFilmDetailsContainer();
-      evt.currentTarget.control.checked = true;
-      evt.currentTarget.focus();
     };
   }
 
@@ -128,19 +147,17 @@ class MovieController {
         emojiPath = emoji.img;
       }
     });
-    const addEmojiLabelContainer =
+    const emojiLabelContainer =
       this._filmDetailsComponent.element
       .querySelector(`.film-details__add-emoji-label`);
-    const imgElement = document.createElement(`img`);
-    imgElement.src = emojiPath;
-    imgElement.width = 55;
-    imgElement.height = 55;
-    imgElement.alt = `emoji`;
-    imgElement.id = `add-emoji`;
-    if (addEmojiLabelContainer.firstElementChild !== null) {
-      addEmojiLabelContainer.firstElementChild.remove();
+    const templateEmoji = `<img
+      src="${emojiPath}"
+      width="55" height="55"
+      alt="emoji" id="add-emoji">`;
+    if (emojiLabelContainer.firstElementChild !== null) {
+      emojiLabelContainer.firstElementChild.remove();
     }
-    addEmojiLabelContainer.appendChild(imgElement);
+    emojiLabelContainer.appendChild(createElement(templateEmoji));
   }
 
   /**

@@ -1,11 +1,11 @@
 
-import {
-  getSortTemplate
-} from './sort-template.js';
 import AbstractComponent from './abstract-component.js';
 import {
   KEYS
 } from '../utils.js';
+import {
+  getSortTemplate
+} from './sort-template.js';
 
 /**
  * Class representaing sort.

@@ -1,6 +1,5 @@
 import {
-  menuTypes,
-  menuTypesId
+  getMenuTypes
 } from '../data.js';
 
 /**
@@ -8,6 +7,7 @@ import {
  * @return {string}
  */
 const getMainNavigationTemplate = () => {
+  const menuTypes = getMenuTypes();
   return menuTypes.map(({id, modifiers, title, isActive, filmsCount}) => (`
     <a href="#${id}" data-id="${id}"
       class="main-navigation__item
@@ -16,10 +16,10 @@ const getMainNavigationTemplate = () => {
     ).trim()).join(` `)}
       ${isActive ? `main-navigation__item--active` : ``}">
       ${title}
-      ${id !== menuTypesId.stats ? `${filmsCount ? `
-        <span class="main-navigation__item-count">`
-        + filmsCount + `</span>` : ``}` : ``}
-      
+      ${filmsCount ? `
+        <span class="main-navigation__item-count">
+          ${filmsCount}
+        </span>` : ``}      
     </a>`).trim()).join(``);
 };
 

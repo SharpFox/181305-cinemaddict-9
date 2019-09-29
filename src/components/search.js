@@ -1,10 +1,12 @@
+import AbstractComponent from './abstract-component.js';
+import {
+  KEYS,
+  doEscapeHTML,
+  MIN_SEARCH_LENGTH
+} from '../utils.js';
 import {
   getSearchTemplate
 } from './search-template.js';
-import {
-  KEYS
-} from '../utils.js';
-import AbstractComponent from './abstract-component.js';
 
 /**
  * Class representaing profile.
@@ -84,6 +86,7 @@ class Search extends AbstractComponent {
   _bindOnSearchFilm(element) {
     const formContainer = element.querySelector(`.header__search`);
     if (formContainer !== null) {
+      formContainer.addEventListener(`input`, this._onSearchFilm);
       formContainer.addEventListener(`submit`, this._onSearchFilm);
       formContainer.addEventListener(`keydown`, this._onSearchFilm);
     }
@@ -98,6 +101,7 @@ class Search extends AbstractComponent {
     if (formContainer !== null) {
       formContainer.addEventListener(`reset`, this._onCloseSearch);
       formContainer.addEventListener(`keydown`, this._onCloseSearch);
+      formContainer.addEventListener(`input`, this._onCloseSearch);
     }
   }
 
@@ -108,6 +112,7 @@ class Search extends AbstractComponent {
   _unbindOnSearchFilm(element) {
     const formContainer = element.querySelector(`.header__search`);
     if (formContainer !== null) {
+      formContainer.removeEventListener(`input`, this._onSearchFilm);
       formContainer.removeEventListener(`submit`, this._onSearchFilm);
       formContainer.removeEventListener(`keydown`, this._onSearchFilm);
     }
@@ -122,6 +127,7 @@ class Search extends AbstractComponent {
     if (formContainer !== null) {
       formContainer.removeEventListener(`reset`, this._onCloseSearch);
       formContainer.removeEventListener(`keydown`, this._onCloseSearch);
+      formContainer.removeEventListener(`input`, this._onCloseSearch);
     }
   }
 
@@ -130,10 +136,16 @@ class Search extends AbstractComponent {
    * @param {event} evt
    */
   _onSearchFilm(evt) {
-    if ((evt.keyCode === KEYS.ENTER || evt.type === `submit`)
-      && (typeof this._searchFilm === `function`)) {
+    if (evt.keyCode === KEYS.ENTER || evt.type === `submit`) {
       evt.preventDefault();
-      this._searchFilm(evt);
+      return;
+    }
+    if (evt.type === `input` && typeof this._searchFilm === `function`) {
+      evt.preventDefault();
+      const searchLine = this._getSearchLine(evt);
+      if (searchLine.length >= MIN_SEARCH_LENGTH) {
+        this._searchFilm(searchLine);
+      }
     }
   }
 
@@ -142,11 +154,32 @@ class Search extends AbstractComponent {
    * @param {event} evt
    */
   _onCloseSearch(evt) {
-    if ((evt.keyCode === KEYS.ESC || evt.type === `reset`)
-      && (typeof this._closeSearch === `function`)) {
-      this._closeSearch(evt);
-      this._setFormSearchAfterClosing();
+    if (evt.keyCode !== undefined) {
+      return;
     }
+    if ((evt.type === `reset`
+      || evt.type === `input`)
+      && typeof this._closeSearch === `function`) {
+      const searchLine = this._getSearchLine(evt);
+      if (!searchLine.length) {
+        this._closeSearch(evt);
+        this._setFormSearchAfterClosing();
+      }
+    }
+  }
+
+  /**
+   * Return prepare line of seach.
+   * @param {event} evt
+   * @return {string}
+   */
+  _getSearchLine(evt) {
+    const searchLine = evt.target.value;
+    if (searchLine === undefined) {
+      return ``;
+    }
+    const regExpTemplate = /[.,\/#!$%\^&\*;:{}=\-_`~()]/g;
+    return doEscapeHTML(searchLine.trim().replace(regExpTemplate, ``));
   }
 
   /**

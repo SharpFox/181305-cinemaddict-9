@@ -4,12 +4,20 @@ import StatisticController from './controllers/statistic-controller.js';
 import SearchController from './controllers/search-controller.js';
 import Footer from './components/footer.js';
 import Profile from './components/profile.js';
+import API from './api.js';
 import {
-  addElementDOM
+  END_POINT,
+  addElementDOM,
+  getAuthorizationValue
 } from './utils.js';
 import {
-  countFilmCards
+  filmsCardsMain,
+  addFilmCardToFilmCardsMain,
+  addCommentToFilmsCardsMain,
+  fillFilmsCardsCurrent
 } from './data.js';
+
+const api = new API(END_POINT, getAuthorizationValue());
 
 const bodyContainer = document.querySelector(`body`);
 const headerContainer = bodyContainer.querySelector(`.header`);
@@ -22,24 +30,60 @@ const filmsContainer = mainContainer.querySelector(`.films`);
 const filmDetailsContainer = bodyContainer.querySelector(`.film-details`);
 const footerContainer = bodyContainer.querySelector(`.footer`);
 
-const pageController = new PageController(filmsContainer, filmDetailsContainer,
-    sortContainer);
-pageController.init();
+/**
+ * Initialization application.
+ */
+const init = () => {
+  fillFilmsCardsCurrent();
 
-const mainNavigationController = new MainNavigationController(pageController,
-    mainNavigationContainer, filmsContainer, sortContainer, statisticContainer);
-mainNavigationController.init();
+  const pageController = new PageController(filmsContainer, filmDetailsContainer,
+      sortContainer);
+  pageController.init();
 
-const searchController = new SearchController(pageController,
-    mainNavigationController, mainNavigationContainer,
-    filmsContainer, sortContainer, statisticContainer);
-searchController.init();
+  const mainNavigationController = new MainNavigationController(pageController,
+      mainNavigationContainer, filmsContainer, sortContainer, statisticContainer);
+  mainNavigationController.init();
 
-const statisticController = new StatisticController(statisticContainer);
-statisticController.init();
+  const searchController = new SearchController(pageController,
+      mainNavigationController, mainNavigationContainer,
+      filmsContainer, sortContainer, statisticContainer);
+  searchController.init();
 
-const profileComponent = new Profile();
-addElementDOM(profileContainer, profileComponent);
+  const statisticController = new StatisticController(statisticContainer);
+  statisticController.init();
 
-const footerComponent = new Footer(countFilmCards);
-addElementDOM(footerContainer, footerComponent);
+  const profileComponent = new Profile();
+  addElementDOM(profileContainer, profileComponent);
+
+  const footerComponent = new Footer();
+  addElementDOM(footerContainer, footerComponent);
+};
+
+/**
+ * Get films cards from server.
+ */
+const getFilmsCardsFromServer = () => {
+  api.getFilms()
+  .then((filmsCards) => {
+    filmsCards.forEach((filmCard) => {
+      addFilmCardToFilmCardsMain(filmCard);
+    });
+    getComments();
+    init();
+  })
+  .catch();
+};
+
+/**
+ * Get and add comments to FilmsCardsMain.
+ */
+const getComments = () => {
+  filmsCardsMain.forEach((filmCard) => {
+    api.getComments(filmCard.id)
+    .then((comments) => {
+      addCommentToFilmsCardsMain(comments, filmCard.id);
+    });
+  });
+};
+
+getFilmsCardsFromServer();

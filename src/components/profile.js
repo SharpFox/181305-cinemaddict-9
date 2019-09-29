@@ -1,11 +1,11 @@
 
-import {
-  getProfileTemplate
-} from './profile-template.js';
+import AbstractComponent from './abstract-component.js';
 import {
   getUserTotalRank
 } from '../data.js';
-import AbstractComponent from './abstract-component.js';
+import {
+  getProfileTemplate
+} from './profile-template.js';
 
 /**
  * Class representaing profile.

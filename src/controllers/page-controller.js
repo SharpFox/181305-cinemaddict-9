@@ -2,7 +2,11 @@ import ButtonShowMore from '../components/button-show-more.js';
 import FilmList from '../components/film-list.js';
 import MovieController from '../controllers/movie-controller.js';
 import Sort from '../components/sort.js';
-import API from '../api.js';
+import {
+  addElementDOM,
+  removeContainerChildren,
+  createElement
+} from '../utils.js';
 import {
   filmLists,
   filmsCardsCurrent,
@@ -17,15 +21,9 @@ import {
   getExtraFilmsTopRated,
   getExtraFilmsMostCommented,
   getSortFunctionForFilmByRating,
-  getSortFunctionForFilmByDate
+  getSortFunctionForFilmByDate,
+  getMaxFilmPortionNumber
 } from '../data.js';
-import {
-  END_POINT,
-  addElementDOM,
-  removeContainerChildren,
-  getAuthorizationValue,
-  createElement
-} from '../utils.js';
 
 /**
  * Class representaing controller of page.
@@ -45,7 +43,6 @@ class PageController {
     this._movieControllers = [];
     this._filmsListsComponents = [];
     this._getFilmsCards = getFilmsCardsPortion();
-    this._api = new API(END_POINT, getAuthorizationValue());
 
     this._onDataChange = this._onDataChange.bind(this);
   }
@@ -68,6 +65,9 @@ class PageController {
    * @param {string} filmsCards
    */
   addFilmsList(filmCategory, filmsCards) {
+    if (filmsCards === undefined) {
+      filmsCards = filmsCardsCurrent;
+    }
     if (!filmsCards.length) {
       return;
     }
@@ -77,9 +77,6 @@ class PageController {
     const filmsListContainer =
       this._getFilmsListContainer(filmsListComponent.element);
     const needButton = filmsCards !== undefined ? true : false;
-    if (filmsCards === undefined) {
-      filmsCards = filmsCardsCurrent;
-    }
     this._addFilmsCards(filmsCards, filmsListContainer,
         this._getFilmsListFilmsContainer(filmsListContainer));
     this._createButtonForFilmsList(filmsListComponent.element,
@@ -307,7 +304,7 @@ class PageController {
     buttonShowMoreComponent.onOpen = () => {
       setNumberDownloadedFilmsCards();
       this._addMoreCards();
-      if (this._totalFilmPortionNumber === 3) {
+      if (this._totalFilmPortionNumber === getMaxFilmPortionNumber()) {
         document.querySelector(`.films-list__show-more`).remove();
         buttonShowMoreComponent.unrender();
       }

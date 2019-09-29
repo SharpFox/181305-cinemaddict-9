@@ -5,13 +5,11 @@ import {
 
 /**
  * Return termplate for statistic text list.
- * @param {number} totalWatchedFilms
- * @param {number} totalDuration
- * @param {string} topGenre
+ * @param {number} statisticParams
  * @return {string}
  */
-const getStatList = (totalWatchedFilms, totalDuration,
-    topGenre) => {
+const getStatList = ({totalWatchedFilms, totalDuration,
+  topGenre}) => {
   const statisticList =
     getStatisticList(totalWatchedFilms, totalDuration, topGenre);
   return `${statisticList.map(({title, texts}) => (`
@@ -55,7 +53,7 @@ const getStatFilters = (filter) => {
  * @param {object} statistic
  * @return {string}
  */
-const getStatisticTemplate = ({_userTotalRating, _totalWatchedFilms,
+const getStatisticTemplate = ({_userTotalRating, _statisticParams,
   _totalDuration, _topGenre, _filter}) => {
   return `
     <p class="statistic__rank">
@@ -77,7 +75,7 @@ const getStatisticTemplate = ({_userTotalRating, _totalWatchedFilms,
       ${getStatFilters(_filter)}
     </form>
     <ul class="statistic__text-list">
-      ${getStatList(_totalWatchedFilms, _totalDuration, _topGenre)}
+      ${getStatList(_statisticParams)}
     </ul>
     <div class="statistic__chart-wrap">
       <canvas class="statistic__chart" width="1000"></canvas>

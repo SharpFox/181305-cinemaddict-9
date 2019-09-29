@@ -1,3 +1,7 @@
+import moment from 'moment';
+import {
+  getDuration
+} from '../utils.js';
 import {
   filmDetailsControlsTypes,
   filmControlsTypesId,
@@ -5,10 +9,6 @@ import {
   emojiList,
   getImgPathEmoji
 } from '../data.js';
-import {
-  getDuration
-} from '../utils.js';
-import moment from 'moment';
 
 /**
  * Return of rating activity.
@@ -146,9 +146,9 @@ const getCommentsListTemplate = (comments) => {
  * @param {object} filmDetails
  * @return {string}
  */
-const getFilmDetailsTemplate = ({_img, _age, _title, _rating, _userRating,
-  _director, _writers, _actors, _year, _duration, _country, _genres,
-  _description, _comments, _controlsTypes}) => {
+const getFilmDetailsTemplate = ({_img, _age, _title, _alternativeTitle, _rating,
+  _userRating, _director, _writers, _actors, _year, _duration, _country,
+  _genres, _description, _comments, _controlsTypes}) => {
   return `
     <form class="film-details__inner"
       tabindex="1"
@@ -176,7 +176,7 @@ const getFilmDetailsTemplate = ({_img, _age, _title, _rating, _userRating,
                   ${_title}
                 </h3>
                 <p class="film-details__title-original">
-                  Original: ${_title}
+                  Original: ${_alternativeTitle}
                 </p>
               </div>
               <div class="film-details__rating">
@@ -218,7 +218,7 @@ const getFilmDetailsTemplate = ({_img, _age, _title, _rating, _userRating,
                   Runtime
                 </td>
                 <td class="film-details__cell">
-                  ${getDuration(_duration.start, _duration.end)}               
+                  ${getDuration(_duration)}               
                 </td>
               </tr>
               <tr class="film-details__row">
@@ -229,15 +229,15 @@ const getFilmDetailsTemplate = ({_img, _age, _title, _rating, _userRating,
                   ${_country}  
                 </td>
               </tr>
-              <tr class="film-details__row">
+              ${_genres.length ? `<tr class="film-details__row">
                 <td class="film-details__term">
-                  Genres
+                  ${_genres.length === 1 ? `Genre` : `Genres`}
                 </td>
                 <td class="film-details__cell">
                   ${_genres.map((genre) => (`<span class="film-details__genre">
                     ${genre}</span>`)).join(``)}
                 </td>
-              </tr>
+              </tr>` : ``}
             </table>
             <p class="film-details__film-description">
               ${_description}

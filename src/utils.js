@@ -15,6 +15,10 @@ const METHODS = {
 const END_POINT = `https://htmlacademy-es-9.appspot.com/cinemaddict`;
 const ANIMATION_TIMEOUT = 600;
 const DEFAULT_FILM_ID = -1;
+const MIN_SEARCH_LENGTH = 3;
+const BAR_HEIGHT = 55;
+const HOUR_MS = 3600000;
+const MINUTE_MS = 60000;
 
 /**
  * Add cloned of component element to DOM.
@@ -100,22 +104,36 @@ const removeContainerChildren = (container) => {
 };
 
 /**
+ * Return result of restoring date.
+ * @param {string} key
+ * @param {string} value
+ * @return {date}
+ */
+const restoreDate = (key, value) => {
+  if (key === `date`
+    || key === `userWatchingDate`
+    || key === `year`) {
+    return moment(value).toDate();
+  }
+
+  return value;
+};
+
+/**
  * Return clone of object.
  * @param {object} oldObject
  * @return {object}
  */
 const cloneDeep = (oldObject) => {
-  return JSON.parse(JSON.stringify(oldObject));
+  return JSON.parse(JSON.stringify(oldObject), restoreDate);
 };
 
 /**
  * Return duration.
- * @param {date} startDate
- * @param {date} endDate
+ * @param {number} duration
  * @return {string}
  */
-const getDuration = (startDate, endDate) => {
-  const duration = moment(endDate) - moment(startDate);
+const getDuration = (duration) => {
   const durationFormat = moment(duration).utcOffset(0).format(`H[h] m[m]`);
   for (let char of durationFormat) {
     if (char === `0`) {
@@ -166,12 +184,28 @@ const getAuthorizationValue = () => {
   return `Basic ${result}`;
 };
 
+/**
+ * Remove HTML символы from string.
+ * @param {string} HTMLString
+ * @return {string}
+ */
+const doEscapeHTML = (HTMLString) => {
+  const newElement = document.createElement(`div`);
+  const newTextNode = document.createTextNode(HTMLString);
+
+  return newElement.appendChild(newTextNode).parentNode.innerHTML;
+};
+
 export {
   KEYS,
   METHODS,
   END_POINT,
   ANIMATION_TIMEOUT,
   DEFAULT_FILM_ID,
+  MIN_SEARCH_LENGTH,
+  BAR_HEIGHT,
+  HOUR_MS,
+  MINUTE_MS,
   createElement,
   getRandomValueMinMax,
   compareRandom,
@@ -183,5 +217,6 @@ export {
   getDuration,
   checkStatus,
   toJSON,
-  getAuthorizationValue
+  getAuthorizationValue,
+  doEscapeHTML
 };

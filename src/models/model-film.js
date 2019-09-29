@@ -12,25 +12,25 @@ class ModelFilm {
    * @param {object} data
    */
   constructor(data) {
-    this._id = Number(data.id);
-    this._comments = data.comments;
-    this._title = data.film_info.title;
-    this._alternativeTitle = data.film_info.alternative_title;
-    this._rating = Number(data.film_info.total_rating);
-    this._img = data.film_info.poster;
-    this._age = Number(data.film_info.age_rating);
-    this._director = data.film_info.director;
-    this._writers = data.film_info.writers;
-    this._actors = data.film_info.actors;
-    this._year = moment(data.film_info.release.date);
-    this._country = data.film_info.release.release_country;
-    this._duration = Number(data.film_info.runtime);
-    this._genres = data.film_info.genre;
-    this._description = data.film_info.description;
-    this._userRating = Number(data.user_details.personal_rating);
-    this._userWatchingDate = moment(data.user_details.watching_date);
-    this._categoriesId = [filmControlsTypesId.watchlist];
-    this._controlsTypes = this._getFilmControlsTypes(data.user_details);
+    this.id = Number(data.id);
+    this.comments = data.comments;
+    this.title = data.film_info.title;
+    this.alternativeTitle = data.film_info.alternative_title;
+    this.rating = Number(data.film_info.total_rating);
+    this.img = data.film_info.poster;
+    this.age = Number(data.film_info.age_rating);
+    this.director = data.film_info.director;
+    this.writers = data.film_info.writers;
+    this.actors = data.film_info.actors;
+    this.year = moment(data.film_info.release.date).toDate();
+    this.country = data.film_info.release.release_country;
+    this.duration = Number(data.film_info.runtime) * 60 * 1000;
+    this.genres = data.film_info.genre;
+    this.description = data.film_info.description;
+    this.userRating = Number(data.user_details.personal_rating);
+    this.userWatchingDate = moment(data.user_details.watching_date).toDate();
+    this.categoriesId = [filmControlsTypesId.watchlist];
+    this.controlsTypes = this._getFilmControlsTypes(data.user_details);
   }
 
   /**
@@ -78,13 +78,13 @@ class ModelFilm {
   _getFilmControlsTypes(userDetails) {
     const controlsTypes = [];
     if (userDetails.watchlist) {
-      controlsTypes.push(userDetails.watchlist);
+      controlsTypes.push(filmControlsTypesId.watchlist);
     }
-    if (userDetails.watchlist) {
-      controlsTypes.push(userDetails.already_watched);
+    if (userDetails.already_watched) {
+      controlsTypes.push(filmControlsTypesId.watched);
     }
-    if (userDetails.watchlist) {
-      controlsTypes.push(userDetails.favorite);
+    if (userDetails.favorite) {
+      controlsTypes.push(filmControlsTypesId.favorite);
     }
     return controlsTypes;
   }

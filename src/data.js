@@ -1,11 +1,21 @@
+import moment from 'moment';
+import ModelFilm from './models/model-film.js';
+import ModelComment from './models/model-comment.js';
 import {
-  getRandomValueMinMax,
+  HOUR_MS,
+  MINUTE_MS,
   compareRandom,
   cloneDeep
 } from './utils.js';
-import moment from 'moment';
 
 const FILMS_CARDS_STEP = 5;
+
+const userRanks = {
+  zero: ``,
+  novice: `Novice`,
+  fan: `Fan`,
+  movieBuff: `Movie Buff`
+};
 
 const sortTypes = {
   default: true,
@@ -18,142 +28,6 @@ const sortTypesId = {
   date: `date`,
   rating: `rating`
 };
-
-const genres = [
-  `Drama`,
-  `Mystery`,
-  `Comedy`,
-  `Musical`,
-  `Western`,
-  `Documentary`,
-  `Action movie`,
-  `Сartoon`,
-  `Family`,
-  `Sci-Fi`
-];
-
-const titles = [
-  `Sagebrush Trail`,
-  `The Dance of Life`,
-  `The Man with the Golden Arm`,
-  `Santa Claus Conquers the Martians`,
-  `Popeye the Sailor Meets Sindbad the Sailor`,
-  `The Man with the Golden Arm`,
-  `The Great Flamarion`,
-  `Santa Claus Conquers the Martians`,
-  `Made for Each Other`,
-  `Avengers`,
-  `Quantum of Solace`,
-  `Harry Potter And The Chamber of secrets`,
-  `Dracula`,
-  `Tom and Jerry`,
-  `It`
-];
-
-const durationList = [
-  {
-    start: `1970-01-01T00:00:00`,
-    end: `1970-01-01T01:55:00`
-  },
-  {
-    start: `1970-01-01T00:00:00`,
-    end: `1970-01-01T00:54:00`
-  },
-  {
-    start: `1970-01-01T00:00:00`,
-    end: `1970-01-01T02:59:00`
-  },
-  {
-    start: `1970-01-01T00:00:00`,
-    end: `1970-01-01T01:21:00`
-  },
-  {
-    start: `1970-01-01T00:00:00`,
-    end: `1970-01-01T00:16:00`
-  },
-  {
-    start: `1970-01-01T00:00:00`,
-    end: `1970-01-01T01:32:00`
-  },
-  {
-    start: `1970-01-01T00:00:00`,
-    end: `1970-01-01T01:21:00`
-  },
-  {
-    start: `1970-01-01T00:00:00`,
-    end: `1970-01-01T01:18:00`
-  }
-];
-
-const years = [
-  `1956-03-15T00:00:00`,
-  `1944-04-01T00:00:00`,
-  `1978-01-01T00:00:00`,
-  `1955-06-05T00:00:00`,
-  `1983-09-24T00:00:00`
-];
-
-const posters = [
-  `made-for-each-other.png`,
-  `popeye-meets-sinbad.png`,
-  `sagebrush-trail.jpg`,
-  `santa-claus-conquers-the-martians.jpg`,
-  `the-dance-of-life.jpg`,
-  `the-great-flamarion.jpg`,
-  `the-man-with-the-golden-arm.jpg`
-];
-
-const descriptions = [
-  `Lorem ipsum dolor sit amet, consectetur adipiscing elit`,
-  `Cras aliquet varius magna, non porta ligula feugiat eget`,
-  `Fusce tristique felis at fermentum pharetra`,
-  `Aliquam id orci ut lectus varius viverra`,
-  `Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante`,
-  `Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum`,
-  `Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus
-   nunc ante ut dui`,
-  `Sed sed nisi sed augue convallis suscipit in sed felis`,
-  `Aliquam erat volutpat`,
-  `Nunc fermentum tortor ac porta dapibus`,
-  `In rutrum ac purus sit amet tempus`
-];
-
-const directors = [
-  `Anthony Mann`,
-  `Quentin Tarantino`,
-  `David Litch`,
-  `Andre Ovredal`,
-  `John Rice`
-];
-
-const writers = [
-  `Peter Eckerman`,
-  `Eyal Podell`,
-  `Jonathan E. Stewart`,
-  `Kevin Hagman`,
-  `Guillermo del Toro`
-];
-
-const actors = [
-  `Leonardo DiCaprio`,
-  `Brad Pitt`,
-  `Margot Robbie`,
-  `Emil Hirsch`,
-  `Margaret Cuelli`,
-  `Timothy Olyphant`,
-  `Julia Butters`,
-  `Austin butler`,
-  `Dakota Fanning`,
-  `Bruce Dern`
-];
-
-const countries = [
-  `USA`,
-  `Great Britain`,
-  `China`,
-  `Canada`,
-  `Finland`
-];
 
 const imgPathEmoji = {
   smile: `./images/emoji/smile.png`,
@@ -197,37 +71,6 @@ const getImgPathEmoji = (emojiType) => {
   return imgPathEmoji[emojiType];
 };
 
-const comments = [
-  {
-    id: 0,
-    type: emojiId.smile,
-    text: `Interesting setting and a good cast`,
-    author: `Tim Macoveev`,
-    date: `2019-09-15T12:05:55`
-  },
-  {
-    id: 1,
-    type: emojiId.sleeping,
-    text: `Booooooooooring`,
-    author: `John Doe`,
-    date: `2019-09-17T18:01:35`
-  },
-  {
-    id: 2,
-    type: emojiId.puke,
-    text: `Very very old. Meh`,
-    author: `John Doe`,
-    date: `2019-09-21T11:01:52`
-  },
-  {
-    id: 3,
-    type: emojiId.angry,
-    text: `Almost two hours? Seriously?`,
-    author: `John Doe`,
-    date: `2019-09-19T02:01:12`
-  }
-];
-
 const ratingScales = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 const filmDetailsControlsTypes = {
@@ -260,106 +103,56 @@ const filmsCategoriesId = {
   MostCommented: `MostCommented`
 };
 
-/**
- * Return comments for film.
- * @return {array}
- */
-const getComments = () => {
-  const randomComments = comments.slice(0,
-      getRandomValueMinMax(1, comments.length - 1));
-
-  return randomComments;
-};
+const filmsCardsMain = [];
 
 /**
- * Return random rating for interval from 1 to 10.
- * @return {number}
+ * Fill main array of cards of films.
+ * @param {object} filmCard
  */
-const getRating = () => {
-  const rating = getRandomValueMinMax(1, 9, 1);
-  return rating > 9 ? Math.floor(rating) : rating;
+const addFilmCardToFilmCardsMain = (filmCard) => {
+  filmsCardsMain.push(cloneDeep(filmCard));
 };
 
-/**
- * Return random film control types.
- * @return {object}
- */
-const getFilmControlsTypes = () => {
-  const filmControlsTypesKeys = Object.keys(filmDetailsControlsTypes);
-  return filmControlsTypesKeys.sort(compareRandom)
-      .slice(0, getRandomValueMinMax(1, filmControlsTypesKeys.length - 1));
-};
-
-/**
- * Return card of film.
- * @param {number} id
- * @return {object}
- */
-const getFilmCard = (id) => {
-  const filmControlsTypes = getFilmControlsTypes();
-
-  let filmUserRating = 0;
-  filmControlsTypes.forEach((controlType) => {
-    if (controlType === filmControlsTypesId.watched) {
-      filmUserRating = getRating();
-    }
-  });
-  return {
-    id,
-    genres: genres.sort(compareRandom).slice(0,
-        getRandomValueMinMax(1, genres.length - 1)),
-    year: years[getRandomValueMinMax(0, years.length - 1)],
-    title: titles[getRandomValueMinMax(0, titles.length - 1)],
-    rating: getRating(),
-    userRating: filmUserRating,
-    duration: durationList[getRandomValueMinMax(0, durationList.length - 1)],
-    img: `./images/posters/`
-      + posters[getRandomValueMinMax(0, posters.length - 1)],
-    description: descriptions.sort(compareRandom).slice(0,
-        getRandomValueMinMax(1, descriptions.length - 1)),
-    comments: getComments(),
-    age: getRandomValueMinMax(6, 18),
-    director: directors[getRandomValueMinMax(0, directors.length - 1)],
-    writers: writers.sort(compareRandom).slice(0,
-        getRandomValueMinMax(1, writers.length - 1)),
-    actors: actors.sort(compareRandom).slice(0,
-        getRandomValueMinMax(1, actors.length - 1)),
-    country: countries[getRandomValueMinMax(0, countries.length - 1)],
-    controlsTypes: filmControlsTypes
-  };
-};
-
-/**
- * Return array of cards of films.
- * @param {number} filmsCount
- * @return {array}
- */
-const getFilmCardsMain = (filmsCount) => {
-  const filmCards = [];
-  for (let i = 0; i < filmsCount; i++) {
-    filmCards.push(getFilmCard(i));
-  }
-
-  return filmCards;
-};
-
-const filmsCardsMain = getFilmCardsMain(titles.length);
+let filmsCardsCurrent = [];
 
 /**
  * Clone filmCardMain.
- * @return {array}
  */
-const cloneFilmCards = () => {
-  const filmsCards = [];
+const fillFilmsCardsCurrent = () => {
   filmsCardsMain.forEach((filmCard) => {
-    filmsCards.push(cloneDeep(filmCard));
+    filmsCardsCurrent.push(cloneDeep(filmCard));
   });
-
-  return filmsCards;
 };
 
-let filmsCardsCurrent = cloneFilmCards();
+/**
+ * Add comment to filmsCardsMain.
+ * @param {array} comments
+ * @param {number} filmId
+ */
+const addCommentToFilmsCardsMain = (comments, filmId) => {
+  for (let filmCard of filmsCardsMain) {
+    if (filmCard.id === filmId) {
+      filmCard.comments = [];
+      comments.forEach((comment) => filmCard.comments.push(comment));
+      break;
+    }
+  }
+};
 
+/**
+ * Add comment to filmsCardsCurrent.
+ * @param {array} comments
+ * @param {number} filmId
+ */
+const addCommentToFilmsCardsCurrent = (comments, filmId) => {
+  for (let filmCard of filmsCardsCurrent) {
+    if (filmCard.id === filmId) {
+      filmCard.comments = [];
+      comments.forEach((comment) => filmCard.comments.push(comment));
+      break;
+    }
+  }
+};
 /**
  * Do default data for filmsCardsCurrent.
  */
@@ -384,6 +177,14 @@ const selectfilmsCardsCurrent = (category) => {
       }
     }
   });
+};
+
+/**
+ * Return max number of portion film.
+ * @return {number}
+ */
+const getMaxFilmPortionNumber = () => {
+  return Math.ceil(filmsCardsCurrent.length / FILMS_CARDS_STEP);
 };
 
 /**
@@ -416,7 +217,6 @@ const getSortFunctionForFilmByComments = (firstFilmCard, secondFilmCard) => {
   return secondFilmCard.comments.length
     - firstFilmCard.comments.length;
 };
-
 
 /**
  * Find a film by the search line in FilmsCardsCurrent.
@@ -463,6 +263,7 @@ const getExtraFilms = (filmsCards, filmCardKey) => {
   }
   const maxNumberFilms = 2;
   filmsCards = filmsCards.slice(0, maxNumberFilms);
+
   return checkFilmsCardsByZero(filmsCards, filmCardKey, maxNumberFilms);
 };
 
@@ -527,7 +328,7 @@ const setNumberDownloadedFilmsCards = () => {
   totalDownloadedFilmsCards += FILMS_CARDS_STEP;
 };
 
-let filmsCardsPortionCount = 0;
+let startCountfilmsCardsPortion = 0;
 let stepFilmsCardsPortion = FILMS_CARDS_STEP;
 
 /**
@@ -535,16 +336,16 @@ let stepFilmsCardsPortion = FILMS_CARDS_STEP;
  * @return {function}
  */
 const getFilmsCardsPortion = () => {
-  filmsCardsPortionCount = 0;
+  startCountfilmsCardsPortion = 0;
   /**
    * Return portion of film cards.
    * @return {array}
    */
   return () => {
-    const filmCardsPortion = filmsCardsCurrent.slice(filmsCardsPortionCount,
-        filmsCardsPortionCount + stepFilmsCardsPortion);
+    const filmCardsPortion = filmsCardsCurrent.slice(startCountfilmsCardsPortion,
+        startCountfilmsCardsPortion + stepFilmsCardsPortion);
 
-    filmsCardsPortionCount += FILMS_CARDS_STEP;
+    startCountfilmsCardsPortion += stepFilmsCardsPortion;
     stepFilmsCardsPortion = FILMS_CARDS_STEP;
 
     return filmCardsPortion;
@@ -556,19 +357,22 @@ const getFilmsCardsPortion = () => {
  * @param {number} newStep
  */
 const changefilmsCardsPortionCount = (newStep) => {
-  filmsCardsPortionCount = 0;
+  startCountfilmsCardsPortion = 0;
   stepFilmsCardsPortion = newStep;
 };
 
 /**
  * Return amount of watched films.
+ * @param {date} boundaryUserDate
  * @return {number}
  */
-const getWatchedFilmsAmount = () => {
+const getWatchedFilmsAmount = (boundaryUserDate) => {
   let filmsAmount = 0;
   filmsCardsCurrent.forEach((filmCard) => {
     filmCard.controlsTypes.forEach((controlType) => {
-      if (controlType === filmControlsTypesId.watched) {
+      if (controlType === filmControlsTypesId.watched
+        && (boundaryUserDate === null
+        || filmCard.userWatchingDate >= boundaryUserDate)) {
         filmsAmount++;
       }
     });
@@ -579,12 +383,16 @@ const getWatchedFilmsAmount = () => {
 
 /**
  * Return unique genres from filmsCardsCurrent.
+ * @param {date} boundaryUserDate
  * @return {object}
  */
-const getUniqueGenres = () => {
+const getUniqueGenres = (boundaryUserDate) => {
   const allGenres = [];
   filmsCardsCurrent.forEach((filmCard) => {
-    filmCard.genres.forEach((genre) => allGenres.push(genre));
+    if (boundaryUserDate === null
+      || filmCard.userWatchingDate >= boundaryUserDate) {
+      filmCard.genres.forEach((genre) => allGenres.push(genre));
+    }
   });
 
   const uniqueGenres = {};
@@ -601,11 +409,12 @@ const getUniqueGenres = () => {
 
 /**
  * Return a top genre.
+ * @param {date} boundaryUserDate
  * @return {string}
  */
-const getTopGenre = () => {
+const getTopGenre = (boundaryUserDate) => {
   let topGenre = null;
-  const uniqueGenres = getUniqueGenres();
+  const uniqueGenres = getUniqueGenres(boundaryUserDate);
   const maxGenreAmount = Math.max(...Object.values(uniqueGenres));
   const uniqGenresTotal = Object.entries(uniqueGenres);
   for (let [genre, amount] of uniqGenresTotal) {
@@ -620,12 +429,16 @@ const getTopGenre = () => {
 
 /**
  * Return total duration of all films.
+ * @param {date} boundaryUserDate
  * @return {number}
  */
-const getTotalDuration = () => {
+const getTotalDuration = (boundaryUserDate) => {
   let totalDuration = 0;
-  durationList.forEach((duration) => {
-    totalDuration += moment(duration.end) - moment(duration.start);
+  filmsCardsCurrent.forEach((filmCard) => {
+    if (boundaryUserDate === null
+      || filmCard.userWatchingDate >= boundaryUserDate) {
+      totalDuration += moment(filmCard.duration);
+    }
   });
 
   return totalDuration;
@@ -647,13 +460,6 @@ const getFilmsAmountByCategories = (category) => {
   });
 
   return filmsAmount;
-};
-
-const userRanks = {
-  zero: ``,
-  novice: `Novice`,
-  fan: `Fan`,
-  movieBuff: `Movie Buff`
 };
 
 /**
@@ -693,22 +499,32 @@ const getUserTotalRank = () => {
   return userTotalRank;
 };
 
-const countFilmCards = filmsCardsCurrent.length;
+/**
+ * Return total films cards.
+ * @return {number}
+ */
+const getTotalFilmsCards = () => {
+  return filmsCardsMain.length;
+};
 
 /**
  * Update film card for sending form.
  * @param {object} newData
  * @param {object} filmCard
  * @param {string} keyUpdate
- * @param {different} value
+ * @param {different} newValue
  */
-const updateServerDataForSendingForm = (newData, filmCard, keyUpdate, value) => {
+const updateServerDataForSendingForm = (newData, filmCard, keyUpdate, newValue) => {
+  if (newValue === null
+    || (Array.isArray(newValue) && newValue.length === 0)) {
+    return;
+  }
   if (keyUpdate !== `comments`) {
-    filmCard[keyUpdate] = value;
+    filmCard[keyUpdate] = newValue;
     return;
   }
   if (newData.comment.text !== null) {
-    filmCard[keyUpdate].push(value);
+    filmCard[keyUpdate].push(newValue);
   }
 };
 
@@ -787,45 +603,51 @@ const menuTypesId = {
   'stats': `stats`
 };
 
-const menuTypes = [
-  {
-    'title': `All movies`,
-    'id': menuTypesId.all,
-    'isActive': true,
-    'filmsCount': countFilmCards,
-    'modifiers': []
-  },
-  {
-    'title': `Watchlist`,
-    'id': menuTypesId.watchlist,
-    'isActive': false,
-    'filmsCount': getFilmsAmountByCategories(filmControlsTypesId.watchlist),
-    'modifiers': []
-  },
-  {
-    'title': `History`,
-    'id': menuTypesId.history,
-    'isActive': false,
-    'filmsCount': getFilmsAmountByCategories(filmControlsTypesId.watched),
-    'modifiers': []
-  },
-  {
-    'title': `Favorites`,
-    'id': menuTypesId.favorites,
-    'isActive': false,
-    'filmsCount': getFilmsAmountByCategories(filmControlsTypesId.favorite),
-    'modifiers': []
-  },
-  {
-    'title': `Stats`,
-    'id': menuTypesId.stats,
-    'isActive': false,
-    'filmsCount': 0,
-    'modifiers': [
-      `additional`
-    ]
-  }
-];
+/**
+ * Return menu types.
+ * @return {array}
+ */
+const getMenuTypes = () => {
+  return [
+    {
+      'title': `All movies`,
+      'id': menuTypesId.all,
+      'isActive': true,
+      'filmsCount': 0,
+      'modifiers': []
+    },
+    {
+      'title': `Watchlist`,
+      'id': menuTypesId.watchlist,
+      'isActive': false,
+      'filmsCount': getFilmsAmountByCategories(filmControlsTypesId.watchlist),
+      'modifiers': []
+    },
+    {
+      'title': `History`,
+      'id': menuTypesId.history,
+      'isActive': false,
+      'filmsCount': getFilmsAmountByCategories(filmControlsTypesId.watched),
+      'modifiers': []
+    },
+    {
+      'title': `Favorites`,
+      'id': menuTypesId.favorites,
+      'isActive': false,
+      'filmsCount': getFilmsAmountByCategories(filmControlsTypesId.favorite),
+      'modifiers': []
+    },
+    {
+      'title': `Stats`,
+      'id': menuTypesId.stats,
+      'isActive': false,
+      'filmsCount': 0,
+      'modifiers': [
+        `additional`
+      ]
+    }
+  ];
+};
 
 const statisticFiltersId = {
   'allTime': `all-time`,
@@ -876,6 +698,29 @@ const getStatisticFilters = (isCheckedCategory) => {
 };
 
 /**
+ * Return duration by hours.
+ * @param {number} duration
+ * @return {number}
+ */
+const getDurationByHours = (duration) => {
+  return Math.trunc(duration / HOUR_MS);
+};
+
+/**
+ * Return duration by minutes.
+ * @param {number} duration
+ * @return {number}
+ */
+const getDurationByMinutes = (duration) => {
+  const hoursNumbers = Math.trunc(duration / HOUR_MS);
+  for (let i = 1; i <= hoursNumbers; i++) {
+    duration -= HOUR_MS;
+  }
+
+  return Math.ceil(duration / MINUTE_MS);
+};
+
+/**
  * Return statistic list.
  * @param {number} totalWatchedFilms
  * @param {number} totalDuration
@@ -902,7 +747,7 @@ const getStatisticList = (totalWatchedFilms, totalDuration,
       title: `Total duration`,
       texts: [
         {
-          textTitle: moment(totalDuration).format(`H`),
+          textTitle: getDurationByHours(totalDuration),
           isDescription: false
         },
         {
@@ -910,7 +755,7 @@ const getStatisticList = (totalWatchedFilms, totalDuration,
           isDescription: true
         },
         {
-          textTitle: moment(totalDuration).format(`m`),
+          textTitle: getDurationByMinutes(totalDuration),
           isDescription: false
         },
         {
@@ -923,7 +768,7 @@ const getStatisticList = (totalWatchedFilms, totalDuration,
       title: `Top genre`,
       texts: [
         {
-          textTitle: topGenre,
+          textTitle: topGenre === null ? `-` : topGenre,
           isDescription: false
         }
       ]
@@ -933,7 +778,6 @@ const getStatisticList = (totalWatchedFilms, totalDuration,
 
 export {
   getImgPathEmoji,
-  genres,
   sortTypes,
   sortTypesId,
   filmCardControlsTypes,
@@ -941,12 +785,12 @@ export {
   filmControlsTypesId,
   emojiList,
   filmLists,
-  menuTypes,
+  getMenuTypes,
   menuTypesId,
   getStatisticList,
   filmsCardsMain,
   filmsCardsCurrent,
-  countFilmCards,
+  getTotalFilmsCards,
   filmsCategories,
   filmsCategoriesId,
   statisticFiltersId,
@@ -968,5 +812,10 @@ export {
   getExtraFilmsTopRated,
   getExtraFilmsMostCommented,
   getSortFunctionForFilmByRating,
-  getSortFunctionForFilmByDate
+  getSortFunctionForFilmByDate,
+  addFilmCardToFilmCardsMain,
+  fillFilmsCardsCurrent,
+  getMaxFilmPortionNumber,
+  addCommentToFilmsCardsMain,
+  addCommentToFilmsCardsCurrent
 };

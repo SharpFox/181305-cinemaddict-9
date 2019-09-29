@@ -4,9 +4,6 @@ import {
   removeContainerChildren
 } from '../utils.js';
 import {
-  getWatchedFilmsAmount,
-  getTotalDuration,
-  getTopGenre,
   statisticFiltersId
 } from '../data.js';
 
@@ -29,19 +26,16 @@ class StatisticController {
    * Create statistic.
    */
   init() {
-    this._addStatistic(
-        this._getStatisticParams(statisticFiltersId.allTime),
-        statisticFiltersId.allTime);
+    this._addStatistic(statisticFiltersId.allTime);
   }
 
   /**
    * Add statistic to DOM and fill handlers.
-   * @param {object} statisticParams
    * @param {string} filter
    */
-  _addStatistic(statisticParams, filter) {
+  _addStatistic(filter) {
     this._statisticComponent = new Statistic(this._statisticContainer,
-        statisticParams, filter, this.onUpdateStatistic);
+        filter, this.onUpdateStatistic);
     addElementDOM(this._statisticContainer, this._statisticComponent);
     this._statisticComponent.renderChart();
   }
@@ -53,19 +47,7 @@ class StatisticController {
   onUpdateStatistic(newFilter) {
     removeContainerChildren(this._statisticContainer);
     this._statisticComponent.unrender();
-    this._addStatistic(this._getStatisticParams(newFilter), newFilter);
-  }
-
-  /**
-   * Return statistic params.
-   * @return {object}
-   */
-  _getStatisticParams() {
-    return {
-      totalWatchedFilms: getWatchedFilmsAmount(),
-      totalDuration: getTotalDuration(),
-      topGenre: getTopGenre()
-    };
+    this._addStatistic(newFilter);
   }
 }
 

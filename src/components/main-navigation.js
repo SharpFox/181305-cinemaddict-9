@@ -1,14 +1,14 @@
 
-import {
-  getMainNavigationTemplate
-} from './main-navigation-template.js';
+import AbstractComponent from './abstract-component.js';
 import {
   KEYS
 } from '../utils.js';
 import {
   menuTypesId
 } from '../data.js';
-import AbstractComponent from './abstract-component.js';
+import {
+  getMainNavigationTemplate
+} from './main-navigation-template.js';
 
 /**
  * Class representaing main navigation.

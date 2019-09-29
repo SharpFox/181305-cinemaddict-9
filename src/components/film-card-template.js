@@ -1,10 +1,31 @@
-import {
-  filmCardControlsTypes
-} from '../data.js';
+import moment from 'moment';
 import {
   getDuration
 } from '../utils.js';
-import moment from 'moment';
+import {
+  filmCardControlsTypes
+} from '../data.js';
+
+/**
+ * Return description for card of film by limit for symbols
+ * (139 symbols).
+ * @param {string} description
+ * @return {string}
+ */
+const getFilmCardDescription = (description) => {
+  let limitDescription = ``;
+  let currentNumber = 1;
+  for (let char of description) {
+    limitDescription += char;
+    if (currentNumber === 139) {
+      limitDescription += `...`;
+      break;
+    }
+    currentNumber += 1;
+  }
+
+  return limitDescription;
+};
 
 /**
  * Return template for card of film.
@@ -24,15 +45,15 @@ const getFilmCardTemplate = ({_id, _title, _rating, _year, _duration, _genres, _
       <p class="film-card__info">
         <span class="film-card__year">${moment(_year).format(`YYYY`)}</span>
         <span class="film-card__duration">
-          ${getDuration(_duration.start, _duration.end)}
+          ${getDuration(_duration)}
         </span>
-        <span class="film-card__genre">${_genres[0]}</span>
+        ${_genres.length ? `<span class="film-card__genre">${_genres[0]}</span>` : ``}
       </p>
       <img src="${_img}"
         alt="" class="film-card__poster"
       >
       <p class="film-card__description">
-        ${_description}
+        ${getFilmCardDescription(_description)}
       </p>
       <a class="film-card__comments">
         ${_comments.length} comment${_comments.length === 1 ? `` : `s`}   

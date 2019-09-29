@@ -9,13 +9,11 @@ class ModelComment {
    * @param {object} data
    */
   constructor(data) {
-    this._id = Number(data.id);
-    this._type = this._getImgPathOfSmileType(data.emotion);
-    this._text = data.comment;
-    this._date = moment(data.date);
-    this._author = data.author;
-
-    this._smileTypesServer = this._getSmileTypesServer();
+    this.id = Number(data.id);
+    this.type = data.emotion;
+    this.text = data.comment;
+    this.date = moment(data.date).toDate();
+    this.author = data.author;
   }
 
   /**
@@ -37,7 +35,7 @@ class ModelComment {
    * @return {obj}
    * @static
    */
-  static parseFilm(data) {
+  static parseComment(data) {
     return new ModelComment(data);
   }
 
@@ -47,8 +45,8 @@ class ModelComment {
    * @return {obj}
    * @static
    */
-  static parseFilms(data) {
-    return data.map(ModelComment.parseFilm);
+  static parseComments(data) {
+    return data.map(ModelComment.parseComment);
   }
 }
 

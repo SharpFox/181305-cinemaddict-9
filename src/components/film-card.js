@@ -1,10 +1,10 @@
-import {
-  getFilmCardTemplate
-} from './film-card-template.js';
+import AbstractComponent from './abstract-component.js';
 import {
   KEYS
 } from '../utils.js';
-import AbstractComponent from './abstract-component.js';
+import {
+  getFilmCardTemplate
+} from './film-card-template.js';
 
 /**
  * Class representaing film card.
@@ -98,6 +98,12 @@ class FilmCard extends AbstractComponent {
       commentsContainer.addEventListener(`click`, this._onOpenDetails);
       commentsContainer.addEventListener(`keydown`, this._onOpenDetails);
     }
+
+    const titleContainer = element.querySelector(`.film-card__title`);
+    if (titleContainer !== null) {
+      titleContainer.addEventListener(`click`, this._onOpenDetails);
+      titleContainer.addEventListener(`keydown`, this._onOpenDetails);
+    }
   }
 
   /**
@@ -127,6 +133,12 @@ class FilmCard extends AbstractComponent {
     if (commentsContainer !== null) {
       commentsContainer.removeEventListener(`click`, this._onOpenDetails);
       commentsContainer.removeEventListener(`keydown`, this._onOpenDetails);
+    }
+
+    const titleContainer = element.querySelector(`.film-card__title`);
+    if (titleContainer !== null) {
+      titleContainer.removeEventListener(`click`, this._onOpenDetails);
+      titleContainer.removeEventListener(`keydown`, this._onOpenDetails);
     }
   }
 

@@ -54,18 +54,17 @@ class SearchController {
 
     /**
      * Search film.
-     * @param {event} evt
+     * @param {string} searchLine
      */
-    this._searchComponent.searchFilm = (evt) => {
+    this._searchComponent.searchFilm = (searchLine) => {
       this._hideOtherContainers();
-      const searchLine = evt.target.value.trim();
       if (!searchLine) {
         removeContainerChildren(this._searchResultContainer);
         this._addSearchResultElement(0);
         this._addNoResultElement();
         return;
       }
-      findFilmsCardsCurrent(evt.target.value.trim());
+      findFilmsCardsCurrent(searchLine);
       removeContainerChildren(this._searchResultContainer);
       this._addSearchResultElement(filmsCardsCurrent.length);
       if (!filmsCardsCurrent.length) {

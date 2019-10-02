@@ -2,22 +2,16 @@ import moment from 'moment';
 import {
   getDuration
 } from '../utils.js';
-import {
-  filmDetailsControlsTypes,
-  filmControlsTypesId,
-  ratingScales,
-  emojiList,
-  getImgPathEmoji
-} from '../data.js';
 
 /**
  * Return of rating activity.
+ * @param {object} data
  * @param {array} controlsTypes
  * @return {boolean}
  */
-const ratingIsActive = (controlsTypes) => {
+const ratingIsActive = (data, controlsTypes) => {
   for (let type of controlsTypes) {
-    if (type === filmControlsTypesId.watched) {
+    if (type === data.filmControlsTypesId.watched) {
       return true;
     }
   }
@@ -26,12 +20,13 @@ const ratingIsActive = (controlsTypes) => {
 
 /**
  * Return template emoji list.
+ * @param {object} data
  * @param {string} img
  * @param {string} title
  * @param {number} userRating
  * @return {string}
  */
-const getFilmRatingTemplate = (img, title, userRating) => {
+const getFilmRatingTemplate = (data, img, title, userRating) => {
   return `
     <section class="film-details__user-rating-wrap">
       <div class="film-details__user-rating-controls">
@@ -59,7 +54,7 @@ const getFilmRatingTemplate = (img, title, userRating) => {
           </p>
 
           <div class="film-details__user-rating-score">
-            ${ratingScales.map((scale) => (`<input type="radio"
+            ${data.ratingScales.map((scale) => (`<input type="radio"
                 name="score"
                 class="film-details__user-rating-input visually-hidden"
                 value="${scale}"
@@ -78,12 +73,13 @@ const getFilmRatingTemplate = (img, title, userRating) => {
 
 /**
  * Return template emoji list.
+ * @param {object} data
  * @return {string}
  */
-const getEmojiListTemplate = () => {
+const getEmojiListTemplate = (data) => {
   return `
     <div class="film-details__emoji-list">
-      ${emojiList.map(({id, img}) => (`<input
+      ${data.emojiList.map(({id, img}) => (`<input
         class="film-details__emoji-item visually-hidden"
         name="comment-emoji"
         type="radio"
@@ -103,50 +99,11 @@ const getEmojiListTemplate = () => {
 };
 
 /**
- * Return comment list.
- * @param {array} comments
- * @return {string}
- */
-const getCommentsListTemplate = (comments) => {
-  return `
-    <ul class="film-details__comments-list">
-      ${comments.map(({id, type, text, author, date}) => (`<li
-        class="film-details__comment">
-        <span class="film-details__comment-emoji">
-          <img src="${getImgPathEmoji(type)}"
-            width="55"
-            height="55"
-            alt="emoji"
-          >
-        </span>
-        <div>
-          <p class="film-details__comment-text">
-            ${text}
-          </p>
-          <p class="film-details__comment-info">
-            <span class="film-details__comment-author">
-              ${author}
-            </span>
-            <span class="film-details__comment-day">
-              ${moment(date).fromNow()}
-            </span>
-            <button class="film-details__comment-delete"
-              tabindex="4"
-              data-id="${id}">
-              Delete
-            </button>
-          </p>
-        </div>
-      </li>`)).join(``)}
-    </ul>`;
-};
-
-/**
  * Return template for details of film.
  * @param {object} filmDetails
  * @return {string}
  */
-const getFilmDetailsTemplate = ({_img, _age, _title, _alternativeTitle, _rating,
+const getFilmDetailsTemplate = ({_data, _img, _age, _title, _alternativeTitle, _rating,
   _userRating, _director, _writers, _actors, _year, _duration, _country,
   _genres, _description, _comments, _controlsTypes}) => {
   return `
@@ -245,7 +202,7 @@ const getFilmDetailsTemplate = ({_img, _age, _title, _alternativeTitle, _rating,
           </div>
         </div>
         <section class="film-details__controls">
-          ${Object.keys(filmDetailsControlsTypes).map((type) => (`<input type="checkbox"
+          ${Object.keys(_data.filmDetailsControlsTypes).map((type) => (`<input type="checkbox"
             class="film-details__control-input visually-hidden"
             tabindex="3"
             value="${type}"
@@ -257,23 +214,17 @@ const getFilmDetailsTemplate = ({_img, _age, _title, _alternativeTitle, _rating,
           <label for="${type}"
             class="film-details__control-label
               film-details__control-label--${type}">
-              ${filmDetailsControlsTypes[type]}
+              ${_data.filmDetailsControlsTypes[type]}
           </label>`)).join(``)}    
         </section>
       </div>
       <div class="form-details__middle-container
-        ${ratingIsActive(_controlsTypes, filmControlsTypesId) ? `` : ` visually-hidden`}">
-        ${getFilmRatingTemplate(_img, _title, _userRating, ratingScales)}
+        ${ratingIsActive(_data, _controlsTypes) ? `` : ` visually-hidden`}">
+        ${getFilmRatingTemplate(_data, _img, _title, _userRating)}
       </div>
       <div class="form-details__bottom-container">
-        <section class="film-details__comments-wrap"> 
-          <h3 class="film-details__comments-title">
-            Comments
-            <span class="film-details__comments-count">
-              ${_comments.length}
-            </span>
-          </h3>
-          ${getCommentsListTemplate(_comments)}
+        <section class="film-details__comments-wrap">          
+          <div id="comment-list"></div>
           <div class="film-details__new-comment"> 
             <div for="add-emoji"
               class="film-details__add-emoji-label">
@@ -284,7 +235,7 @@ const getFilmDetailsTemplate = ({_img, _age, _title, _alternativeTitle, _rating,
                 placeholder="Select reaction below and write comment here" 
                 name="comment"></textarea>
             </label> 
-            ${getEmojiListTemplate()}         
+            ${getEmojiListTemplate(_data)}         
           </div>
         </section>
       </div>

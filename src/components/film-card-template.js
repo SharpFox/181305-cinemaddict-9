@@ -2,9 +2,6 @@ import moment from 'moment';
 import {
   getDuration
 } from '../utils.js';
-import {
-  filmCardControlsTypes
-} from '../data.js';
 
 /**
  * Return description for card of film by limit for symbols
@@ -32,7 +29,7 @@ const getFilmCardDescription = (description) => {
  * @param {object} filmCard
  * @return {string}
  */
-const getFilmCardTemplate = ({_id, _title, _rating, _year, _duration, _genres, _img,
+const getFilmCardTemplate = ({_data, _id, _title, _rating, _year, _duration, _genres, _img,
   _description, _comments, _controlsTypes}) => {
   return `
     <article class="film-card">
@@ -60,16 +57,16 @@ const getFilmCardTemplate = ({_id, _title, _rating, _year, _duration, _genres, _
       </a>      
       <form class="film-card__controls"
         id="form-film-card-controls-${_id}">          
-        ${Object.keys(filmCardControlsTypes).map((type) => (`<button
+        ${Object.keys(_data.filmCardControlsTypes).map((type) => (`<button
           name="${type}"
           value="${type}"
           data-id="${type}"
           class="film-card__controls-item button
-          film-card__controls-item--${filmCardControlsTypes[type]}
+          film-card__controls-item--${_data.filmCardControlsTypes[type]}
           ${_controlsTypes.map((currentType) => (`
             ${currentType === type ? ` film-card__controls-item--active` : ``}`).trim())
             .join(``)}">
-          ${filmCardControlsTypes[type]}
+          ${_data.filmCardControlsTypes[type]}
         </button>`).trim()).join(``)}
       </form>
     </article>`;

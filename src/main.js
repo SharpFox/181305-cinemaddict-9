@@ -5,19 +5,22 @@ import SearchController from './controllers/search-controller.js';
 import Footer from './components/footer.js';
 import Profile from './components/profile.js';
 import API from './api.js';
+import Data from './data.js';
+import ModelFilm from './models/model-film.js';
+import ModelComment from './models/model-comment.js';
 import {
   END_POINT,
   addElementDOM,
   getAuthorizationValue
 } from './utils.js';
-import {
-  filmsCardsMain,
-  addFilmCardToFilmCardsMain,
-  addCommentToFilmsCardsMain,
-  fillFilmsCardsCurrent
-} from './data.js';
 
-const api = new API(END_POINT, getAuthorizationValue());
+let pageController = null;
+let mainNavigationController = null;
+let profileComponent = null;
+let isFirstLoadApplication = true;
+
+const data = new Data();
+const api = new API(data, END_POINT, getAuthorizationValue());
 
 const bodyContainer = document.querySelector(`body`);
 const headerContainer = bodyContainer.querySelector(`.header`);
@@ -34,56 +37,187 @@ const footerContainer = bodyContainer.querySelector(`.footer`);
  * Initialization application.
  */
 const init = () => {
-  fillFilmsCardsCurrent();
-
-  const pageController = new PageController(filmsContainer, filmDetailsContainer,
-      sortContainer);
+  pageController = new PageController(data, filmsContainer, filmDetailsContainer,
+      sortContainer, onDataChange, onCommentsLoad);
   pageController.init();
 
-  const mainNavigationController = new MainNavigationController(pageController,
+  mainNavigationController = new MainNavigationController(data, pageController,
       mainNavigationContainer, filmsContainer, sortContainer, statisticContainer);
   mainNavigationController.init();
 
-  const searchController = new SearchController(pageController,
+  const searchController = new SearchController(data, pageController,
       mainNavigationController, mainNavigationContainer,
       filmsContainer, sortContainer, statisticContainer);
   searchController.init();
 
-  const statisticController = new StatisticController(statisticContainer);
+  const statisticController = new StatisticController(data, statisticContainer);
   statisticController.init();
 
-  const profileComponent = new Profile();
-  addElementDOM(profileContainer, profileComponent);
+  initProfile();
 
-  const footerComponent = new Footer();
+  const footerComponent = new Footer(data);
   addElementDOM(footerContainer, footerComponent);
+
+  isFirstLoadApplication = false;
 };
 
 /**
- * Get films cards from server.
+ * Initialization profile.
  */
-const getFilmsCardsFromServer = () => {
-  api.getFilms()
-  .then((filmsCards) => {
-    filmsCards.forEach((filmCard) => {
-      addFilmCardToFilmCardsMain(filmCard);
-    });
-    getComments();
-    init();
+const initProfile = () => {
+  profileComponent = new Profile(data, profileContainer);
+  addElementDOM(profileContainer, profileComponent);
+};
+
+/**
+ * Update data of film card.
+ * @param {object} newData
+ */
+const onDataChange = (newData) => {
+  for (const filmCard of data.filmsCardsCurrent) {
+    if (filmCard.id === newData.id) {
+      updateFilmCard(newData, filmCard);
+      getNewComment(newData);
+      deleteComment(newData, filmCard.id);
+
+      break;
+    }
+  }
+};
+
+/**
+ * Load comments to details of film.
+ * @param {number} filmId
+ * @param {function} addComments
+ */
+const onCommentsLoad = (filmId, addComments) => {
+  api.getComments(filmId)
+  .then((comments) => {
+    addComments(comments);
   })
   .catch();
 };
 
 /**
- * Get and add comments to FilmsCardsMain.
+ * Get films cards from server.
+ * @param {number} filmCardId
  */
-const getComments = () => {
-  filmsCardsMain.forEach((filmCard) => {
-    api.getComments(filmCard.id)
-    .then((comments) => {
-      addCommentToFilmsCardsMain(comments, filmCard.id);
+const getFilmsCardsFromServer = (filmCardId) => {
+  api.getFilms()
+  .then((filmsCards) => {
+    data.clearFilmCardsMain();
+    filmsCards.forEach((filmCard) => {
+      data.addFilmCardToFilmCardsMain(filmCard);
     });
-  });
+    if (isFirstLoadApplication) {
+      data.fillFilmsCardsCurrent();
+      init();
+    } else {
+      data.updateFilmCardsCurrent();
+      profileComponent.unrender();
+      initProfile();
+      mainNavigationController.rerender();
+      pageController.rerender(filmCardId);
+    }
+  })
+  .catch();
+};
+
+/**
+ * Return filled model of film based newData.
+ * @param {object} filmCard
+ * @return {object}
+ */
+const getFilledModelFilm = (filmCard) => {
+  const modelFilm = new ModelFilm(data, ModelFilm.getTemplateData());
+  const filmCardEntries = Object.entries(filmCard);
+  for (let [key, value] of filmCardEntries) {
+    modelFilm[key] = value;
+  }
+
+  return modelFilm;
+};
+
+/**
+ * Update film card.
+ * @param {object} newData
+ * @param {object} filmCard
+ */
+const updateFilmCard = (newData, filmCard) => {
+  if (newData.isSendingForm) {
+    const modelFilm = getFilledModelFilm(filmCard);
+    const newDataEntries = Object.entries(newData);
+    for (let [key, value] of newDataEntries) {
+      if (key === `userRating`
+      || key === `controlsTypes`) {
+        modelFilm[key] = value;
+      }
+    }
+    updateFilmCardByServer(modelFilm.toRAW(), newData.id);
+  }
+};
+
+/**
+ * Update comment.
+ * @param {object} newData
+ */
+const getNewComment = (newData) => {
+  if (newData.isSendingComment) {
+    const modelComment =
+      new ModelComment(data, ModelComment.getTemplateData());
+    const newDataEntries = Object.entries(newData);
+    for (let [key, value] of newDataEntries) {
+      if (key === `comment`) {
+        modelComment[key] = value;
+      }
+    }
+    postCommentToServer(modelComment.toRAW(), newData.id);
+  }
+};
+
+/**
+ * Delete comment.
+ * @param {object} newData
+ * @param {number} filmCardId
+ */
+const deleteComment = (newData, filmCardId) => {
+  if (newData.isDeletingComment) {
+    deleteCommentToServer(newData.comment.id, filmCardId);
+  }
+};
+
+/**
+ * Update film card by server.
+ * @param {object} newFilmCard
+ * @param {number} filmCardId
+ */
+const updateFilmCardByServer = (newFilmCard, filmCardId) => {
+  api.updateFilm(newFilmCard, filmCardId)
+  .then(() => {
+  })
+  .catch();
+};
+
+/**
+ * Post comment to server.
+ * @param {object} newComment
+ * @param {number} filmCardId
+ */
+const postCommentToServer = (newComment, filmCardId) => {
+  api.postComment(newComment, filmCardId)
+  .then(getFilmsCardsFromServer(filmCardId))
+  .catch();
+};
+
+/**
+ * Delete comment by server.
+ * @param {number} commentId
+ * @param {number} filmCardId
+ */
+const deleteCommentToServer = (commentId, filmCardId) => {
+  api.deleteComment(commentId)
+  .then(getFilmsCardsFromServer(filmCardId))
+  .catch();
 };
 
 getFilmsCardsFromServer();

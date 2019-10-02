@@ -8,14 +8,6 @@ import {
   BAR_HEIGHT
 } from '../utils.js';
 import {
-  getUniqueGenres,
-  getUserTotalRank,
-  getWatchedFilmsAmount,
-  getTotalDuration,
-  getTopGenre,
-  statisticFiltersId
-} from '../data.js';
-import {
   getStatisticTemplate
 } from './statistic-template.js';
 
@@ -26,13 +18,15 @@ import {
 class Statistic extends AbstractComponent {
   /**
    * Create statistic.
+   * @param {object} data
    * @param {HTMLElement} statisticContainer
    * @param {string} filter
    * @param {function} onUpdateStatistic
    */
-  constructor(statisticContainer, filter, onUpdateStatistic) {
+  constructor(data, statisticContainer, filter, onUpdateStatistic) {
     super();
-    this._userTotalRating = getUserTotalRank();
+    this._data = data;
+    this._userTotalRating = this._data.getUserTotalRank();
     this._statisticParams = this._getStatisticParams(filter);
     this._onUpdateStatistic = onUpdateStatistic;
     this._filter = filter;
@@ -65,7 +59,7 @@ class Statistic extends AbstractComponent {
    */
   renderChart() {
     const boundaryUserDate = this._getBoundaryUserDate(this._filter);
-    let uniqueGenres = Object.entries(getUniqueGenres(boundaryUserDate));
+    let uniqueGenres = Object.entries(this._data.getUniqueGenres(boundaryUserDate));
     const statisticChartContainer =
       this._statisticContainer
       .querySelector(`.statistic__chart`);
@@ -151,9 +145,9 @@ class Statistic extends AbstractComponent {
   _getStatisticParams(filter) {
     const boundaryUserDate = this._getBoundaryUserDate(filter);
     return {
-      totalWatchedFilms: getWatchedFilmsAmount(boundaryUserDate),
-      totalDuration: getTotalDuration(boundaryUserDate),
-      topGenre: getTopGenre(boundaryUserDate)
+      totalWatchedFilms: this._data.getWatchedFilmsAmount(boundaryUserDate),
+      totalDuration: this._data.getTotalDuration(boundaryUserDate),
+      topGenre: this._data.getTopGenre(boundaryUserDate)
     };
   }
 
@@ -165,13 +159,13 @@ class Statistic extends AbstractComponent {
    */
   _getBoundaryUserDate(filter) {
     let boundaryUserDate = null;
-    if (filter === statisticFiltersId.today) {
+    if (filter === this._data.statisticFiltersId.today) {
       boundaryUserDate = moment().startOf(`day`).toDate();
-    } else if (filter === statisticFiltersId.week) {
+    } else if (filter === this._data.statisticFiltersId.week) {
       boundaryUserDate = moment().startOf(`isoWeek`).toDate();
-    } else if (filter === statisticFiltersId.month) {
+    } else if (filter === this._data.statisticFiltersId.month) {
       boundaryUserDate = moment().startOf(`month`).toDate();
-    } else if (filter === statisticFiltersId.year) {
+    } else if (filter === this._data.statisticFiltersId.year) {
       boundaryUserDate = moment().startOf(`year`).toDate();
     }
 

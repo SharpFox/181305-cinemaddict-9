@@ -1,17 +1,13 @@
-import {
-  getStatisticList,
-  getStatisticFilters
-} from '../data.js';
-
 /**
  * Return termplate for statistic text list.
+ * @param {object} data
  * @param {number} statisticParams
  * @return {string}
  */
-const getStatList = ({totalWatchedFilms, totalDuration,
+const getStatList = (data, {totalWatchedFilms, totalDuration,
   topGenre}) => {
   const statisticList =
-    getStatisticList(totalWatchedFilms, totalDuration, topGenre);
+  data.getStatisticList(totalWatchedFilms, totalDuration, topGenre);
   return `${statisticList.map(({title, texts}) => (`
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">
@@ -27,11 +23,12 @@ const getStatList = ({totalWatchedFilms, totalDuration,
 
 /**
  * Return template for statistic filters.
+ * @param {object} data
  * @param {string} filter
  * @return {string}
  */
-const getStatFilters = (filter) => {
-  const statisticFilters = getStatisticFilters(filter);
+const getStatFilters = (data, filter) => {
+  const statisticFilters = data.getStatisticFilters(filter);
   return `${statisticFilters.map(({id, isChecked, title}) => (`<input
       type="radio"
       class="statistic__filters-input visually-hidden"
@@ -53,8 +50,8 @@ const getStatFilters = (filter) => {
  * @param {object} statistic
  * @return {string}
  */
-const getStatisticTemplate = ({_userTotalRating, _statisticParams,
-  _totalDuration, _topGenre, _filter}) => {
+const getStatisticTemplate = ({_data, _userTotalRating, _statisticParams,
+  _filter}) => {
   return `
     <p class="statistic__rank">
       Your rank
@@ -72,10 +69,10 @@ const getStatisticTemplate = ({_userTotalRating, _statisticParams,
       <p class="statistic__filters-description">
         Show stats:
       </p>
-      ${getStatFilters(_filter)}
+      ${getStatFilters(_data, _filter)}
     </form>
     <ul class="statistic__text-list">
-      ${getStatList(_statisticParams)}
+      ${getStatList(_data, _statisticParams)}
     </ul>
     <div class="statistic__chart-wrap">
       <canvas class="statistic__chart" width="1000"></canvas>

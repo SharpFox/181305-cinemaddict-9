@@ -13,12 +13,14 @@ import {
 class FilmCard extends AbstractComponent {
   /**
    * Create film card.
+   * @param {object} data
    * @param {object} filmCard
    * @param {function} onDataChange
    */
-  constructor({id, title, rating, year, duration, genres, img,
+  constructor(data, {id, title, rating, year, duration, genres, img,
     description, comments, controlsTypes}, onDataChange) {
     super();
+    this._data = data;
     this._id = id;
     this._title = title;
     this._rating = rating;

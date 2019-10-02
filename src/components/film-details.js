@@ -1,12 +1,10 @@
 
+import moment from 'moment';
 import AbstractComponent from './abstract-component.js';
 import {
   KEYS,
   doEscapeHTML
 } from '../utils.js';
-import {
-  filmControlsTypesId
-} from '../data.js';
 import {
   getFilmDetailsTemplate
 } from './film-details-template.js';
@@ -18,14 +16,17 @@ import {
 class FilmDetails extends AbstractComponent {
   /**
    * Create film details.
+   * @param {object} data
    * @param {HTMLElement} filmsDetailsContainer
    * @param {object} filmCard
    * @param {function} onDataChange
+   * @param {function} onCommentsLoad
    */
-  constructor(filmsDetailsContainer, {id, img, age, title, alternativeTitle,
+  constructor(data, filmsDetailsContainer, {id, img, age, title, alternativeTitle,
     rating, userRating, director, writers, actors, year, duration, country,
-    genres, description, comments, controlsTypes}, onDataChange) {
+    genres, description, comments, controlsTypes}, onDataChange, onCommentsLoad) {
     super();
+    this._data = data;
     this._id = id;
     this._filmsDetailsContainer = filmsDetailsContainer;
     this._img = img;
@@ -45,6 +46,7 @@ class FilmDetails extends AbstractComponent {
     this._comments = comments;
     this._controlsTypes = controlsTypes;
     this._onDataChange = onDataChange;
+    this._onCommentsLoad = onCommentsLoad;
 
     this._onClose = null;
     this._addEmoji = null;
@@ -53,7 +55,6 @@ class FilmDetails extends AbstractComponent {
     this._onCloseForm = this._onCloseForm.bind(this);
     this._onSendForm = this._onSendForm.bind(this);
     this._onOpenCloseRating = this._onOpenCloseRating.bind(this);
-    this._onDeleteComment = this._onDeleteComment.bind(this);
   }
 
   /**
@@ -62,6 +63,14 @@ class FilmDetails extends AbstractComponent {
    */
   get template() {
     return getFilmDetailsTemplate(this);
+  }
+
+  /**
+   * Return id of film.
+   * @return {number}
+   */
+  get id() {
+    return this._id;
   }
 
   /**
@@ -102,7 +111,6 @@ class FilmDetails extends AbstractComponent {
     this._bindOnCloseForm(element);
     this._bindOnSendForm(element);
     this._bindOnOpenCloseRating(element);
-    this._bindOnDeleteComment(element);
     this._bindOnUndoUserRating(element);
   }
 
@@ -120,7 +128,6 @@ class FilmDetails extends AbstractComponent {
     this._unbindOnCloseForm(element);
     this._unbindOnSendForm(element);
     this._unbindOnOpenCloseRating(element);
-    this._unbindOnDeleteComment(element);
     this._unbindOnUndoUserRating(element);
   }
 
@@ -164,21 +171,6 @@ class FilmDetails extends AbstractComponent {
     if (ratingContainer !== null) {
       ratingContainer.addEventListener(`click`, this._onOpenCloseRating);
       ratingContainer.addEventListener(`keydown`, this._onOpenCloseRating);
-    }
-  }
-
-  /**
-   * Add events for delete comments.
-   * @param {DocumentFragment} element
-   */
-  _bindOnDeleteComment(element) {
-    const commentsDeleteContainer =
-      element.querySelectorAll(`.film-details__comment-delete`);
-    if (commentsDeleteContainer !== null) {
-      for (let commentContainer of commentsDeleteContainer) {
-        commentContainer.addEventListener(`click`, this._onDeleteComment);
-        commentContainer.addEventListener(`keydown`, this._onDeleteComment);
-      }
     }
   }
 
@@ -239,21 +231,6 @@ class FilmDetails extends AbstractComponent {
   }
 
   /**
-   * Remove events for delete comments.
-   * @param {DocumentFragment} element
-   */
-  _unbindOnDeleteComment(element) {
-    const commentsDeleteContainer =
-      element.querySelectorAll(`.film-details__comment-delete`);
-    if (commentsDeleteContainer !== null) {
-      for (let commentContainer of commentsDeleteContainer) {
-        commentContainer.removeEventListener(`click`, this._onDeleteComment);
-        commentContainer.removeEventListener(`keydown`, this._onDeleteComment);
-      }
-    }
-  }
-
-  /**
    * Remove events for undo of user rating.
    * @param {DocumentFragment} element
    */
@@ -289,24 +266,12 @@ class FilmDetails extends AbstractComponent {
   }
 
   /**
-   * Call the function for delete comment.
-   * @param {event} evt
-   */
-  _onDeleteComment(evt) {
-    if (evt.keyCode === KEYS.ENTER || evt.type === `click`) {
-      evt.preventDefault();
-      this._onDataChange(
-          this._getNewDataForIdComment(Number(evt.target.dataset.id)));
-    }
-  }
-
-  /**
    * Call the function for undo of user rating.
    * @param {event} evt
    */
   _onUndoUserRating(evt) {
     if (evt.keyCode === KEYS.ENTER || evt.type === `click`) {
-      const newData = this._getEmptyNewData();
+      const newData = FilmDetails.getEmptyNewData();
       newData.isSendingForm = true;
       newData.id = this._id;
       newData.userRating = 0;
@@ -394,26 +359,13 @@ class FilmDetails extends AbstractComponent {
   }
 
   /**
-   * Return object newData for id comment.
-   * @param {number} commentId
-   * @return {object}
-   */
-  _getNewDataForIdComment(commentId) {
-    const newData = this._getEmptyNewData();
-    newData.id = this._id;
-    newData.comment.id = commentId;
-
-    return newData;
-  }
-
-  /**
    * Reset userRating in newData.
    * @param {object} newData
    */
   _resetUserRating(newData) {
     let isContolTypeWatched = false;
     newData.controlsTypes.forEach((contolType) => {
-      if (contolType === filmControlsTypesId.watched) {
+      if (contolType === this._data.filmControlsTypesId.watched) {
         isContolTypeWatched = true;
       }
     });
@@ -432,7 +384,7 @@ class FilmDetails extends AbstractComponent {
     if (evt.keyCode !== KEYS.ENTER
       || (evt.keyCode === KEYS.ENTER
       && !evt.ctrlKey && !evt.metaKey)) {
-      newData.comment = this._getEmptyComment();
+      newData.comment = FilmDetails.getEmptyComment();
     }
   }
 
@@ -446,40 +398,13 @@ class FilmDetails extends AbstractComponent {
   }
 
   /**
-   * Return empty object "comment".
-   * @return {object}
-   */
-  _getEmptyComment() {
-    return {
-      id: null,
-      type: null,
-      text: null
-    };
-  }
-
-  /**
-   * Return empty NewData.
-   * @return {object}
-   */
-  _getEmptyNewData() {
-    return {
-      isSendingForm: false,
-      id: null,
-      userRating: null,
-      comment: this._getEmptyComment(),
-      controlsTypes: []
-    };
-  }
-
-  /**
    * Return new data object.
    * @param {FormData} formData
    * @param {number} filmCardId
    * @return {object}
    */
   _processForm(formData, filmCardId) {
-    const newData = this._getEmptyNewData();
-    newData.isSendingForm = true;
+    const newData = FilmDetails.getEmptyNewData();
     newData.id = filmCardId;
 
     const filmCardMapper = this._createMapper(newData);
@@ -489,16 +414,11 @@ class FilmDetails extends AbstractComponent {
       }
     }
 
-    const commentsDeleteCounter =
-      this._element.querySelectorAll(`.film-details__comment-delete`);
-    if (commentsDeleteCounter.length) {
-      const idList = [];
-      commentsDeleteCounter.forEach((commentDeleteContainer) => {
-        idList.push(Number(commentDeleteContainer.dataset.id));
-      });
-      newData.comment.id = idList.sort()[idList.length - 1] + 1;
+    if (newData.comment.text === null
+      || newData.comment.type === null) {
+      newData.isSendingForm = true;
     } else {
-      newData.comment.id = 0;
+      newData.isSendingComment = true;
     }
 
     return newData;
@@ -526,10 +446,58 @@ class FilmDetails extends AbstractComponent {
       'comment': (value) => {
         const newText = doEscapeHTML(value.trim());
         newData.comment.text = newText === `` ? null : newText;
+        newData.comment.date = moment().toDate();
       },
       'comment-emoji': (value) => {
         newData.comment.type = value;
       }
+    };
+  }
+
+  /**
+   * Return object newData for id comment.
+   * @param {number} commentId
+   * @param {number} filmId
+   * @return {object}
+   * @static
+   */
+  static getNewComment(commentId, filmId) {
+    const newData = FilmDetails.getEmptyNewData();
+    newData.isDeletingComment = true;
+    newData.id = filmId;
+    newData.comment.id = commentId;
+
+    return newData;
+  }
+
+  /**
+   * Return empty NewData.
+   * @return {object}
+   * @static
+   */
+  static getEmptyNewData() {
+    return {
+      isSendingForm: false,
+      isSendingComment: false,
+      isDeletingComment: false,
+      id: null,
+      userRating: null,
+      comment: FilmDetails.getEmptyComment(),
+      controlsTypes: []
+    };
+  }
+
+  /**
+   * Return empty object "comment".
+   * @return {object}
+   * @static
+   */
+  static getEmptyComment() {
+    return {
+      id: null,
+      type: null,
+      text: null,
+      date: null
     };
   }
 }

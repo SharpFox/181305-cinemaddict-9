@@ -3,9 +3,6 @@ import {
   addElementDOM,
   removeContainerChildren
 } from '../utils.js';
-import {
-  statisticFiltersId
-} from '../data.js';
 
 /**
  * Class representaing controller of statistic.
@@ -13,9 +10,11 @@ import {
 class StatisticController {
   /**
    * Create statistic controller.
+   * @param {object} data
    * @param {HTMLElement} statisticContainer
    */
-  constructor(statisticContainer) {
+  constructor(data, statisticContainer) {
+    this._data = data;
     this._statisticContainer = statisticContainer;
     this._statisticComponent = null;
 
@@ -26,7 +25,7 @@ class StatisticController {
    * Create statistic.
    */
   init() {
-    this._addStatistic(statisticFiltersId.allTime);
+    this._addStatistic(this._data.statisticFiltersId.allTime);
   }
 
   /**
@@ -34,7 +33,7 @@ class StatisticController {
    * @param {string} filter
    */
   _addStatistic(filter) {
-    this._statisticComponent = new Statistic(this._statisticContainer,
+    this._statisticComponent = new Statistic(this._data, this._statisticContainer,
         filter, this.onUpdateStatistic);
     addElementDOM(this._statisticContainer, this._statisticComponent);
     this._statisticComponent.renderChart();

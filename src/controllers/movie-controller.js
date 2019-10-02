@@ -1,14 +1,12 @@
 import FilmCard from '../components/film-card.js';
 import FilmDetails from '../components/film-details.js';
+import Comments from '../components/comments.js';
 import {
   KEYS,
   addElementDOM,
   updateElementDOM,
   createElement
 } from '../utils.js';
-import {
-  emojiList,
-} from '../data.js';
 
 /**
  * Class representaing controller of move.+
@@ -16,22 +14,28 @@ import {
 class MovieController {
   /**
    * Create move controller.
+   * @param {object} data
    * @param {object} filmCard
    * @param {HTMLElement} filmsListContainer
    * @param {HTMLElement} filmsListFilmsContainer
    * @param {HTMLElement} filmDetailsContainer
    * @param {function} onDataChange
+   * @param {function} onCommentsLoad
    */
-  constructor(filmCard, filmsListContainer, filmsListFilmsContainer,
-      filmDetailsContainer, onDataChange) {
+  constructor(data, filmCard, filmsListContainer, filmsListFilmsContainer,
+      filmDetailsContainer, onDataChange, onCommentsLoad) {
+    this._data = data;
     this._id = filmCard.id;
     this._filmCard = filmCard;
     this._filmsListContainer = filmsListContainer;
     this._filmsListFilmsContainer = filmsListFilmsContainer;
     this._filmDetailsContainer = filmDetailsContainer;
-    this._filmCardComponent = new FilmCard(this._filmCard, onDataChange);
-    this._filmDetailsComponent = new FilmDetails(this._filmDetailsContainer,
+    this._filmCardComponent = new FilmCard(this._data, this._filmCard, onDataChange);
+    this._filmDetailsComponent = new FilmDetails(this._data, this._filmDetailsContainer,
         this._filmCard, onDataChange);
+    this._onDataChange = onDataChange;
+    this._onCommentsLoad = onCommentsLoad;
+    this.addComments = this.addComments.bind(this);
   }
 
   /**
@@ -68,6 +72,17 @@ class MovieController {
   }
 
   /**
+   * Put comments from server and add to FilmDetails.
+   * @param {array} comments
+   */
+  addComments(comments) {
+    const commentsComponent = new Comments(this._data,
+        comments, this._filmDetailsComponent.id, this._onDataChange);
+    const commentsContainer = document.getElementById(`comment-list`);
+    addElementDOM(commentsContainer, commentsComponent);
+  }
+
+  /**
    * Add one card of film.
    */
   _addFilmCard() {
@@ -84,6 +99,7 @@ class MovieController {
         this._filmDetailsContainer.firstElementChild.remove();
       }
       this.openFilmDetails();
+      this._onCommentsLoad(this._filmDetailsComponent.id, this.addComments);
     };
 
     /**
@@ -142,7 +158,7 @@ class MovieController {
    */
   _addEmojiToFilmDetailsElement(emojiId) {
     let emojiPath = null;
-    emojiList.forEach((emoji) => {
+    this._data.emojiList.forEach((emoji) => {
       if (emojiId === emoji.id) {
         emojiPath = emoji.img;
       }

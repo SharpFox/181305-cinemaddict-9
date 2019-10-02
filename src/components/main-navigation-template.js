@@ -1,13 +1,10 @@
-import {
-  getMenuTypes
-} from '../data.js';
-
 /**
  * Return template for main-navigation.
+ * @param {object} mainNavigation
  * @return {string}
  */
-const getMainNavigationTemplate = () => {
-  const menuTypes = getMenuTypes();
+const getMainNavigationTemplate = ({_data}) => {
+  const menuTypes = _data.getMenuTypes();
   return menuTypes.map(({id, modifiers, title, isActive, filmsCount}) => (`
     <a href="#${id}" data-id="${id}"
       class="main-navigation__item

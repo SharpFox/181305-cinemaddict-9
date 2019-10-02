@@ -13,12 +13,12 @@ const METHODS = {
 };
 
 const END_POINT = `https://htmlacademy-es-9.appspot.com/cinemaddict`;
-const ANIMATION_TIMEOUT = 600;
 const DEFAULT_FILM_ID = -1;
 const MIN_SEARCH_LENGTH = 3;
 const BAR_HEIGHT = 55;
 const HOUR_MS = 3600000;
 const MINUTE_MS = 60000;
+const FILMS_CARDS_STEP = 5;
 
 /**
  * Add cloned of component element to DOM.
@@ -104,6 +104,15 @@ const removeContainerChildren = (container) => {
 };
 
 /**
+ * Return clone of object.
+ * @param {object} oldObject
+ * @return {object}
+ */
+const cloneDeep = (oldObject) => {
+  return JSON.parse(JSON.stringify(oldObject), restoreDate);
+};
+
+/**
  * Return result of restoring date.
  * @param {string} key
  * @param {string} value
@@ -117,15 +126,6 @@ const restoreDate = (key, value) => {
   }
 
   return value;
-};
-
-/**
- * Return clone of object.
- * @param {object} oldObject
- * @return {object}
- */
-const cloneDeep = (oldObject) => {
-  return JSON.parse(JSON.stringify(oldObject), restoreDate);
 };
 
 /**
@@ -200,12 +200,12 @@ export {
   KEYS,
   METHODS,
   END_POINT,
-  ANIMATION_TIMEOUT,
   DEFAULT_FILM_ID,
   MIN_SEARCH_LENGTH,
   BAR_HEIGHT,
   HOUR_MS,
   MINUTE_MS,
+  FILMS_CARDS_STEP,
   createElement,
   getRandomValueMinMax,
   compareRandom,

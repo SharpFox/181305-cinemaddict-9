@@ -1,8 +1,8 @@
 
 import AbstractComponent from './abstract-component.js';
 import {
-  getUserTotalRank
-} from '../data.js';
+  removeContainerChildren
+} from '../utils.js';
 import {
   getProfileTemplate
 } from './profile-template.js';
@@ -14,10 +14,13 @@ import {
 class Profile extends AbstractComponent {
   /**
    * Create profile.
+   * @param {object} data
+   * @param {HTMLElement} profileContainer
    */
-  constructor() {
+  constructor(data, profileContainer) {
     super();
-    this._userTotalRating = getUserTotalRank();
+    this._profileContainer = profileContainer;
+    this._userTotalRating = data.getUserTotalRank();
   }
 
   /**
@@ -26,6 +29,15 @@ class Profile extends AbstractComponent {
    */
   get template() {
     return getProfileTemplate(this);
+  }
+
+  /**
+   * Rerender component.
+   */
+  rerender() {
+    this.unrender();
+    removeContainerChildren(this._profileContainer);
+    this.init();
   }
 }
 

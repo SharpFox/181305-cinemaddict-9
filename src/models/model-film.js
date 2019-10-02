@@ -1,7 +1,7 @@
 import moment from 'moment';
 import {
-  filmControlsTypesId
-} from '../data.js';
+  DEFAULT_FILM_ID
+} from '../utils.js';
 
 /**
  * Class representing model of film.
@@ -10,27 +10,29 @@ class ModelFilm {
   /**
    * Create model of film.
    * @param {object} data
+   * @param {object} serverDataPart
    */
-  constructor(data) {
-    this.id = Number(data.id);
-    this.comments = data.comments;
-    this.title = data.film_info.title;
-    this.alternativeTitle = data.film_info.alternative_title;
-    this.rating = Number(data.film_info.total_rating);
-    this.img = data.film_info.poster;
-    this.age = Number(data.film_info.age_rating);
-    this.director = data.film_info.director;
-    this.writers = data.film_info.writers;
-    this.actors = data.film_info.actors;
-    this.year = moment(data.film_info.release.date).toDate();
-    this.country = data.film_info.release.release_country;
-    this.duration = Number(data.film_info.runtime) * 60 * 1000;
-    this.genres = data.film_info.genre;
-    this.description = data.film_info.description;
-    this.userRating = Number(data.user_details.personal_rating);
-    this.userWatchingDate = moment(data.user_details.watching_date).toDate();
-    this.categoriesId = [filmControlsTypesId.watchlist];
-    this.controlsTypes = this._getFilmControlsTypes(data.user_details);
+  constructor(data, serverDataPart) {
+    this._filmControlsTypesId = data.filmControlsTypesId;
+    this.id = Number(serverDataPart.id);
+    this.comments = serverDataPart.comments;
+    this.title = serverDataPart.film_info.title;
+    this.alternativeTitle = serverDataPart.film_info.alternative_title;
+    this.rating = Number(serverDataPart.film_info.total_rating);
+    this.img = serverDataPart.film_info.poster;
+    this.age = Number(serverDataPart.film_info.age_rating);
+    this.director = serverDataPart.film_info.director;
+    this.writers = serverDataPart.film_info.writers;
+    this.actors = serverDataPart.film_info.actors;
+    this.year = moment(serverDataPart.film_info.release.date).toDate();
+    this.country = serverDataPart.film_info.release.release_country;
+    this.duration = Number(serverDataPart.film_info.runtime) * 60 * 1000;
+    this.genres = serverDataPart.film_info.genre;
+    this.description = serverDataPart.film_info.description;
+    this.userRating = Number(serverDataPart.user_details.personal_rating);
+    this.userWatchingDate = moment(serverDataPart.user_details.watching_date).toDate();
+    this.categoriesId = [data.filmControlsTypesId.watchlist];
+    this.controlsTypes = this._getFilmControlsTypes(serverDataPart.user_details);
   }
 
   /**
@@ -39,33 +41,32 @@ class ModelFilm {
    */
   toRAW() {
     return {
-      'id': String(this._id),
-      'comments': this._comments,
+      'comments': this.comments,
       'film_info': {
-        'title': this._title,
-        'alternative_title': this._alternativeTitle,
-        'total_rating': this._rating,
-        'poster': this._img,
-        'age_rating': this._age,
-        'director': this._director,
-        'writers': this._writers,
-        'actors': this._actors,
+        'title': this.title,
+        'alternative_title': this.alternativeTitle,
+        'total_rating': this.rating,
+        'poster': this.img,
+        'age_rating': this.age,
+        'director': this.director,
+        'writers': this.writers,
+        'actors': this.actors,
         'release': {
-          'date': moment(this._year).valueOf(),
-          'release_country': this._country
+          'date': moment(this.year).format(`YYYY-MM-DDTHH:mm:ss.SSSZ`),
+          'release_country': this.country
         },
-        'runtime': this._duration,
-        'genre': this._genres,
-        'description': this._description
+        'runtime': this.duration,
+        'genre': this.genres,
+        'description': this.description
       },
       'user_details': {
-        'personal_rating': this._userRating,
-        'watchlist': this._getFilmControlType(filmControlsTypesId.watchlist),
+        'personal_rating': this.userRating,
+        'watchlist': this._getFilmControlType(this._filmControlsTypesId.watchlist),
         'already_watched':
-          this._getFilmControlType(filmControlsTypesId.watched),
+          this._getFilmControlType(this._filmControlsTypesId.watched),
         'watching_date':
-          moment(this._userWatchingDate).format(`YYYY-MM-DDTHH:mm:ss.SSSZ`),
-        'favorite': this._getFilmControlType(filmControlsTypesId.favorite),
+          moment(this.userWatchingDate).format(`YYYY-MM-DDTHH:mm:ss.SSSZ`),
+        'favorite': this._getFilmControlType(this._filmControlsTypesId.favorite),
       }
     };
   }
@@ -78,13 +79,13 @@ class ModelFilm {
   _getFilmControlsTypes(userDetails) {
     const controlsTypes = [];
     if (userDetails.watchlist) {
-      controlsTypes.push(filmControlsTypesId.watchlist);
+      controlsTypes.push(this._filmControlsTypesId.watchlist);
     }
     if (userDetails.already_watched) {
-      controlsTypes.push(filmControlsTypesId.watched);
+      controlsTypes.push(this._filmControlsTypesId.watched);
     }
     if (userDetails.favorite) {
-      controlsTypes.push(filmControlsTypesId.favorite);
+      controlsTypes.push(this._filmControlsTypesId.favorite);
     }
     return controlsTypes;
   }
@@ -95,7 +96,7 @@ class ModelFilm {
    * @return {boolean}
    */
   _getFilmControlType(controlType) {
-    for (let value of this._controlsTypes) {
+    for (let value of this.controlsTypes) {
       if (value === controlType) {
         return true;
       }
@@ -104,23 +105,72 @@ class ModelFilm {
   }
 
   /**
+   * Return template of model trip.
+   * @return {object}
+   */
+  static getTemplateData() {
+    return {
+      'id': DEFAULT_FILM_ID,
+      'comments': [],
+      'film_info': {
+        'title': ``,
+        'alternative_title': ``,
+        'total_rating': 0,
+        'poster': ``,
+        'age_rating': 0,
+        'director': ``,
+        'writers': [],
+        'actors': [],
+        'release': {
+          'date': null,
+          'release_country': ``
+        },
+        'runtime': 0,
+        'genre': [],
+        'description': ``
+      },
+      'user_details': {
+        'personal_rating': 0,
+        'watchlist': false,
+        'already_watched': false,
+        'watching_date': null,
+        'favorite': false
+      }
+    };
+  }
+
+  /**
+   * Get template for method of synchronization.
+   * @param {array} filmsCards
+   * @return {object}
+   */
+  static getTemplateDataAsync(filmsCards) {
+    return {
+      'updated': [filmsCards]
+    };
+  }
+
+  /**
    * Return result of parsing part of data of comment from server.
    * @param {object} data
+   * @param {object} serverDataPart
    * @return {obj}
    * @static
    */
-  static parseFilm(data) {
-    return new ModelFilm(data);
+  static parseFilm(data, serverDataPart) {
+    return new ModelFilm(data, serverDataPart);
   }
 
   /**
    * Return result of parsing data of film from server.
    * @param {object} data
+   * @param {object} serverData
    * @return {obj}
    * @static
    */
-  static parseFilms(data) {
-    return data.map(ModelFilm.parseFilm);
+  static parseFilms(data, serverData) {
+    return serverData.map((serverDataPart) =>
+      ModelFilm.parseFilm(data, serverDataPart));
   }
 }
 

@@ -3,13 +3,6 @@ import {
   addElementDOM,
   removeContainerChildren
 } from '../utils.js';
-import {
-  menuTypesId,
-  selectfilmsCardsCurrent,
-  doDefaultFilmCardsCurrent,
-  changefilmsCardsPortionCount,
-  totalDownloadedFilmsCards
-} from '../data.js';
 
 /**
  * Class representaing controller of main navigation.
@@ -17,20 +10,22 @@ import {
 class MainNavigationController {
   /**
    * Create main-navigation controller.
+   * @param {object} data
    * @param {object} pageController
    * @param {HTMLElement} mainNavigationContainer
    * @param {HTMLElement} filmsContainer
    * @param {HTMLElement} sortContainer
    * @param {HTMLElement} statisticContainer
    */
-  constructor(pageController, mainNavigationContainer, filmsContainer, sortContainer,
+  constructor(data, pageController, mainNavigationContainer, filmsContainer, sortContainer,
       statisticContainer) {
+    this._data = data;
     this._pageController = pageController;
     this._mainNavigationContainer = mainNavigationContainer;
     this._filmsContainer = filmsContainer;
     this._sortContainer = sortContainer;
     this._statisticContainer = statisticContainer;
-    this._mainNavigationComponent = new MainNavigation();
+    this._mainNavigationComponent = new MainNavigation(this._data);
   }
 
   /**
@@ -49,26 +44,35 @@ class MainNavigationController {
       .querySelectorAll(`.main-navigation__item--active`);
     let currentType = null;
     for (const itemContainer of mainNavigationItems) {
-      if ((itemContainer.dataset.id !== menuTypesId.stats)
+      if ((itemContainer.dataset.id !== this._data.menuTypesId.stats)
         && (itemContainer.classList.contains(`main-navigation__item--active`))) {
         currentType = itemContainer.dataset.id;
         break;
       }
     }
-    if (currentType === menuTypesId.all) {
-      doDefaultFilmCardsCurrent();
+    if (currentType === this._data.menuTypesId.all) {
+      this._data.doDefaultFilmCardsCurrent();
       this._rerenderFilmsLists();
       return;
     }
-    selectfilmsCardsCurrent(currentType);
+    this._data.selectfilmsCardsCurrent(currentType);
     this._rerenderFilmsLists();
+  }
+
+  /**
+   * Rerender component of controller.
+   */
+  rerender() {
+    this._mainNavigationComponent.unrender();
+    removeContainerChildren(this._mainNavigationContainer);
+    this.init();
   }
 
   /**
    * Rerender all films lists.
    */
   _rerenderFilmsLists() {
-    changefilmsCardsPortionCount(totalDownloadedFilmsCards);
+    this._data.changefilmsCardsPortionCount(this._data.totalDownloadedFilmsCards);
     removeContainerChildren(this._filmsContainer);
     removeContainerChildren(this._sortContainer);
     this._pageController.unrenderFilmsListsComponents();

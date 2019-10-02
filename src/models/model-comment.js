@@ -6,47 +6,60 @@ import moment from 'moment';
 class ModelComment {
   /**
    * Create model of comment.
-   * @param {object} data
+   * @param {object} serverDataPart
    */
-  constructor(data) {
-    this.id = Number(data.id);
-    this.type = data.emotion;
-    this.text = data.comment;
-    this.date = moment(data.date).toDate();
-    this.author = data.author;
+  constructor(serverDataPart) {
+    this.id = Number(serverDataPart.id);
+    this.type = serverDataPart.emotion;
+    this.text = serverDataPart.comment;
+    this.date = moment(serverDataPart.date).toDate();
+    this.author = serverDataPart.author;
   }
 
   /**
    * Return RAW object for server.
-    * @return {object}
+   * @return {object}
    */
   toRAW() {
     return {
-      "comment": this._text,
-      "date":
+      'comment': this._text,
+      'date':
         moment(this._userWatchingDate).format(`YYYY-MM-DDTHH:mm:ss.SSSZ`),
-      "emotion": this._type
+      'emotion': this._type
+    };
+  }
+
+  /**
+   * Return template of model comment.
+   * @return {object}
+   */
+  static getTemplateData() {
+    return {
+      'comment': ``,
+      'date': null,
+      'emotion': ``
     };
   }
 
   /**
    * Return result of parsing part of data of comment from server.
-   * @param {object} data
+   * @param {object} serverDataPart
    * @return {obj}
    * @static
    */
-  static parseComment(data) {
-    return new ModelComment(data);
+  static parseComment(serverDataPart) {
+    return new ModelComment(serverDataPart);
   }
 
   /**
    * Return result of parsing data of comment from server.
-   * @param {object} data
+   * @param {object} serverData
    * @return {obj}
    * @static
    */
-  static parseComments(data) {
-    return data.map(ModelComment.parseComment);
+  static parseComments(serverData) {
+    return serverData.map((serverDataPart) =>
+      ModelComment.parseComment(serverDataPart));
   }
 }
 

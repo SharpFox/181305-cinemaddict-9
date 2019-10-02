@@ -12,10 +12,12 @@ import {
 class API {
   /**
    * Create api.
+   * @param {object} data
    * @param {string} endPoint
    * @param {string} authorization
    */
-  constructor(endPoint, authorization) {
+  constructor(data, endPoint, authorization) {
+    this._data = data;
     this._endPoint = endPoint;
     this._authorization = authorization;
   }
@@ -27,7 +29,40 @@ class API {
   getFilms() {
     return this._load({url: `movies`})
       .then(toJSON)
-      .then(ModelFilm.parseFilms);
+      .then((filmsCards) => ModelFilm.parseFilms(this._data, filmsCards));
+  }
+
+  /**
+   * Return result of putting film by server.
+   * @param {object} data
+   * @param {number} filmId
+   * @return {object}
+   */
+  updateFilm(data, filmId) {
+    return this._load({
+      url: `movies/${filmId}`,
+      method: METHODS.PUT,
+      body: JSON.stringify(data),
+      headers: new Headers({'Content-Type': `application/json`})
+    })
+      .then(toJSON)
+      .then((filmCard) => ModelFilm.parseFilm(this._data, filmCard));
+  }
+
+  /**
+   * Return result of posting film by server.
+   * @param {object} data
+   * @return {object}
+   */
+  syncFilm(data) {
+    return this._load({
+      url: `movies/sync`,
+      method: METHODS.POST,
+      body: JSON.stringify(data),
+      headers: new Headers({'Content-Type': `application/json`})
+    })
+      .then(toJSON)
+      .then((filmsCards) => ModelFilm.parseFilms(this._data, filmsCards));
   }
 
   /**
@@ -38,24 +73,24 @@ class API {
   getComments(filmId) {
     return this._load({url: `comments/${filmId}`})
       .then(toJSON)
-      .then(ModelComment.parseComments);
+      .then((filmsCards) => ModelComment.parseComments(filmsCards));
   }
 
   /**
-   * Return result of putting film by server.
-   * @param {number} filmId
+   * Return result of posting comment by server.
    * @param {object} data
+   * @param {number} filmId
    * @return {object}
    */
-  updateFilm(filmId, data) {
+  postComment(data, filmId) {
     return this._load({
-      url: `movies/${filmId}`,
-      method: METHODS.PUT,
+      url: `comments/${filmId}`,
+      method: METHODS.POST,
       body: JSON.stringify(data),
       headers: new Headers({'Content-Type': `application/json`})
     })
       .then(toJSON)
-      .then(ModelFilm.parseFilm);
+      .then(ModelComment.parseComment);
   }
 
   /**

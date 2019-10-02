@@ -1,9 +1,10 @@
 /**
  * Return template for sorting.
- * @param {object} sortType
+ * @param {object} sort
  * @return {string}
  */
-const getSortTemplate = ([sortType, isActive]) => {
+const getSortTemplate = ({_sortType}) => {
+  const [sortType, isActive] = _sortType;
   return `
     <li>
       <a data-sorttype="${sortType}" class="sort__button

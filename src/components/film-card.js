@@ -1,10 +1,10 @@
-import {
-  getFilmCardTemplate
-} from './film-card-template.js';
+import AbstractComponent from './abstract-component.js';
 import {
   KEYS
 } from '../utils.js';
-import AbstractComponent from './abstract-component.js';
+import {
+  getFilmCardTemplate
+} from './film-card-template.js';
 
 /**
  * Class representaing film card.
@@ -13,12 +13,14 @@ import AbstractComponent from './abstract-component.js';
 class FilmCard extends AbstractComponent {
   /**
    * Create film card.
+   * @param {object} data
    * @param {object} filmCard
    * @param {function} onDataChange
    */
-  constructor({id, title, rating, year, duration, genres, img,
+  constructor(data, {id, title, rating, year, duration, genres, img,
     description, comments, controlsTypes}, onDataChange) {
     super();
+    this._data = data;
     this._id = id;
     this._title = title;
     this._rating = rating;
@@ -98,6 +100,12 @@ class FilmCard extends AbstractComponent {
       commentsContainer.addEventListener(`click`, this._onOpenDetails);
       commentsContainer.addEventListener(`keydown`, this._onOpenDetails);
     }
+
+    const titleContainer = element.querySelector(`.film-card__title`);
+    if (titleContainer !== null) {
+      titleContainer.addEventListener(`click`, this._onOpenDetails);
+      titleContainer.addEventListener(`keydown`, this._onOpenDetails);
+    }
   }
 
   /**
@@ -127,6 +135,12 @@ class FilmCard extends AbstractComponent {
     if (commentsContainer !== null) {
       commentsContainer.removeEventListener(`click`, this._onOpenDetails);
       commentsContainer.removeEventListener(`keydown`, this._onOpenDetails);
+    }
+
+    const titleContainer = element.querySelector(`.film-card__title`);
+    if (titleContainer !== null) {
+      titleContainer.removeEventListener(`click`, this._onOpenDetails);
+      titleContainer.removeEventListener(`keydown`, this._onOpenDetails);
     }
   }
 

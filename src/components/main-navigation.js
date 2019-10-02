@@ -1,14 +1,11 @@
 
-import {
-  getMainNavigationTemplate
-} from './main-navigation-template.js';
+import AbstractComponent from './abstract-component.js';
 import {
   KEYS
 } from '../utils.js';
 import {
-  menuTypesId
-} from '../data.js';
-import AbstractComponent from './abstract-component.js';
+  getMainNavigationTemplate
+} from './main-navigation-template.js';
 
 /**
  * Class representaing main navigation.
@@ -17,9 +14,11 @@ import AbstractComponent from './abstract-component.js';
 class MainNavigation extends AbstractComponent {
   /**
    * Create main navigation.
+   * @param {object} data
    */
-  constructor() {
+  constructor(data) {
     super();
+    this._data = data;
 
     this._selectFilms = null;
     this._openCloseState = null;
@@ -32,7 +31,7 @@ class MainNavigation extends AbstractComponent {
    * @return {string}
    */
   get template() {
-    return getMainNavigationTemplate();
+    return getMainNavigationTemplate(this);
   }
 
   /**
@@ -89,7 +88,7 @@ class MainNavigation extends AbstractComponent {
     const itemsContainer = element.querySelectorAll(`.main-navigation__item`);
     if (itemsContainer !== null) {
       for (const itemContainer of itemsContainer) {
-        if (itemContainer.dataset.id !== menuTypesId.stats) {
+        if (itemContainer.dataset.id !== this._data.menuTypesId.stats) {
           itemContainer.addEventListener(`click`, this._onSelectFilms);
           itemContainer.addEventListener(`keydown`, this._onSelectFilms);
         }
@@ -105,7 +104,7 @@ class MainNavigation extends AbstractComponent {
     const itemsContainer = element.querySelectorAll(`.main-navigation__item`);
     if (itemsContainer !== null) {
       for (const itemContainer of itemsContainer) {
-        if (itemContainer.dataset.id === menuTypesId.stats) {
+        if (itemContainer.dataset.id === this._data.menuTypesId.stats) {
           itemContainer.addEventListener(`click`, this._onOpenCloseState);
           itemContainer.addEventListener(`keydown`, this._onOpenCloseState);
         }
@@ -121,7 +120,7 @@ class MainNavigation extends AbstractComponent {
     const itemsContainer = element.querySelectorAll(`.main-navigation__item`);
     if (itemsContainer !== null) {
       for (let itemContainer of itemsContainer) {
-        if (itemContainer.dataset.id !== menuTypesId.stats) {
+        if (itemContainer.dataset.id !== this._data.menuTypesId.stats) {
           itemContainer.removeEventListener(`click`, this._onSelectFilms);
           itemContainer.removeEventListener(`keydown`, this._onSelectFilms);
         }
@@ -137,7 +136,7 @@ class MainNavigation extends AbstractComponent {
     const itemsContainer = element.querySelectorAll(`.main-navigation__item`);
     if (itemsContainer !== null) {
       for (const itemContainer of itemsContainer) {
-        if (itemContainer.dataset.id === menuTypesId.stats) {
+        if (itemContainer.dataset.id === this._data.menuTypesId.stats) {
           itemContainer.removeEventListener(`click`, this._onOpenCloseState);
           itemContainer.removeEventListener(`keydown`, this._onOpenCloseState);
         }

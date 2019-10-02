@@ -5,6 +5,21 @@ const KEYS = {
   'ENTER': 13
 };
 
+const METHODS = {
+  GET: `GET`,
+  POST: `POST`,
+  PUT: `PUT`,
+  DELETE: `DELETE`
+};
+
+const END_POINT = `https://htmlacademy-es-9.appspot.com/cinemaddict`;
+const DEFAULT_FILM_ID = -1;
+const MIN_SEARCH_LENGTH = 3;
+const BAR_HEIGHT = 55;
+const HOUR_MS = 3600000;
+const MINUTE_MS = 60000;
+const FILMS_CARDS_STEP = 5;
+
 /**
  * Add cloned of component element to DOM.
  * @param {HTMLElement} container
@@ -94,17 +109,31 @@ const removeContainerChildren = (container) => {
  * @return {object}
  */
 const cloneDeep = (oldObject) => {
-  return JSON.parse(JSON.stringify(oldObject));
+  return JSON.parse(JSON.stringify(oldObject), restoreDate);
+};
+
+/**
+ * Return result of restoring date.
+ * @param {string} key
+ * @param {string} value
+ * @return {date}
+ */
+const restoreDate = (key, value) => {
+  if (key === `date`
+    || key === `userWatchingDate`
+    || key === `year`) {
+    return moment(value).toDate();
+  }
+
+  return value;
 };
 
 /**
  * Return duration.
- * @param {date} startDate
- * @param {date} endDate
+ * @param {number} duration
  * @return {string}
  */
-const getDuration = (startDate, endDate) => {
-  const duration = moment(endDate) - moment(startDate);
+const getDuration = (duration) => {
   const durationFormat = moment(duration).utcOffset(0).format(`H[h] m[m]`);
   for (let char of durationFormat) {
     if (char === `0`) {
@@ -116,8 +145,67 @@ const getDuration = (startDate, endDate) => {
   return durationFormat;
 };
 
+/**
+ * Return response, if code >= 200 or < 300, else
+ * throws error.
+ * @param {ArrayBuffer|Blob|Document} response
+ * @return {ArrayBuffer|Blob|Document}
+ */
+const checkStatus = (response) => {
+  if (response.status >= 200 && response.status < 300) {
+    return response;
+  }
+  throw new Error(`${response.status}: ${response.statusText}`);
+};
+
+/**
+ * Return json from responce of request.
+ * @param {ArrayBuffer|Blob|Document} response
+ * @return {json}
+ */
+const toJSON = (response) => {
+  return response.json();
+};
+
+/**
+ * Return value of authorization by server.
+ * @return {string}
+ */
+const getAuthorizationValue = () => {
+  let result = ``;
+  const words = `0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM`;
+  const maxPosition = words.length - 1;
+  let position = 0;
+  for (let i = 0; i < 15; i++) {
+    position = Math.floor(Math.random() * maxPosition);
+    result += words.substring(position, position + 1);
+  }
+
+  return `Basic ${result}`;
+};
+
+/**
+ * Remove HTML символы from string.
+ * @param {string} HTMLString
+ * @return {string}
+ */
+const doEscapeHTML = (HTMLString) => {
+  const newElement = document.createElement(`div`);
+  const newTextNode = document.createTextNode(HTMLString);
+
+  return newElement.appendChild(newTextNode).parentNode.innerHTML;
+};
+
 export {
   KEYS,
+  METHODS,
+  END_POINT,
+  DEFAULT_FILM_ID,
+  MIN_SEARCH_LENGTH,
+  BAR_HEIGHT,
+  HOUR_MS,
+  MINUTE_MS,
+  FILMS_CARDS_STEP,
   createElement,
   getRandomValueMinMax,
   compareRandom,
@@ -126,5 +214,9 @@ export {
   updateElementDOM,
   removeContainerChildren,
   cloneDeep,
-  getDuration
+  getDuration,
+  checkStatus,
+  toJSON,
+  getAuthorizationValue,
+  doEscapeHTML
 };

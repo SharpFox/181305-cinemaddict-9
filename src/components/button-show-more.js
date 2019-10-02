@@ -1,11 +1,11 @@
 
-import {
-  getButtonShowMoreTemplate
-} from './button-show-more-template.js';
+import AbstractComponent from './abstract-component.js';
 import {
   KEYS
 } from '../utils.js';
-import AbstractComponent from './abstract-component.js';
+import {
+  getButtonShowMoreTemplate
+} from './button-show-more-template.js';
 
 /**
  * Class representaing button "Show more".
@@ -26,7 +26,7 @@ class ButtonShowMore extends AbstractComponent {
    * @return {string}
    */
   get template() {
-    return getButtonShowMoreTemplate(this);
+    return getButtonShowMoreTemplate();
   }
 
   /**

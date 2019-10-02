@@ -3,14 +3,6 @@ import {
   addElementDOM,
   removeContainerChildren
 } from '../utils.js';
-import {
-  filmsCategories,
-  filmsCategoriesId,
-  filmsCardsCurrent,
-  findFilmsCardsCurrent,
-  menuTypesId,
-  doDefaultFilmCardsCurrent
-} from '../data.js';
 
 /**
  * Class representaing controller of search.
@@ -18,6 +10,7 @@ import {
 class SearchController {
   /**
    * Create search controller.
+   * @param {object} data
    * @param {object} pageController
    * @param {object} mainNavigationController
    * @param {HTMLElement} mainNavigationContainer
@@ -26,8 +19,9 @@ class SearchController {
    * @param {HTMLElement} statisticContainer
    * @param {HTMLElement} searchResultContainer
    */
-  constructor(pageController, mainNavigationController, mainNavigationContainer,
+  constructor(data, pageController, mainNavigationController, mainNavigationContainer,
       filmsContainer, sortContainer, statisticContainer) {
+    this._data = data;
     this._pageController = pageController;
     this._mainNavigationController = mainNavigationController;
     this._searchContainer = document.getElementById(`search`);
@@ -54,25 +48,24 @@ class SearchController {
 
     /**
      * Search film.
-     * @param {event} evt
+     * @param {string} searchLine
      */
-    this._searchComponent.searchFilm = (evt) => {
+    this._searchComponent.searchFilm = (searchLine) => {
       this._hideOtherContainers();
-      const searchLine = evt.target.value.trim();
       if (!searchLine) {
         removeContainerChildren(this._searchResultContainer);
         this._addSearchResultElement(0);
         this._addNoResultElement();
         return;
       }
-      findFilmsCardsCurrent(evt.target.value.trim());
+      this._data.findFilmsCardsCurrent(searchLine);
       removeContainerChildren(this._searchResultContainer);
-      this._addSearchResultElement(filmsCardsCurrent.length);
-      if (!filmsCardsCurrent.length) {
+      this._addSearchResultElement(this._data.filmsCardsCurrent.length);
+      if (!this._data.filmsCardsCurrent.length) {
         this._addNoResultElement();
         return;
       }
-      this._pageController.addFilmsList(filmsCategoriesId.AllMoviesUpcoming);
+      this._pageController.addFilmsList(this._data.filmsCategoriesId.AllMoviesUpcoming);
     };
 
     /**
@@ -85,7 +78,7 @@ class SearchController {
       this._mainNavigationContainer.classList.remove(`visually-hidden`);
       this._openStatistic();
       this._sortContainer.classList.remove(`visually-hidden`);
-      doDefaultFilmCardsCurrent();
+      this._data.doDefaultFilmCardsCurrent();
       const sortButtonActiveContainer =
         document.querySelector(`.sort__button--active`);
       this._mainNavigationController.selectFilms();
@@ -112,7 +105,7 @@ class SearchController {
       this._mainNavigationContainer
       .querySelector(`.main-navigation__item--active`);
 
-    if (mainNavigationElement.dataset.id === menuTypesId.stats) {
+    if (mainNavigationElement.dataset.id === this._data.menuTypesId.stats) {
       this._statisticContainer.classList.remove(`visually-hidden`);
     }
   }
@@ -141,7 +134,7 @@ class SearchController {
     noResultElement.innerHTML = `<section
         class="films-list">
         <h2 class="films-list__title visually-hidden">
-          ${filmsCategories.AllMoviesUpcoming}
+          ${this._data.filmsCategories.AllMoviesUpcoming}
         </h2>
         <div class="no-result">
           There is no movies for your request.

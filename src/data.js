@@ -1,826 +1,944 @@
+import moment from 'moment';
 import {
-  getRandomValueMinMax,
+  HOUR_MS,
+  MINUTE_MS,
+  FILMS_CARDS_STEP,
   compareRandom,
   cloneDeep
 } from './utils.js';
-import moment from 'moment';
-
-const FILMS_CARDS_STEP = 5;
-
-const sortTypes = {
-  default: true,
-  date: false,
-  rating: false
-};
-
-const sortTypesId = {
-  default: `default`,
-  date: `date`,
-  rating: `rating`
-};
-
-const userRanks = [
-  `Movie Buff`,
-  `Dilettante`,
-  `Сritic`
-];
-
-const genres = [
-  `Drama`,
-  `Mystery`,
-  `Comedy`,
-  `Musical`,
-  `Western`,
-  `Documentary`,
-  `Action movie`,
-  `Сartoon`,
-  `Family`,
-  `Sci-Fi`
-];
-
-const titles = [
-  `Sagebrush Trail`,
-  `The Dance of Life`,
-  `The Man with the Golden Arm`,
-  `Santa Claus Conquers the Martians`,
-  `Popeye the Sailor Meets Sindbad the Sailor`,
-  `The Man with the Golden Arm`,
-  `The Great Flamarion`,
-  `Santa Claus Conquers the Martians`,
-  `Made for Each Other`,
-  `Avengers`,
-  `Quantum of Solace`,
-  `Harry Potter And The Chamber of secrets`,
-  `Dracula`,
-  `Tom and Jerry`,
-  `It`
-];
-
-const durationList = [
-  {
-    start: `1970-01-01T00:00:00`,
-    end: `1970-01-01T01:55:00`
-  },
-  {
-    start: `1970-01-01T00:00:00`,
-    end: `1970-01-01T00:54:00`
-  },
-  {
-    start: `1970-01-01T00:00:00`,
-    end: `1970-01-01T02:59:00`
-  },
-  {
-    start: `1970-01-01T00:00:00`,
-    end: `1970-01-01T01:21:00`
-  },
-  {
-    start: `1970-01-01T00:00:00`,
-    end: `1970-01-01T00:16:00`
-  },
-  {
-    start: `1970-01-01T00:00:00`,
-    end: `1970-01-01T01:32:00`
-  },
-  {
-    start: `1970-01-01T00:00:00`,
-    end: `1970-01-01T01:21:00`
-  },
-  {
-    start: `1970-01-01T00:00:00`,
-    end: `1970-01-01T01:18:00`
-  }
-];
-
-const years = [
-  `1956-03-15T00:00:00`,
-  `1944-04-01T00:00:00`,
-  `1978-01-01T00:00:00`,
-  `1955-06-05T00:00:00`,
-  `1983-09-24T00:00:00`
-];
-
-const posters = [
-  `made-for-each-other.png`,
-  `popeye-meets-sinbad.png`,
-  `sagebrush-trail.jpg`,
-  `santa-claus-conquers-the-martians.jpg`,
-  `the-dance-of-life.jpg`,
-  `the-great-flamarion.jpg`,
-  `the-man-with-the-golden-arm.jpg`
-];
-
-const descriptions = [
-  `Lorem ipsum dolor sit amet, consectetur adipiscing elit`,
-  `Cras aliquet varius magna, non porta ligula feugiat eget`,
-  `Fusce tristique felis at fermentum pharetra`,
-  `Aliquam id orci ut lectus varius viverra`,
-  `Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante`,
-  `Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum`,
-  `Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus
-   nunc ante ut dui`,
-  `Sed sed nisi sed augue convallis suscipit in sed felis`,
-  `Aliquam erat volutpat`,
-  `Nunc fermentum tortor ac porta dapibus`,
-  `In rutrum ac purus sit amet tempus`
-];
-
-const directors = [
-  `Anthony Mann`,
-  `Quentin Tarantino`,
-  `David Litch`,
-  `Andre Ovredal`,
-  `John Rice`
-];
-
-const writers = [
-  `Peter Eckerman`,
-  `Eyal Podell`,
-  `Jonathan E. Stewart`,
-  `Kevin Hagman`,
-  `Guillermo del Toro`
-];
-
-const actors = [
-  `Leonardo DiCaprio`,
-  `Brad Pitt`,
-  `Margot Robbie`,
-  `Emil Hirsch`,
-  `Margaret Cuelli`,
-  `Timothy Olyphant`,
-  `Julia Butters`,
-  `Austin butler`,
-  `Dakota Fanning`,
-  `Bruce Dern`
-];
-
-const countries = [
-  `USA`,
-  `Great Britain`,
-  `China`,
-  `Canada`,
-  `Finland`
-];
-
-const emojiList = [
-  {
-    id: `emoji-smile`,
-    value: `sleeping`,
-    img: `./images/emoji/smile.png`
-  },
-  {
-    id: `emoji-sleeping`,
-    value: `neutral-face`,
-    img: `./images/emoji/sleeping.png`
-  },
-  {
-    id: `emoji-gpuke`,
-    value: `grinning`,
-    img: `./images/emoji/puke.png`
-  },
-  {
-    id: `emoji-angry`,
-    value: `angry`,
-    img: `./images/emoji/angry.png`
-  }
-];
 
 /**
- * Return path to img for emoji.
- * @param {string} value
- * @return {string}
+ * Class representaing data.
  */
-const getEmojiImg = (value) => {
-  let valueEmoji = ``;
-  for (let emoji of emojiList) {
-    if (emoji.value === value) {
-      valueEmoji = emoji.img;
-      break;
-    }
+class Data {
+  /**
+   * Create data.
+   */
+  constructor() {
+    this._userRanks = this._getUserRanks();
+    this._sortTypes = this._getSortTypes();
+    this._sortTypesId = this._getSortTypesId();
+    this._imgPathEmoji = this._getImgPathEmoji();
+    this._emojiId = this._getEmojiId();
+    this._emojiList = this._getEmojiList();
+    this._ratingScales = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    this._filmDetailsControlsTypes = this._getFilmDetailsControlsTypes();
+    this._filmCardControlsTypes = this._getFilmCardControlsTypes();
+    this._filmControlsTypesId = this._getFilmControlsTypesId();
+    this._filmsCategories = this._getFilmsCategories();
+    this._filmsCategoriesId = this._getFilmsCategoriesId();
+    this._filmsCardsMain = [];
+    this._filmsCardsCurrent = [];
+    this._totalDownloadedFilmsCards = FILMS_CARDS_STEP;
+    this._startCountfilmsCardsPortion = 0;
+    this._stepFilmsCardsPortion = FILMS_CARDS_STEP;
+    this._filmLists = this._getFilmLists();
+    this._menuTypesId = this._getMenuTypesId();
+    this._statisticFiltersId = this._getStatisticFiltersId();
   }
 
-  return valueEmoji;
-};
-
-const comments = [
-  {
-    id: 0,
-    img: `./images/emoji/smile.png`,
-    text: `Interesting setting and a good cast`,
-    author: `Tim Macoveev`,
-    date: `2019-09-15T12:05:55`
-  },
-  {
-    id: 1,
-    img: `./images/emoji/sleeping.png`,
-    text: `Booooooooooring`,
-    author: `John Doe`,
-    date: `2019-09-17T18:01:35`
-  },
-  {
-    id: 2,
-    img: `./images/emoji/puke.png`,
-    text: `Very very old. Meh`,
-    author: `John Doe`,
-    date: `2019-09-21T11:01:52`
-  },
-  {
-    id: 3,
-    img: `./images/emoji/angry.png`,
-    text: `Almost two hours? Seriously?`,
-    author: `John Doe`,
-    date: `2019-09-19T02:01:12`
-  }
-];
-
-const filmDetailsControlsTypes = {
-  watchlist: `Add to watchlist`,
-  watched: `Already watched`,
-  favorite: `Add to favorites`
-};
-
-const filmCardControlsTypes = {
-  watchlist: `add-to-watchlist`,
-  watched: `mark-as-watched`,
-  favorite: `favorite`
-};
-
-const filmControlsTypesId = {
-  watchlist: `watchlist`,
-  watched: `watched`,
-  favorite: `favorite`
-};
-
-const ratingScales = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-
-const filmsCategories = {
-  AllMoviesUpcoming: `All movies. Upcoming`,
-  TopRated: `Top rated`,
-  MostCommented: `Most commented`
-};
-
-const filmsCategoriesId = {
-  AllMoviesUpcoming: `AllMoviesUpcoming`,
-  TopRated: `TopRated`,
-  MostCommented: `MostCommented`
-};
-
-/**
- * Return comments for film.
- * @return {array}
- */
-const getComments = () => {
-  const randomComments = comments.slice(0,
-      getRandomValueMinMax(1, comments.length - 1));
-
-  return randomComments;
-};
-
-/**
- * Return random rating for interval from 1 to 10.
- * @return {number}
- */
-const getRating = () => {
-  const rating = getRandomValueMinMax(1, 9, 1);
-  return rating > 9 ? Math.floor(rating) : rating;
-};
-
-/**
- * Return random film control types.
- * @return {object}
- */
-const getFilmControlsTypes = () => {
-  const filmControlsTypesKeys = Object.keys(filmDetailsControlsTypes);
-  return filmControlsTypesKeys.sort(compareRandom)
-      .slice(0, getRandomValueMinMax(1, filmControlsTypesKeys.length - 1));
-};
-
-/**
- * Return categories for film.
- * @return {array}
- */
-const getFilmCategoriesId = () => {
-  let categoriesId = [];
-  categoriesId.push(filmsCategoriesId.AllMoviesUpcoming);
-  if (getRandomValueMinMax(0, 1)) {
-    categoriesId.push(Object.entries(filmsCategoriesId)
-    .slice(1, 3)[getRandomValueMinMax(0, 1)][1]);
+  /**
+   * Return sortTypes.
+   * @return {object}
+   */
+  get sortTypes() {
+    return this._sortTypes;
   }
 
-  return categoriesId;
-};
-
-/**
- * Return card of film.
- * @param {number} id
- * @return {object}
- */
-const getFilmCard = (id) => {
-  const filmControlsTypes = getFilmControlsTypes();
-
-  let filmUserRating = 0;
-  filmControlsTypes.forEach((controlType) => {
-    if (controlType === filmControlsTypesId.watched) {
-      filmUserRating = getRating();
-    }
-  });
-  return {
-    id,
-    genres: genres.sort(compareRandom).slice(0,
-        getRandomValueMinMax(1, genres.length - 1)),
-    year: years[getRandomValueMinMax(0, years.length - 1)],
-    title: titles[getRandomValueMinMax(0, titles.length - 1)],
-    rating: getRating(),
-    userRating: filmUserRating,
-    duration: durationList[getRandomValueMinMax(0, durationList.length - 1)],
-    img: `./images/posters/`
-      + posters[getRandomValueMinMax(0, posters.length - 1)],
-    description: descriptions.sort(compareRandom).slice(0,
-        getRandomValueMinMax(1, descriptions.length - 1)),
-    comments: getComments(),
-    age: getRandomValueMinMax(6, 18),
-    director: directors[getRandomValueMinMax(0, directors.length - 1)],
-    writers: writers.sort(compareRandom).slice(0,
-        getRandomValueMinMax(1, writers.length - 1)),
-    actors: actors.sort(compareRandom).slice(0,
-        getRandomValueMinMax(1, actors.length - 1)),
-    country: countries[getRandomValueMinMax(0, countries.length - 1)],
-    categoriesId: getFilmCategoriesId(),
-    controlsTypes: filmControlsTypes
-  };
-};
-
-/**
- * Return array of cards of films.
- * @param {number} filmsCount
- * @return {array}
- */
-const getFilmCardsMain = (filmsCount) => {
-  const filmCards = [];
-  for (let i = 0; i < filmsCount; i++) {
-    filmCards.push(getFilmCard(i));
+  /**
+   * Return sortTypesId.
+   * @return {object}
+   */
+  get sortTypesId() {
+    return this._sortTypesId;
   }
 
-  return filmCards;
-};
+  /**
+   * Return emojiList.
+   * @return {object}
+   */
+  get emojiList() {
+    return this._emojiList;
+  }
 
-const filmsCardsMain = getFilmCardsMain(titles.length);
+  /**
+   * Return ratingScales.
+   * @return {object}
+   */
+  get ratingScales() {
+    return this._ratingScales;
+  }
 
-/**
- * Clone filmCardMain.
- * @return {array}
- */
-const cloneFilmCards = () => {
-  const filmsCards = [];
-  filmsCardsMain.forEach((filmCard) => {
-    filmsCards.push(cloneDeep(filmCard));
-  });
+  /**
+   * Return filmDetailsControlsTypes.
+   * @return {object}
+   */
+  get filmDetailsControlsTypes() {
+    return this._filmDetailsControlsTypes;
+  }
 
-  return filmsCards;
-};
+  /**
+   * Return filmCardControlsTypes.
+   * @return {object}
+   */
+  get filmCardControlsTypes() {
+    return this._filmCardControlsTypes;
+  }
 
-let filmsCardsCurrent = cloneFilmCards();
+  /**
+   * Return filmControlsTypesId.
+   * @return {object}
+   */
+  get filmControlsTypesId() {
+    return this._filmControlsTypesId;
+  }
 
-/**
- * Do default data for filmsCardsCurrent.
- */
-const doDefaultFilmCardsCurrent = () => {
-  filmsCardsCurrent = [];
-  filmsCardsMain.forEach((filmsCard) => {
-    filmsCardsCurrent.push(cloneDeep(filmsCard));
-  });
-};
+  /**
+   * Return filmsCategories.
+   * @return {object}
+   */
+  get filmsCategories() {
+    return this._filmsCategories;
+  }
 
-/**
- * Fill in filmsCardsCurrent result of selection.
- * @param {string} category
- */
-const selectfilmsCardsCurrent = (category) => {
-  filmsCardsCurrent = [];
-  filmsCardsMain.forEach((filmCard) => {
-    for (let controlType of filmCard.controlsTypes) {
-      if (controlType === category) {
-        filmsCardsCurrent.push(filmCard);
+  /**
+   * Return filmsCategoriesId.
+   * @return {object}
+   */
+  get filmsCategoriesId() {
+    return this._filmsCategoriesId;
+  }
+
+  /**
+   * Return filmsCardsMain.
+   * @return {object}
+   */
+  get filmsCardsMain() {
+    return this._filmsCardsMain;
+  }
+
+  /**
+   * Return filmsCardsCurrent.
+   * @return {object}
+   */
+  get filmsCardsCurrent() {
+    return this._filmsCardsCurrent;
+  }
+
+  /**
+   * Return filmsCardsCurrent.
+   * @return {object}
+   */
+  get totalDownloadedFilmsCards() {
+    return this._totalDownloadedFilmsCards;
+  }
+
+  /**
+   * Return filmLists.
+   * @return {object}
+   */
+  get filmLists() {
+    return this._filmLists;
+  }
+
+  /**
+   * Return menuTypesId.
+   * @return {object}
+   */
+  get menuTypesId() {
+    return this._menuTypesId;
+  }
+
+  /**
+   * Return menuTypesId.
+   * @return {object}
+   */
+  get statisticFiltersId() {
+    return this._statisticFiltersId;
+  }
+
+  /**
+   * Return img path to emoji.
+   * @param {string} emojiType
+   * @return {string}
+   */
+  getImgPathEmoji(emojiType) {
+    return this._imgPathEmoji[emojiType];
+  }
+
+  /**
+   * Clear main array of films cards.
+   */
+  clearFilmCardsMain() {
+    this._filmsCardsMain = [];
+  }
+
+  /**
+   * Clear main array of films cards.
+   */
+  clearFilmCardsCurrent() {
+    this._filmsCardsCurrent = [];
+  }
+
+  /**
+   * Fill main array of cards of films.
+   * @param {object} filmCard
+   */
+  addFilmCardToFilmCardsMain(filmCard) {
+    this._filmsCardsMain.push(cloneDeep(filmCard));
+  }
+
+  /**
+   * Clone filmCardMain.
+   */
+  fillFilmsCardsCurrent() {
+    this._filmsCardsMain.forEach((filmCard) => {
+      this._filmsCardsCurrent.push(cloneDeep(filmCard));
+    });
+  }
+
+  /**
+   * Add comment to filmsCardsCurrent.
+   * @param {array} comments
+   * @param {number} filmId
+   */
+  addCommentToFilmsCardsCurrent(comments, filmId) {
+    for (let filmCard of this._filmsCardsCurrent) {
+      if (filmCard.id === filmId) {
+        filmCard.comments = [];
+        comments.forEach((comment) => filmCard.comments.push(comment));
         break;
       }
     }
-  });
-};
+  }
 
-/**
- * Find a film by the search line in FilmsCardsCurrent.
- * @param {string} searchLine
- */
-const findFilmsCardsCurrent = (searchLine) => {
-  filmsCardsCurrent = [];
-  filmsCardsMain.forEach((filmCard) => {
-    if (filmCard.title.toLowerCase().includes(searchLine.toLowerCase())) {
-      filmsCardsCurrent.push(filmCard);
-    }
-  });
-};
-
-let totalDownloadedFilmsCards = FILMS_CARDS_STEP;
-
-/**
- * Set total downloaded films cards.
- */
-const setNumberDownloadedFilmsCards = () => {
-  totalDownloadedFilmsCards += FILMS_CARDS_STEP;
-};
-
-let filmsCardsPortionCount = 0;
-let stepFilmsCardsPortion = FILMS_CARDS_STEP;
-
-/**
- * Return function for portion of film cards.
- * @return {function}
- */
-const getFilmsCardsPortion = () => {
-  filmsCardsPortionCount = 0;
   /**
-   * Return portion of film cards.
+   * Do default data for filmsCardsCurrent.
+   */
+  doDefaultFilmCardsCurrent() {
+    this._filmsCardsCurrent = [];
+    this._filmsCardsMain.forEach((filmsCard) => {
+      this._filmsCardsCurrent.push(cloneDeep(filmsCard));
+    });
+  }
+
+  /**
+   * Fill in filmsCardsCurrent result of selection.
+   * @param {string} category
+   */
+  selectfilmsCardsCurrent(category) {
+    this._filmsCardsCurrent = [];
+    this._filmsCardsMain.forEach((filmCard) => {
+      for (let controlType of filmCard.controlsTypes) {
+        if (controlType === category) {
+          this._filmsCardsCurrent.push(filmCard);
+          break;
+        }
+      }
+    });
+  }
+
+  /**
+   * Return max number of portion film.
+   * @return {number}
+   */
+  getMaxFilmPortionNumber() {
+    return Math.ceil(this._filmsCardsCurrent.length / FILMS_CARDS_STEP);
+  }
+
+  /**
+   * Return sort of film cards by rating.
+   * @param {object} firstFilmCard
+   * @param {object} secondFilmCard
+   * @return {function}
+   */
+  getSortFunctionForFilmByRating(firstFilmCard, secondFilmCard) {
+    return secondFilmCard.rating - firstFilmCard.rating;
+  }
+
+  /**
+   * Return sort of film cards by date.
+   * @param {object} firstFilmCard
+   * @param {object} secondFilmCard
+   * @return {function}
+   */
+  getSortFunctionForFilmByDate(firstFilmCard, secondFilmCard) {
+    return secondFilmCard.year - firstFilmCard.year;
+  }
+
+  /**
+   * Return sort of film cards by comments.
+   * @param {object} firstFilmCard
+   * @param {object} secondFilmCard
+   * @return {function}
+   */
+  getSortFunctionForFilmByComments(firstFilmCard, secondFilmCard) {
+    return secondFilmCard.comments.length
+      - firstFilmCard.comments.length;
+  }
+
+  /**
+   * Find a film by the search line in FilmsCardsCurrent.
+   * @param {string} searchLine
+   */
+  findFilmsCardsCurrent(searchLine) {
+    this._filmsCardsCurrent = [];
+    this._filmsCardsMain.forEach((filmCard) => {
+      if (filmCard.title.toLowerCase().includes(searchLine.toLowerCase())) {
+        this._filmsCardsCurrent.push(filmCard);
+      }
+    });
+  }
+
+  /**
+   * Return 2 and less films by top rated.
    * @return {array}
    */
-  return () => {
-    const filmCardsPortion = filmsCardsCurrent.slice(filmsCardsPortionCount,
-        filmsCardsPortionCount + stepFilmsCardsPortion);
+  getExtraFilmsTopRated() {
+    let filmsCards =
+      cloneDeep(this._filmsCardsCurrent).sort(this.getSortFunctionForFilmByRating);
+    return this._getExtraFilms(filmsCards, `rating`);
+  }
 
-    filmsCardsPortionCount += FILMS_CARDS_STEP;
-    stepFilmsCardsPortion = FILMS_CARDS_STEP;
+  /**
+   * Return 2 and less films by top rated.
+   * @return {array}
+   */
+  getExtraFilmsMostCommented() {
+    let filmsCards =
+      cloneDeep(this._filmsCardsCurrent).sort(this.getSortFunctionForFilmByComments);
+    return this._getExtraFilms(filmsCards, `comments`);
+  }
 
-    return filmCardsPortion;
-  };
-};
+  /**
+   * Set total downloaded films cards.
+   */
+  setNumberDownloadedFilmsCards() {
+    this._totalDownloadedFilmsCards += FILMS_CARDS_STEP;
+  }
 
-/**
- * Step of displaying the number of films.
- * @param {number} newStep
- */
-const changefilmsCardsPortionCount = (newStep) => {
-  filmsCardsPortionCount = 0;
-  stepFilmsCardsPortion = newStep;
-};
+  /**
+   * Return function for portion of film cards.
+   * @return {function}
+   */
+  getFilmsCardsPortion() {
+    this._startCountfilmsCardsPortion = 0;
+    /**
+     * Return portion of film cards.
+     * @return {array}
+     */
+    return () => {
+      const filmCardsPortion = this._filmsCardsCurrent.slice(this._startCountfilmsCardsPortion,
+          this._startCountfilmsCardsPortion + this._stepFilmsCardsPortion);
 
-/**
- * Return amount of watched films.
- * @return {number}
- */
-const getWatchedFilmsAmount = () => {
-  let filmsAmount = 0;
-  filmsCardsCurrent.forEach((filmCard) => {
-    filmCard.controlsTypes.forEach((controlType) => {
-      if (controlType === filmControlsTypesId.watched) {
-        filmsAmount++;
+      this._startCountfilmsCardsPortion += this._stepFilmsCardsPortion;
+      this._stepFilmsCardsPortion = FILMS_CARDS_STEP;
+
+      return filmCardsPortion;
+    };
+  }
+
+  /**
+   * Step of displaying the number of films.
+   * @param {number} newStep
+   */
+  changefilmsCardsPortionCount(newStep) {
+    this._startCountfilmsCardsPortion = 0;
+    this._stepFilmsCardsPortion = newStep;
+  }
+
+  /**
+   * Return amount of watched films.
+   * @param {date} boundaryUserDate
+   * @return {number}
+   */
+  getWatchedFilmsAmount(boundaryUserDate) {
+    let filmsAmount = 0;
+    this._filmsCardsCurrent.forEach((filmCard) => {
+      filmCard.controlsTypes.forEach((controlType) => {
+        if (controlType === this._filmControlsTypesId.watched
+          && (boundaryUserDate === null
+          || filmCard.userWatchingDate >= boundaryUserDate)) {
+          filmsAmount++;
+        }
+      });
+    });
+
+    return filmsAmount;
+  }
+
+  /**
+   * Return unique genres from filmsCardsCurrent.
+   * @param {date} boundaryUserDate
+   * @return {object}
+   */
+  getUniqueGenres(boundaryUserDate) {
+    const allGenres = [];
+    this._filmsCardsCurrent.forEach((filmCard) => {
+      if (boundaryUserDate === null
+        || filmCard.userWatchingDate >= boundaryUserDate) {
+        filmCard.genres.forEach((genre) => allGenres.push(genre));
       }
     });
-  });
 
-  return filmsAmount;
-};
-
-/**
- * Return unique genres from filmsCardsCurrent.
- * @return {object}
- */
-const getUniqueGenres = () => {
-  const allGenres = [];
-  filmsCardsCurrent.forEach((filmCard) => {
-    filmCard.genres.forEach((genre) => allGenres.push(genre));
-  });
-
-  const uniqueGenres = {};
-  allGenres.forEach((genre) => {
-    if (uniqueGenres[genre] === undefined) {
-      uniqueGenres[genre] = 1;
-    } else {
-      uniqueGenres[genre]++;
-    }
-  });
-
-  return uniqueGenres;
-};
-
-/**
- * Return a top genre.
- * @return {string}
- */
-const getTopGenre = () => {
-  let topGenre = null;
-  const uniqueGenres = getUniqueGenres();
-  const maxGenreAmount = Math.max(...Object.values(uniqueGenres));
-  const uniqGenresTotal = Object.entries(uniqueGenres);
-  for (let [genre, amount] of uniqGenresTotal) {
-    if (amount === maxGenreAmount) {
-      topGenre = genre;
-      break;
-    }
-  }
-
-  return topGenre;
-};
-
-/**
- * Return total duration of all films.
- * @return {number}
- */
-const getTotalDuration = () => {
-  let totalDuration = 0;
-  durationList.forEach((duration) => {
-    totalDuration += moment(duration.end) - moment(duration.start);
-  });
-
-  return totalDuration;
-};
-
-/**
- * Return object of films amount by categories.
- * @param {string} category
- * @return {number}
- */
-const getFilmsAmountByCategories = (category) => {
-  let filmsAmount = 0;
-  filmsCardsCurrent.forEach((filmCard) => {
-    filmCard.controlsTypes.forEach((controlType) => {
-      if (controlType === category) {
-        filmsAmount++;
+    const uniqueGenres = {};
+    allGenres.forEach((genre) => {
+      if (uniqueGenres[genre] === undefined) {
+        uniqueGenres[genre] = 1;
+      } else {
+        uniqueGenres[genre]++;
       }
     });
-  });
 
-  return filmsAmount;
-};
-
-const userTotalRating = userRanks[getRandomValueMinMax(0, userRanks.length - 1)];
-const countFilmCards = filmsCardsCurrent.length;
-
-/**
- * Update film card for sending form.
- * @param {object} newData
- * @param {object} filmCard
- * @param {string} keyUpdate
- * @param {different} value
- */
-const updateServerDataForSendingForm = (newData, filmCard, keyUpdate, value) => {
-  if (keyUpdate !== `comments`) {
-    filmCard[keyUpdate] = value;
-    return;
+    return uniqueGenres;
   }
-  if (newData.comment.text !== null) {
-    filmCard[keyUpdate].push(value);
-  }
-};
 
-/**
- * Delete comment in server.
- * @param {object} newData
- * @param {object} filmCard
- */
-const deleteCommentInServerData = (newData, filmCard) => {
-  const currentKey = `comments`;
-  const filmCardEntries = Object.keys(filmCard);
-  for (let key of filmCardEntries) {
-    if (key !== currentKey) {
-      continue;
-    }
-    const commentsCopy = Object.assign(filmCard[currentKey]);
-    filmCard[currentKey] = [];
-    for (const comment of commentsCopy) {
-      if (comment.id !== newData.comment.id) {
-        filmCard[currentKey].push(comment);
+  /**
+   * Return a top genre.
+   * @param {date} boundaryUserDate
+   * @return {string}
+   */
+  getTopGenre(boundaryUserDate) {
+    let topGenre = null;
+    const uniqueGenres = this.getUniqueGenres(boundaryUserDate);
+    const maxGenreAmount = Math.max(...Object.values(uniqueGenres));
+    const uniqGenresTotal = Object.entries(uniqueGenres);
+    for (let [genre, amount] of uniqGenresTotal) {
+      if (amount === maxGenreAmount) {
+        topGenre = genre;
+        break;
       }
     }
-  }
-};
 
-/**
- * Update data in teh server.
- * @param {object} newData
- */
-const updateServerData = (newData) => {
-  for (const filmCard of filmsCardsCurrent) {
-    if (filmCard.id !== newData.id) {
-      continue;
-    }
-    const newDataEntries = Object.entries(newData);
-    for (let [key, value] of newDataEntries) {
-      const keyUpdate = key === `comment` ? `comments` : key;
-      if (newData.isSendingForm) {
-        updateServerDataForSendingForm(newData, filmCard, keyUpdate, value);
-        continue;
+    return topGenre;
+  }
+
+  /**
+   * Return total duration of all films.
+   * @param {date} boundaryUserDate
+   * @return {number}
+   */
+  getTotalDuration(boundaryUserDate) {
+    let totalDuration = 0;
+    this._filmsCardsCurrent.forEach((filmCard) => {
+      if (boundaryUserDate === null
+        || filmCard.userWatchingDate >= boundaryUserDate) {
+        totalDuration += moment(filmCard.duration);
       }
-      deleteCommentInServerData(newData, filmCard, keyUpdate);
-    }
+    });
+
+    return totalDuration;
   }
-};
 
-const filmLists = {
-  AllMoviesUpcoming: {
-    title: filmsCategories.AllMoviesUpcoming,
-    id: filmsCategoriesId.AllMoviesUpcoming,
-    isVisuallyHidden: true,
-    isExtra: false,
-    isButton: `true`
-  },
-  TopRated: {
-    title: filmsCategories.TopRated,
-    id: filmsCategoriesId.TopRated,
-    isVisuallyHidden: false,
-    isExtra: true,
-    isButton: ``
-  },
-  MostCommented: {
-    title: filmsCategories.MostCommented,
-    id: filmsCategoriesId.MostCommented,
-    isVisuallyHidden: false,
-    isExtra: true,
-    isButton: ``
+  /**
+   * Return total films cards.
+   * @return {number}
+   */
+  getTotalFilmsCards() {
+    return this._filmsCardsMain.length;
   }
-};
 
-const menuTypesId = {
-  'all': `all`,
-  'watchlist': filmControlsTypesId.watchlist,
-  'history': filmControlsTypesId.watched,
-  'favorites': filmControlsTypesId.favorite,
-  'stats': `stats`
-};
-
-const menuTypes = [
-  {
-    'title': `All movies`,
-    'id': menuTypesId.all,
-    'isActive': true,
-    'filmsCount': countFilmCards,
-    'modifiers': []
-  },
-  {
-    'title': `Watchlist`,
-    'id': menuTypesId.watchlist,
-    'isActive': false,
-    'filmsCount': getFilmsAmountByCategories(filmControlsTypesId.watchlist),
-    'modifiers': []
-  },
-  {
-    'title': `History`,
-    'id': menuTypesId.history,
-    'isActive': false,
-    'filmsCount': getFilmsAmountByCategories(filmControlsTypesId.watched),
-    'modifiers': []
-  },
-  {
-    'title': `Favorites`,
-    'id': menuTypesId.favorites,
-    'isActive': false,
-    'filmsCount': getFilmsAmountByCategories(filmControlsTypesId.favorite),
-    'modifiers': []
-  },
-  {
-    'title': `Stats`,
-    'id': menuTypesId.stats,
-    'isActive': false,
-    'filmsCount': 0,
-    'modifiers': [
-      `additional`
-    ]
+  /**
+   * Return menu types.
+   * @return {array}
+   */
+  getMenuTypes() {
+    return [
+      {
+        'title': `All movies`,
+        'id': this._menuTypesId.all,
+        'isActive': true,
+        'filmsCount': 0,
+        'modifiers': []
+      },
+      {
+        'title': `Watchlist`,
+        'id': this._menuTypesId.watchlist,
+        'isActive': false,
+        'filmsCount': this._getFilmsAmountByCategories(this._filmControlsTypesId.watchlist),
+        'modifiers': []
+      },
+      {
+        'title': `History`,
+        'id': this._menuTypesId.history,
+        'isActive': false,
+        'filmsCount': this._getFilmsAmountByCategories(this._filmControlsTypesId.watched),
+        'modifiers': []
+      },
+      {
+        'title': `Favorites`,
+        'id': this._menuTypesId.favorites,
+        'isActive': false,
+        'filmsCount': this._getFilmsAmountByCategories(this._filmControlsTypesId.favorite),
+        'modifiers': []
+      },
+      {
+        'title': `Stats`,
+        'id': this._menuTypesId.stats,
+        'isActive': false,
+        'filmsCount': 0,
+        'modifiers': [
+          `additional`
+        ]
+      }
+    ];
   }
-];
 
-const statisticFiltersId = {
-  'allTime': `all-time`,
-  'today': `today`,
-  'week': `week`,
-  'month': `month`,
-  'year': `year`
-};
+  /**
+   * Return statistic filters.
+   * @param {string} isCheckedCategory
+   * @return {array}
+   */
+  getStatisticFilters(isCheckedCategory) {
+    return [
+      {
+        id: this._statisticFiltersId.allTime,
+        title: `All time`,
+        isChecked:
+          isCheckedCategory === this._statisticFiltersId.allTime ? true : false
+      },
+      {
+        id: this._statisticFiltersId.today,
+        title: `Today`,
+        isChecked:
+          isCheckedCategory === this._statisticFiltersId.today ? true : false
+      },
+      {
+        id: this._statisticFiltersId.week,
+        title: `Week`,
+        isChecked:
+          isCheckedCategory === this._statisticFiltersId.week ? true : false
+      },
+      {
+        id: this._statisticFiltersId.month,
+        title: `Month`,
+        isChecked:
+          isCheckedCategory === this._statisticFiltersId.month ? true : false
+      },
+      {
+        id: this._statisticFiltersId.year,
+        title: `Year`,
+        isChecked:
+          isCheckedCategory === this._statisticFiltersId.year ? true : false
+      }
+    ];
+  }
 
-/**
- * Return statistic filters.
- * @param {string} isCheckedCategory
- * @return {array}
- */
-const getStatisticFilters = (isCheckedCategory) => {
-  return [
-    {
-      id: statisticFiltersId.allTime,
-      title: `All time`,
-      isChecked:
-        isCheckedCategory === statisticFiltersId.allTime ? true : false
-    },
-    {
-      id: statisticFiltersId.today,
-      title: `Today`,
-      isChecked:
-        isCheckedCategory === statisticFiltersId.today ? true : false
-    },
-    {
-      id: statisticFiltersId.week,
-      title: `Week`,
-      isChecked:
-        isCheckedCategory === statisticFiltersId.week ? true : false
-    },
-    {
-      id: statisticFiltersId.month,
-      title: `Month`,
-      isChecked:
-        isCheckedCategory === statisticFiltersId.month ? true : false
-    },
-    {
-      id: statisticFiltersId.year,
-      title: `Year`,
-      isChecked:
-        isCheckedCategory === statisticFiltersId.year ? true : false
+  /**
+   * Return statistic list.
+   * @param {number} totalWatchedFilms
+   * @param {number} totalDuration
+   * @param {string} topGenre
+   * @return {array}
+   */
+  getStatisticList(totalWatchedFilms, totalDuration, topGenre) {
+    return [
+      {
+        title: `You watched`,
+        texts: [
+          {
+            textTitle: totalWatchedFilms,
+            isDescription: false
+          },
+          {
+            textTitle: `movies`,
+            isDescription: true
+          }
+        ]
+      },
+      {
+        title: `Total duration`,
+        texts: [
+          {
+            textTitle: this._getDurationByHours(totalDuration),
+            isDescription: false
+          },
+          {
+            textTitle: `h`,
+            isDescription: true
+          },
+          {
+            textTitle: this._getDurationByMinutes(totalDuration),
+            isDescription: false
+          },
+          {
+            textTitle: `m`,
+            isDescription: true
+          }
+        ]
+      },
+      {
+        title: `Top genre`,
+        texts: [
+          {
+            textTitle: topGenre === null ? `-` : topGenre,
+            isDescription: false
+          }
+        ]
+      }
+    ];
+  }
+
+  /**
+   * Return user total rank.
+   * @return {string}
+   */
+  getUserTotalRank() {
+    const maxNumber = this._getMaxNumberOfWatchedFilm();
+    let userTotalRank = null;
+    if (maxNumber === 0) {
+      userTotalRank = this._userRanks.zero;
+    } else if (maxNumber >= 1 && maxNumber <= 10) {
+      userTotalRank = this._userRanks.novice;
+    } else if (maxNumber >= 11 && maxNumber <= 20) {
+      userTotalRank = this._userRanks.fan;
+    } else if (maxNumber >= 21) {
+      userTotalRank = this._userRanks.movieBuff;
     }
-  ];
-};
 
-/**
- * Return statistic list.
- * @param {number} totalWatchedFilms
- * @param {number} totalDuration
- * @param {string} topGenre
- * @return {array}
- */
-const getStatisticList = (totalWatchedFilms, totalDuration,
-    topGenre) => {
-  return [
-    {
-      title: `You watched`,
-      texts: [
-        {
-          textTitle: totalWatchedFilms,
-          isDescription: false
-        },
-        {
-          textTitle: `movies`,
-          isDescription: true
-        }
-      ]
-    },
-    {
-      title: `Total duration`,
-      texts: [
-        {
-          textTitle: moment(totalDuration).format(`H`),
-          isDescription: false
-        },
-        {
-          textTitle: `h`,
-          isDescription: true
-        },
-        {
-          textTitle: moment(totalDuration).format(`m`),
-          isDescription: false
-        },
-        {
-          textTitle: `m`,
-          isDescription: true
-        }
-      ]
-    },
-    {
-      title: `Top genre`,
-      texts: [
-        {
-          textTitle: topGenre,
-          isDescription: false
-        }
-      ]
+    return userTotalRank;
+  }
+
+  /**
+   * Clear and fill filmsCardsCurrent.
+   */
+  updateFilmCardsCurrent() {
+    this.clearFilmCardsCurrent();
+    this.fillFilmsCardsCurrent();
+  }
+
+  /**
+   * Return ranks of user.
+   * @return {object}
+   */
+  _getUserRanks() {
+    return {
+      zero: ``,
+      novice: `Novice`,
+      fan: `Fan`,
+      movieBuff: `Movie Buff`
+    };
+  }
+
+  /**
+   * Return types of sort.
+   * @return {object}
+   */
+  _getSortTypes() {
+    return {
+      default: true,
+      date: false,
+      rating: false
+    };
+  }
+
+  /**
+   * Return id types of sort.
+   * @return {object}
+   */
+  _getSortTypesId() {
+    return {
+      default: `default`,
+      date: `date`,
+      rating: `rating`
+    };
+  }
+
+  /**
+   * Return img path of emoji.
+   * @return {object}
+   */
+  _getImgPathEmoji() {
+    return {
+      smile: `./images/emoji/smile.png`,
+      sleeping: `./images/emoji/sleeping.png`,
+      puke: `./images/emoji/puke.png`,
+      angry: `./images/emoji/angry.png`
+    };
+  }
+
+  /**
+   * Return id list of emojies.
+   * @return {object}
+   */
+  _getEmojiId() {
+    return {
+      smile: `smile`,
+      sleeping: `sleeping`,
+      puke: `puke`,
+      angry: `angry`
+    };
+  }
+
+  /**
+   * Return list of emoji.
+   * @return {array}
+   */
+  _getEmojiList() {
+    return [
+      {
+        id: this._emojiId.smile,
+        img: this._imgPathEmoji.smile
+      },
+      {
+        id: this._emojiId.sleeping,
+        img: this._imgPathEmoji.sleeping
+      },
+      {
+        id: this._emojiId.puke,
+        img: this._imgPathEmoji.puke
+      },
+      {
+        id: this._emojiId.angry,
+        img: this._imgPathEmoji.angry
+      }
+    ];
+  }
+
+  /**
+   * Return controls types for film details.
+   * @return {object}
+   */
+  _getFilmDetailsControlsTypes() {
+    return {
+      watchlist: `Add to watchlist`,
+      watched: `Already watched`,
+      favorite: `Add to favorites`
+    };
+  }
+
+  /**
+   * Return controls types for film card.
+   * @return {object}
+   */
+  _getFilmCardControlsTypes() {
+    return {
+      watchlist: `add-to-watchlist`,
+      watched: `mark-as-watched`,
+      favorite: `favorite`
+    };
+  }
+
+  /**
+   * Return id for controls types of film.
+   * @return {object}
+   */
+  _getFilmControlsTypesId() {
+    return {
+      watchlist: `watchlist`,
+      watched: `watched`,
+      favorite: `favorite`
+    };
+  }
+
+  /**
+   * Return categories for films.
+   * @return {object}
+   */
+  _getFilmsCategories() {
+    return {
+      AllMoviesUpcoming: `All movies. Upcoming`,
+      TopRated: `Top rated`,
+      MostCommented: `Most commented`
+    };
+  }
+
+  /**
+   * Return id categories for films.
+   * @return {object}
+   */
+  _getFilmsCategoriesId() {
+    return {
+      AllMoviesUpcoming: `AllMoviesUpcoming`,
+      TopRated: `TopRated`,
+      MostCommented: `MostCommented`
+    };
+  }
+
+  /**
+   * Return films lists.
+   * @return {object}
+   */
+  _getFilmLists() {
+    return {
+      AllMoviesUpcoming: {
+        title: this._filmsCategories.AllMoviesUpcoming,
+        id: this._filmsCategoriesId.AllMoviesUpcoming,
+        isVisuallyHidden: true,
+        isExtra: false,
+        isButton: `true`
+      },
+      TopRated: {
+        title: this._filmsCategories.TopRated,
+        id: this._filmsCategoriesId.TopRated,
+        isVisuallyHidden: false,
+        isExtra: true,
+        isButton: ``
+      },
+      MostCommented: {
+        title: this._filmsCategories.MostCommented,
+        id: this._filmsCategoriesId.MostCommented,
+        isVisuallyHidden: false,
+        isExtra: true,
+        isButton: ``
+      }
+    };
+  }
+
+  /**
+   * Return if for types of menu.
+   * @return {object}
+   */
+  _getMenuTypesId() {
+    return {
+      'all': `all`,
+      'watchlist': this._filmControlsTypesId.watchlist,
+      'history': this._filmControlsTypesId.watched,
+      'favorites': this._filmControlsTypesId.favorite,
+      'stats': `stats`
+    };
+  }
+
+  /**
+   * Return id for filters of statistic.
+   * @return {object}
+   */
+  _getStatisticFiltersId() {
+    return {
+      'allTime': `all-time`,
+      'today': `today`,
+      'week': `week`,
+      'month': `month`,
+      'year': `year`
+    };
+  }
+
+  /**
+   * Return 2 and less films by extra films.
+   * @param {array} filmsCards
+   * @param {string} filmCardKey
+   * @return {array}
+   */
+  _getExtraFilms(filmsCards, filmCardKey) {
+    if (!this._filmsCardsHaveSameValues(filmsCards, filmCardKey)) {
+      filmsCards = filmsCards.sort(compareRandom);
     }
-  ];
-};
+    const maxNumberFilms = 2;
+    filmsCards = filmsCards.slice(0, maxNumberFilms);
 
-export {
-  genres,
-  sortTypes,
-  sortTypesId,
-  filmCardControlsTypes,
-  filmDetailsControlsTypes,
-  filmControlsTypesId,
-  emojiList,
-  filmLists,
-  menuTypes,
-  menuTypesId,
-  getStatisticList,
-  filmsCardsMain,
-  filmsCardsCurrent,
-  countFilmCards,
-  userTotalRating,
-  filmsCategories,
-  filmsCategoriesId,
-  statisticFiltersId,
-  ratingScales,
-  totalDownloadedFilmsCards,
-  getFilmsCardsPortion,
-  changefilmsCardsPortionCount,
-  updateServerData,
-  getEmojiImg,
-  doDefaultFilmCardsCurrent,
-  selectfilmsCardsCurrent,
-  setNumberDownloadedFilmsCards,
-  findFilmsCardsCurrent,
-  getTotalDuration,
-  getWatchedFilmsAmount,
-  getTopGenre,
-  getStatisticFilters,
-  getUniqueGenres
-};
+    return this._checkFilmsCardsByZero(filmsCards, filmCardKey, maxNumberFilms);
+  }
+
+  /**
+   * Check films cards for same values.
+   * @param {array} filmsCards
+   * @param {string} filmCardKey
+   * @return {boolean}
+   */
+  _filmsCardsHaveSameValues(filmsCards, filmCardKey) {
+    let maxNumber = this._getValueOfFieldForFilmCard(filmsCards[0], filmCardKey);
+    const filmsCardsFilter = filmsCards.filter((filmCard) =>
+      maxNumber === this._getValueOfFieldForFilmCard(filmCard, filmCardKey));
+
+    return filmsCards.length - filmsCardsFilter.length;
+  }
+
+  /**
+   * Return films cards after checking for zero.
+   * @param {array} filmsCards
+   * @param {string} filmCardKey
+   * @param {number} maxNumberFilms
+   * @return {array}
+   */
+  _checkFilmsCardsByZero(filmsCards, filmCardKey, maxNumberFilms) {
+    let numberFilmsByZero = 0;
+    filmsCards.forEach((filmCard) => {
+      if (!this._getValueOfFieldForFilmCard(filmCard, filmCardKey)) {
+        numberFilmsByZero += 1;
+      }
+    });
+    if (numberFilmsByZero === maxNumberFilms) {
+      filmsCards = [];
+    }
+
+    return filmsCards;
+  }
+
+  /**
+   * Return value for film card by same values.
+   * @param {object} filmCard
+   * @param {string} filmCardKey
+   * @return {number}
+   */
+  _getValueOfFieldForFilmCard(filmCard, filmCardKey) {
+    let fieldValue = null;
+    if (filmCardKey === `rating`) {
+      fieldValue = filmCard[filmCardKey];
+    } else if (filmCardKey === `comments`) {
+      fieldValue = filmCard[filmCardKey].length;
+    }
+
+    return fieldValue;
+  }
+
+  /**
+   * Return object of films amount by categories.
+   * @param {string} category
+   * @return {number}
+   */
+  _getFilmsAmountByCategories(category) {
+    let filmsAmount = 0;
+    this._filmsCardsCurrent.forEach((filmCard) => {
+      filmCard.controlsTypes.forEach((controlType) => {
+        if (controlType === category) {
+          filmsAmount++;
+        }
+      });
+    });
+
+    return filmsAmount;
+  }
+
+  /**
+   * Return max number of watched film..
+   * @return {number}
+   */
+  _getMaxNumberOfWatchedFilm() {
+    let filmsTotalWatched = 0;
+    this._filmsCardsMain.forEach((filmCard) => {
+      filmCard.controlsTypes.forEach((controlType) => {
+        if (controlType === this._filmControlsTypesId.watched) {
+          filmsTotalWatched += 1;
+        }
+      });
+    });
+
+    return filmsTotalWatched;
+  }
+
+  /**
+   * Return duration by hours.
+   * @param {number} duration
+   * @return {number}
+   */
+  _getDurationByHours(duration) {
+    return Math.trunc(duration / HOUR_MS);
+  }
+
+  /**
+   * Return duration by minutes.
+   * @param {number} duration
+   * @return {number}
+   */
+  _getDurationByMinutes(duration) {
+    const hoursNumbers = Math.trunc(duration / HOUR_MS);
+    for (let i = 1; i <= hoursNumbers; i++) {
+      duration -= HOUR_MS;
+    }
+
+    return Math.ceil(duration / MINUTE_MS);
+  }
+
+}
+
+export default Data;

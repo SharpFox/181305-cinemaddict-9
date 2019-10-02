@@ -1,16 +1,15 @@
 
-import AbstractComponent from './abstract-component.js';
+import moment from 'moment';
 import Chart from 'chart.js';
-import ChartDataLabels from 'chartjs-plugin-datalabels';
+import chartDataLabels from 'chartjs-plugin-datalabels';
+import AbstractComponent from './abstract-component.js';
+import {
+  KEYS,
+  BAR_HEIGHT
+} from '../utils.js';
 import {
   getStatisticTemplate
 } from './statistic-template.js';
-import {
-  KEYS
-} from '../utils.js';
-import {
-  getUniqueGenres
-} from '../data.js';
 
 /**
  * Class representaing statistic.
@@ -19,22 +18,19 @@ import {
 class Statistic extends AbstractComponent {
   /**
    * Create statistic.
+   * @param {object} data
    * @param {HTMLElement} statisticContainer
-   * @param {number} userTotalRating
-   * @param {object} statisticParams
    * @param {string} filter
    * @param {function} onUpdateStatistic
    */
-  constructor(statisticContainer, userTotalRating, {totalWatchedFilms,
-    totalDuration, topGenre}, filter, onUpdateStatistic) {
+  constructor(data, statisticContainer, filter, onUpdateStatistic) {
     super();
-    this._userTotalRating = userTotalRating;
-    this._totalWatchedFilms = totalWatchedFilms;
-    this._totalDuration = totalDuration;
-    this._topGenre = topGenre;
+    this._data = data;
+    this._userTotalRating = this._data.getUserTotalRank();
+    this._statisticParams = this._getStatisticParams(filter);
     this._onUpdateStatistic = onUpdateStatistic;
     this._filter = filter;
-    this._barHeight = 55;
+    this._barHeight = BAR_HEIGHT;
     this._statisticContainer = statisticContainer;
 
     this._filterStatistic = null;
@@ -62,7 +58,8 @@ class Statistic extends AbstractComponent {
    * @return {object}
    */
   renderChart() {
-    let uniqueGenres = Object.entries(getUniqueGenres());
+    const boundaryUserDate = this._getBoundaryUserDate(this._filter);
+    let uniqueGenres = Object.entries(this._data.getUniqueGenres(boundaryUserDate));
     const statisticChartContainer =
       this._statisticContainer
       .querySelector(`.statistic__chart`);
@@ -141,13 +138,48 @@ class Statistic extends AbstractComponent {
   }
 
   /**
+   * Return statistic params.
+   * @param {string} filter
+   * @return {object}
+   */
+  _getStatisticParams(filter) {
+    const boundaryUserDate = this._getBoundaryUserDate(filter);
+    return {
+      totalWatchedFilms: this._data.getWatchedFilmsAmount(boundaryUserDate),
+      totalDuration: this._data.getTotalDuration(boundaryUserDate),
+      topGenre: this._data.getTopGenre(boundaryUserDate)
+    };
+  }
+
+  /**
+   * Return boundary date for render statistic
+   * by filter.
+   * @param {string} filter
+   * @return {date}
+   */
+  _getBoundaryUserDate(filter) {
+    let boundaryUserDate = null;
+    if (filter === this._data.statisticFiltersId.today) {
+      boundaryUserDate = moment().startOf(`day`).toDate();
+    } else if (filter === this._data.statisticFiltersId.week) {
+      boundaryUserDate = moment().startOf(`isoWeek`).toDate();
+    } else if (filter === this._data.statisticFiltersId.month) {
+      boundaryUserDate = moment().startOf(`month`).toDate();
+    } else if (filter === this._data.statisticFiltersId.year) {
+      boundaryUserDate = moment().startOf(`year`).toDate();
+    }
+
+    return boundaryUserDate;
+  }
+
+  /**
    * Return setting for chart.
    * @param {object} mainData
    * @return {object}
    */
   _getChartSetting(mainData) {
     return {
-      plugins: [ChartDataLabels],
+      plugins: [chartDataLabels],
       type: `horizontalBar`,
       data: {
         labels: mainData.genres,

@@ -1,15 +1,15 @@
 /**
  * Return template for footer.
- * @param {number} countFilmCards
+ * @param {number} footer
  * @return {string}
  */
-const getFooterTemplate = (countFilmCards) => {
+const getFooterTemplate = ({_countFilmCards}) => {
   return `
     <section class="footer__logo logo logo--smaller">
       Cinemaddict
     </section>
     <section class="footer__statistics">
-      <p>${countFilmCards} movies inside</p>
+      <p>${_countFilmCards} movies inside</p>
     </section>`;
 };
 

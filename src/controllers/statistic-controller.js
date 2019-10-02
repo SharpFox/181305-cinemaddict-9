@@ -3,13 +3,6 @@ import {
   addElementDOM,
   removeContainerChildren
 } from '../utils.js';
-import {
-  userTotalRating,
-  getWatchedFilmsAmount,
-  getTotalDuration,
-  getTopGenre,
-  statisticFiltersId
-} from '../data.js';
 
 /**
  * Class representaing controller of statistic.
@@ -17,9 +10,11 @@ import {
 class StatisticController {
   /**
    * Create statistic controller.
+   * @param {object} data
    * @param {HTMLElement} statisticContainer
    */
-  constructor(statisticContainer) {
+  constructor(data, statisticContainer) {
+    this._data = data;
     this._statisticContainer = statisticContainer;
     this._statisticComponent = null;
 
@@ -30,19 +25,16 @@ class StatisticController {
    * Create statistic.
    */
   init() {
-    this._addStatistic(
-        this._getStatisticParams(statisticFiltersId.allTime),
-        statisticFiltersId.allTime);
+    this._addStatistic(this._data.statisticFiltersId.allTime);
   }
 
   /**
    * Add statistic to DOM and fill handlers.
-   * @param {object} statisticParams
    * @param {string} filter
    */
-  _addStatistic(statisticParams, filter) {
-    this._statisticComponent = new Statistic(this._statisticContainer,
-        userTotalRating, statisticParams, filter, this.onUpdateStatistic);
+  _addStatistic(filter) {
+    this._statisticComponent = new Statistic(this._data, this._statisticContainer,
+        filter, this.onUpdateStatistic);
     addElementDOM(this._statisticContainer, this._statisticComponent);
     this._statisticComponent.renderChart();
   }
@@ -54,19 +46,7 @@ class StatisticController {
   onUpdateStatistic(newFilter) {
     removeContainerChildren(this._statisticContainer);
     this._statisticComponent.unrender();
-    this._addStatistic(this._getStatisticParams(newFilter), newFilter);
-  }
-
-  /**
-   * Return statistic params.
-   * @return {object}
-   */
-  _getStatisticParams() {
-    return {
-      totalWatchedFilms: getWatchedFilmsAmount(),
-      totalDuration: getTotalDuration(),
-      topGenre: getTopGenre()
-    };
+    this._addStatistic(newFilter);
   }
 }
 

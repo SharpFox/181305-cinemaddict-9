@@ -11,13 +11,13 @@ import ModelComment from './models/model-comment.js';
 import {
   END_POINT,
   addElementDOM,
-  getAuthorizationValue
+  getAuthorizationValue,
+  removeContainerChildren
 } from './utils.js';
 
 let pageController = null;
 let mainNavigationController = null;
 let profileComponent = null;
-let isFirstLoadApplication = true;
 
 const data = new Data();
 const api = new API(data, END_POINT, getAuthorizationValue());
@@ -34,15 +34,16 @@ const filmDetailsContainer = bodyContainer.querySelector(`.film-details`);
 const footerContainer = bodyContainer.querySelector(`.footer`);
 
 /**
- * Initialization application.
+ * Initialization contollers and components.
  */
 const init = () => {
-  pageController = new PageController(data, filmsContainer, filmDetailsContainer,
-      sortContainer, onDataChange, onCommentsLoad);
+  pageController = new PageController(data, filmsContainer,
+      filmDetailsContainer, sortContainer, onDataChange, onCommentsLoad);
   pageController.init();
 
   mainNavigationController = new MainNavigationController(data, pageController,
-      mainNavigationContainer, filmsContainer, sortContainer, statisticContainer);
+      mainNavigationContainer, filmsContainer, sortContainer,
+      statisticContainer);
   mainNavigationController.init();
 
   const searchController = new SearchController(data, pageController,
@@ -50,15 +51,14 @@ const init = () => {
       filmsContainer, sortContainer, statisticContainer);
   searchController.init();
 
-  const statisticController = new StatisticController(data, statisticContainer);
+  const statisticController = new StatisticController(data,
+      statisticContainer);
   statisticController.init();
 
   initProfile();
 
   const footerComponent = new Footer(data);
   addElementDOM(footerContainer, footerComponent);
-
-  isFirstLoadApplication = false;
 };
 
 /**
@@ -67,6 +67,22 @@ const init = () => {
 const initProfile = () => {
   profileComponent = new Profile(data, profileContainer);
   addElementDOM(profileContainer, profileComponent);
+};
+
+/**
+ * Get films cards from server.
+ */
+const getFilmsCardsFromServer = () => {
+  api.getFilms()
+  .then((filmsCards) => {
+    data.clearFilmCardsMain();
+    filmsCards.forEach((filmCard) => {
+      data.addFilmCardToFilmCardsMain(filmCard);
+    });
+    data.fillFilmsCardsCurrent();
+    init();
+  })
+  .catch();
 };
 
 /**
@@ -99,28 +115,16 @@ const onCommentsLoad = (filmId, addComments) => {
 };
 
 /**
- * Get films cards from server.
+ * Обновляем содержимое кеша и страницы.
  * @param {number} filmCardId
  */
-const getFilmsCardsFromServer = (filmCardId) => {
-  api.getFilms()
-  .then((filmsCards) => {
-    data.clearFilmCardsMain();
-    filmsCards.forEach((filmCard) => {
-      data.addFilmCardToFilmCardsMain(filmCard);
-    });
-    if (isFirstLoadApplication) {
-      data.fillFilmsCardsCurrent();
-      init();
-    } else {
-      data.updateFilmCardsCurrent();
-      profileComponent.unrender();
-      initProfile();
-      mainNavigationController.rerender();
-      pageController.rerender(filmCardId);
-    }
-  })
-  .catch();
+const updateAppContent = (filmCardId) => {
+  data.updateFilmCardsCurrent();
+  profileComponent.unrender();
+  removeContainerChildren(profileContainer);
+  initProfile();
+  mainNavigationController.rerender();
+  pageController.rerender(filmCardId);
 };
 
 /**
@@ -166,9 +170,12 @@ const getNewComment = (newData) => {
     const modelComment =
       new ModelComment(data, ModelComment.getTemplateData());
     const newDataEntries = Object.entries(newData);
-    for (let [key, value] of newDataEntries) {
-      if (key === `comment`) {
-        modelComment[key] = value;
+    for (let [newDataKey, newDataValue] of newDataEntries) {
+      if (newDataKey === `comment`) {
+        const commentEntries = Object.entries(newDataValue);
+        for (let [commentKey, commentValue] of commentEntries) {
+          modelComment[commentKey] = commentValue;
+        }
       }
     }
     postCommentToServer(modelComment.toRAW(), newData.id);
@@ -193,7 +200,12 @@ const deleteComment = (newData, filmCardId) => {
  */
 const updateFilmCardByServer = (newFilmCard, filmCardId) => {
   api.updateFilm(newFilmCard, filmCardId)
-  .then(() => {
+  .then((modifedFilmCard) => {
+    data.updateFilmsCardsMain(modifedFilmCard);
+    updateAppContent(modifedFilmCard.id);
+    const addComments =
+      pageController.getFuncAddCommentsOfMovieController(filmCardId);
+    onCommentsLoad(filmCardId, addComments);
   })
   .catch();
 };
@@ -205,7 +217,15 @@ const updateFilmCardByServer = (newFilmCard, filmCardId) => {
  */
 const postCommentToServer = (newComment, filmCardId) => {
   api.postComment(newComment, filmCardId)
-  .then(getFilmsCardsFromServer(filmCardId))
+  .then((responce) => {
+    const modelFilm = new ModelFilm(data, responce.movie);
+    data.updateFilmsCardsMain(modelFilm);
+    updateAppContent(modelFilm.id);
+    const addComments =
+      pageController.getFuncAddCommentsOfMovieController(filmCardId);
+    const comments = ModelComment.parseComments(data, responce.comments);
+    addComments(comments);
+  })
   .catch();
 };
 
@@ -216,7 +236,13 @@ const postCommentToServer = (newComment, filmCardId) => {
  */
 const deleteCommentToServer = (commentId, filmCardId) => {
   api.deleteComment(commentId)
-  .then(getFilmsCardsFromServer(filmCardId))
+  .then(() => {
+    data.deleteCommentByFilmsCardsMain(commentId, filmCardId);
+    updateAppContent(filmCardId);
+    const addComments =
+      pageController.getFuncAddCommentsOfMovieController(filmCardId);
+    onCommentsLoad(filmCardId, addComments);
+  })
   .catch();
 };
 

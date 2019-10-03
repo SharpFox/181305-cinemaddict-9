@@ -1,12 +1,15 @@
 import FilmCard from '../components/film-card.js';
 import FilmDetails from '../components/film-details.js';
-import Comments from '../components/comments.js';
+import Comment from '../components/Comment.js';
 import {
   KEYS,
   addElementDOM,
   updateElementDOM,
   createElement
 } from '../utils.js';
+import {
+  getCommentsTitleTemplate
+} from '../templates/comments-title-template.js';
 
 /**
  * Class representaing controller of move.+
@@ -33,6 +36,8 @@ class MovieController {
     this._filmCardComponent = new FilmCard(this._data, this._filmCard, onDataChange);
     this._filmDetailsComponent = new FilmDetails(this._data, this._filmDetailsContainer,
         this._filmCard, onDataChange);
+    this._commentsComponents = [];
+
     this._onDataChange = onDataChange;
     this._onCommentsLoad = onCommentsLoad;
     this.addComments = this.addComments.bind(this);
@@ -69,6 +74,9 @@ class MovieController {
   unrenderComponents() {
     this._filmCardComponent.unrender();
     this._filmDetailsComponent.unrender();
+    this._commentsComponents.forEach((commentComponent) => {
+      commentComponent.unrender();
+    });
   }
 
   /**
@@ -76,10 +84,26 @@ class MovieController {
    * @param {array} comments
    */
   addComments(comments) {
-    const commentsComponent = new Comments(this._data,
-        comments, this._filmDetailsComponent.id, this._onDataChange);
+    this._commentsComponents = [];
+    this._addCommentsTitle(comments.length);
+    comments.forEach((comment) => {
+      const commentComponent = new Comment(this._data,
+          comment, this._filmDetailsComponent.id, this._onDataChange);
+      this._commentsComponents.push(commentComponent);
+      const commentsListContainer =
+        document.querySelector(`.film-details__comments-list`);
+      addElementDOM(commentsListContainer, commentComponent);
+    });
+  }
+
+  /**
+   * Add template for comments title.
+   * @param {number} commentsTotal
+   */
+  _addCommentsTitle(commentsTotal) {
     const commentsContainer = document.getElementById(`comment-list`);
-    addElementDOM(commentsContainer, commentsComponent);
+    const commentsTitleElement = createElement(getCommentsTitleTemplate(commentsTotal));
+    commentsContainer.appendChild(commentsTitleElement);
   }
 
   /**

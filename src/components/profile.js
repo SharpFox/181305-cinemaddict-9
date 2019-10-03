@@ -5,7 +5,7 @@ import {
 } from '../utils.js';
 import {
   getProfileTemplate
-} from './profile-template.js';
+} from '../templates/profile-template.js';
 
 /**
  * Class representaing profile.

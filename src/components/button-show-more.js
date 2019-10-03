@@ -5,7 +5,7 @@ import {
 } from '../utils.js';
 import {
   getButtonShowMoreTemplate
-} from './button-show-more-template.js';
+} from '../templates/button-show-more-template.js';
 
 /**
  * Class representaing button "Show more".

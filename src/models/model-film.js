@@ -1,6 +1,6 @@
 import moment from 'moment';
 import {
-  DEFAULT_FILM_ID
+  DEFAULT_ID
 } from '../utils.js';
 
 /**
@@ -110,7 +110,7 @@ class ModelFilm {
    */
   static getTemplateData() {
     return {
-      'id': DEFAULT_FILM_ID,
+      'id': DEFAULT_ID,
       'comments': [],
       'film_info': {
         'title': ``,
@@ -136,17 +136,6 @@ class ModelFilm {
         'watching_date': null,
         'favorite': false
       }
-    };
-  }
-
-  /**
-   * Get template for method of synchronization.
-   * @param {array} filmsCards
-   * @return {object}
-   */
-  static getTemplateDataAsync(filmsCards) {
-    return {
-      'updated': [filmsCards]
     };
   }
 

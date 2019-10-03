@@ -1,10 +1,11 @@
 import AbstractComponent from './abstract-component.js';
 import {
-  KEYS
+  KEYS,
+  ANIMATION_TIMEOUT
 } from '../utils.js';
 import {
   getFilmCardTemplate
-} from './film-card-template.js';
+} from '../templates/film-card-template.js';
 
 /**
  * Class representaing film card.
@@ -52,6 +53,54 @@ class FilmCard extends AbstractComponent {
    */
   set onOpen(fn) {
     this._onOpen = fn;
+  }
+
+  /**
+   * Add error color for border of form.
+   */
+  addErrorBorder() {
+    const formContainer = document.querySelector(`.film-card__controls`);
+    formContainer.style.borderColor = `#ff0000`;
+    formContainer.style.borderWidth = `1px`;
+    formContainer.style.borderStyle = `solid`;
+  }
+
+  /**
+   * Delete error color for border of form.
+   */
+  deleteErrorBorder() {
+    const formContainer = document.querySelector(`.film-card__controls`);
+    formContainer.style.borderColor = ``;
+    formContainer.style.borderWidth = `0px`;
+    formContainer.style.borderStyle = ``;
+  }
+
+  /**
+   * Draw animation for error from server.
+   */
+  shake() {
+    const formContainer = document.querySelector(`.film-card__controls`);
+    formContainer.style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`;
+
+    setTimeout(() => {
+      formContainer.style.animation = ``;
+    }, ANIMATION_TIMEOUT);
+  }
+
+  /**
+   * Block container for posting to server.
+   */
+  blockPosting() {
+    const formContainer = document.querySelector(`.film-card__controls`);
+    formContainer.disabled = true;
+  }
+
+  /**
+   * Unblock container for posting to server.
+   */
+  unblockPosting() {
+    const formContainer = document.querySelector(`.film-card__controls`);
+    formContainer.disabled = false;
   }
 
   /**

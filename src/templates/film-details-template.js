@@ -62,7 +62,8 @@ const getFilmRatingTemplate = (data, img, title, userRating) => {
                 ${Math.ceil(userRating) === scale ? `checked` : ``}
               >
               <label class="film-details__user-rating-label"
-                for="rating-${scale}">
+                for="rating-${scale}"
+                data-id="${scale}">
                 ${scale}
               </label>`).trim()).join(``)}       
           </div>

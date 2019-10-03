@@ -2,7 +2,7 @@
 import AbstractComponent from './abstract-component.js';
 import {
   getFooterTemplate
-} from './footer-template.js';
+} from '../templates/footer-template.js';
 
 /**
  * Class representaing footer.

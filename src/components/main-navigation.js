@@ -5,7 +5,7 @@ import {
 } from '../utils.js';
 import {
   getMainNavigationTemplate
-} from './main-navigation-template.js';
+} from '../templates/main-navigation-template.js';
 
 /**
  * Class representaing main navigation.

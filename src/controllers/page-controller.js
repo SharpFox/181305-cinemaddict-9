@@ -143,6 +143,24 @@ class PageController {
   }
 
   /**
+   * Return function "AddComment" of specific сomponent
+   * of film card.
+   * @param {number} filmCardId
+   * @return {function}
+   */
+  getFuncAddCommentsOfMovieController(filmCardId) {
+    let addComments = null;
+    for (let movieController of this._movieControllers) {
+      if (movieController.id === filmCardId) {
+        addComments = movieController.addComments;
+        break;
+      }
+    }
+
+    return addComments;
+  }
+
+  /**
    * Add films lists.
    */
   _addFilmsLists() {

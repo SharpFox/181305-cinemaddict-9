@@ -6,7 +6,7 @@ import {
 } from '../utils.js';
 import {
   getSearchTemplate
-} from './search-template.js';
+} from '../templates/search-template.js';
 
 /**
  * Class representaing profile.

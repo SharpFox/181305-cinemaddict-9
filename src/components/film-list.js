@@ -1,7 +1,7 @@
 import AbstractComponent from './abstract-component.js';
 import {
   getFilmsListTemplate
-} from './film-list-template.js';
+} from '../templates/film-list-template.js';
 
 /**
  * Class representaing film list.

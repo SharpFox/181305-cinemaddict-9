@@ -608,6 +608,37 @@ class Data {
   }
 
   /**
+   * Update filmsCardsMain.
+   * @param {object} modifedFilmCard
+   */
+  updateFilmsCardsMain(modifedFilmCard) {
+    const lengthFilmsCardsMain = this._filmsCardsMain.length;
+    for (let i = 0; i < lengthFilmsCardsMain; i++) {
+      if (this._filmsCardsMain[i].id === modifedFilmCard.id) {
+        this._filmsCardsMain[i] = modifedFilmCard;
+        break;
+      }
+    }
+  }
+
+  /**
+   * Delete comment from filmsCardsMain.
+   * @param {number} commentId
+   * @param {number} filmCardId
+   */
+  deleteCommentByFilmsCardsMain(commentId, filmCardId) {
+    for (let filmCard of this._filmsCardsMain) {
+      if (filmCard.id === filmCardId) {
+        filmCard.comments =
+          filmCard.comments.filter((id) => {
+            return Number(id) !== commentId;
+          });
+        break;
+      }
+    }
+  }
+
+  /**
    * Return ranks of user.
    * @return {object}
    */

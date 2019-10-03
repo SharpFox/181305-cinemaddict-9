@@ -73,7 +73,7 @@ class API {
   getComments(filmId) {
     return this._load({url: `comments/${filmId}`})
       .then(toJSON)
-      .then((filmsCards) => ModelComment.parseComments(filmsCards));
+      .then((filmsCards) => ModelComment.parseComments(this._data, filmsCards));
   }
 
   /**
@@ -90,7 +90,7 @@ class API {
       headers: new Headers({'Content-Type': `application/json`})
     })
       .then(toJSON)
-      .then(ModelComment.parseComment);
+      .then((serverData) => ModelComment.parseComments(this._data, serverData));
   }
 
   /**

@@ -3,11 +3,12 @@ import moment from 'moment';
 import AbstractComponent from './abstract-component.js';
 import {
   KEYS,
+  ANIMATION_TIMEOUT,
   doEscapeHTML
 } from '../utils.js';
 import {
   getFilmDetailsTemplate
-} from './film-details-template.js';
+} from '../templates/film-details-template.js';
 
 /**
  * Class representaing film details.
@@ -95,6 +96,70 @@ class FilmDetails extends AbstractComponent {
    */
   set openCloseRating(fn) {
     this._openCloseRating = fn;
+  }
+
+  /**
+   * Add error color for border of form.
+   */
+  addErrorBorder() {
+    const formContainer = document.querySelector(`.film-details__inner`);
+    formContainer.style.borderColor = `#ff0000`;
+    formContainer.style.borderWidth = `1px`;
+    formContainer.style.borderStyle = `solid`;
+  }
+
+  /**
+   * Delete error color for border of form.
+   */
+  deleteErrorBorder() {
+    const formContainer = document.querySelector(`.film-details__inner`);
+    formContainer.style.borderColor = ``;
+    formContainer.style.borderWidth = `0px`;
+    formContainer.style.borderStyle = ``;
+  }
+
+  /**
+   * Add error color for background of user rating.
+   * @param {HTMLElement} userRatingContainer
+   */
+  addErrorBackground(userRatingContainer) {
+    userRatingContainer.style.backgroundColor = `#ff0000`;
+  }
+
+  /**
+   * Delete error color for background of user rating.
+   * @param {HTMLElement} userRatingContainer
+   */
+  deleteErrorBackground(userRatingContainer) {
+    userRatingContainer.style.backgroundColor = ``;
+  }
+
+  /**
+   * Draw animation for error from server.
+   */
+  shake() {
+    const formContainer = document.querySelector(`.film-details__inner`);
+    formContainer.style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`;
+
+    setTimeout(() => {
+      formContainer.style.animation = ``;
+    }, ANIMATION_TIMEOUT);
+  }
+
+  /**
+   * Block container for posting to server.
+   */
+  blockPosting() {
+    const formContainer = document.querySelector(`.film-details__inner`);
+    formContainer.disabled = true;
+  }
+
+  /**
+   * Unblock container for posting to server.
+   */
+  unblockPosting() {
+    const formContainer = document.querySelector(`.film-details__inner`);
+    formContainer.disabled = false;
   }
 
   /**
@@ -481,7 +546,7 @@ class FilmDetails extends AbstractComponent {
       isSendingComment: false,
       isDeletingComment: false,
       id: null,
-      userRating: null,
+      userRating: 0,
       comment: FilmDetails.getEmptyComment(),
       controlsTypes: []
     };

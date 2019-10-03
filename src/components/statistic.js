@@ -9,7 +9,7 @@ import {
 } from '../utils.js';
 import {
   getStatisticTemplate
-} from './statistic-template.js';
+} from '../templates/statistic-template.js';
 
 /**
  * Class representaing statistic.

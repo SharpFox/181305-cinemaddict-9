@@ -13,12 +13,13 @@ const METHODS = {
 };
 
 const END_POINT = `https://htmlacademy-es-9.appspot.com/cinemaddict`;
-const DEFAULT_FILM_ID = -1;
+const DEFAULT_ID = -1;
 const MIN_SEARCH_LENGTH = 3;
 const BAR_HEIGHT = 55;
 const HOUR_MS = 3600000;
 const MINUTE_MS = 60000;
 const FILMS_CARDS_STEP = 5;
+const ANIMATION_TIMEOUT = 600;
 
 /**
  * Add cloned of component element to DOM.
@@ -200,12 +201,13 @@ export {
   KEYS,
   METHODS,
   END_POINT,
-  DEFAULT_FILM_ID,
+  DEFAULT_ID,
   MIN_SEARCH_LENGTH,
   BAR_HEIGHT,
   HOUR_MS,
   MINUTE_MS,
   FILMS_CARDS_STEP,
+  ANIMATION_TIMEOUT,
   createElement,
   getRandomValueMinMax,
   compareRandom,

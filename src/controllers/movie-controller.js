@@ -33,9 +33,11 @@ class MovieController {
     this._filmsListContainer = filmsListContainer;
     this._filmsListFilmsContainer = filmsListFilmsContainer;
     this._filmDetailsContainer = filmDetailsContainer;
-    this._filmCardComponent = new FilmCard(this._data, this._filmCard, onDataChange);
-    this._filmDetailsComponent = new FilmDetails(this._data, this._filmDetailsContainer,
-        this._filmCard, onDataChange);
+    this._filmCardComponent =
+      new FilmCard(this._data, this._filmCard, onDataChange);
+    this._filmDetailsComponent =
+      new FilmDetails(this._data, this._filmDetailsContainer, this._filmCard,
+          onDataChange);
     this._commentsComponents = [];
 
     this._onDataChange = onDataChange;
@@ -84,6 +86,7 @@ class MovieController {
    * @param {array} comments
    */
   addComments(comments) {
+    this._data.fillFilmCardCommentsCurrent(comments);
     this._commentsComponents = [];
     this._addCommentsTitle(comments.length);
     comments.forEach((comment) => {
@@ -102,7 +105,8 @@ class MovieController {
    */
   _addCommentsTitle(commentsTotal) {
     const commentsContainer = document.getElementById(`comment-list`);
-    const commentsTitleElement = createElement(getCommentsTitleTemplate(commentsTotal));
+    const commentsTitleElement =
+      createElement(getCommentsTitleTemplate(commentsTotal));
     commentsContainer.appendChild(commentsTitleElement);
   }
 
@@ -134,6 +138,7 @@ class MovieController {
       if (!evt.target.classList.contains(`film-details__comment-input`)) {
         this._filmDetailsContainer.classList.add(`visually-hidden`);
         this._filmDetailsContainer.firstElementChild.remove();
+        this._data.clearFilmCardCommentsCurrent();
       }
     };
 

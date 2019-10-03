@@ -3,8 +3,14 @@ import moment from 'moment';
 import AbstractComponent from './abstract-component.js';
 import {
   KEYS,
-  ANIMATION_TIMEOUT,
-  doEscapeHTML
+  doEscapeHTML,
+  addErrorBackground,
+  deleteErrorBackground,
+  addErrorBorder,
+  deleteErrorBorder,
+  blockContainer,
+  unblockContainer,
+  shake
 } from '../utils.js';
 import {
   getFilmDetailsTemplate
@@ -100,66 +106,83 @@ class FilmDetails extends AbstractComponent {
 
   /**
    * Add error color for border of form.
+   * @param {HTMLElement} currentContainer
    */
-  addErrorBorder() {
-    const formContainer = document.querySelector(`.film-details__inner`);
-    formContainer.style.borderColor = `#ff0000`;
-    formContainer.style.borderWidth = `1px`;
-    formContainer.style.borderStyle = `solid`;
+  addErrorBorder(currentContainer) {
+    addErrorBorder(currentContainer);
   }
 
   /**
    * Delete error color for border of form.
+   * @param {HTMLElement} currentContainer
    */
-  deleteErrorBorder() {
-    const formContainer = document.querySelector(`.film-details__inner`);
-    formContainer.style.borderColor = ``;
-    formContainer.style.borderWidth = `0px`;
-    formContainer.style.borderStyle = ``;
-  }
-
-  /**
-   * Add error color for background of user rating.
-   * @param {HTMLElement} userRatingContainer
-   */
-  addErrorBackground(userRatingContainer) {
-    userRatingContainer.style.backgroundColor = `#ff0000`;
-  }
-
-  /**
-   * Delete error color for background of user rating.
-   * @param {HTMLElement} userRatingContainer
-   */
-  deleteErrorBackground(userRatingContainer) {
-    userRatingContainer.style.backgroundColor = ``;
+  deleteErrorBorder(currentContainer) {
+    deleteErrorBorder(currentContainer);
   }
 
   /**
    * Draw animation for error from server.
+   * @param {HTMLElement} currentContainer
    */
-  shake() {
-    const formContainer = document.querySelector(`.film-details__inner`);
-    formContainer.style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`;
-
-    setTimeout(() => {
-      formContainer.style.animation = ``;
-    }, ANIMATION_TIMEOUT);
+  shake(currentContainer) {
+    shake(currentContainer);
   }
 
   /**
-   * Block container for posting to server.
+   * Block form for posting to server.
+   * @param {HTMLElement} currentContainer
    */
-  blockPosting() {
-    const formContainer = document.querySelector(`.film-details__inner`);
-    formContainer.disabled = true;
+  blockContainer(currentContainer) {
+    blockContainer(currentContainer);
   }
 
   /**
-   * Unblock container for posting to server.
+   * Unblock form for posting to server.
+   * @param {HTMLElement} currentContainer
    */
-  unblockPosting() {
-    const formContainer = document.querySelector(`.film-details__inner`);
-    formContainer.disabled = false;
+  unblockContainer(currentContainer) {
+    unblockContainer(currentContainer);
+  }
+
+  /**
+   * Add error color for background of user rating.
+   * @param {HTMLElement} currentContainer
+   */
+  addErrorBackground(currentContainer) {
+    if (currentContainer.classList
+    .contains(`film-details__user-rating-input`)) {
+      const userRatingContainer = currentContainer.labels[0];
+      addErrorBackground(userRatingContainer);
+    }
+  }
+
+  /**
+   * Delete error color for background of user rating.
+   * @param {HTMLElement} currentContainer
+   */
+  deleteErrorBackground(currentContainer) {
+    if (currentContainer.classList
+      .contains(`film-details__user-rating-input`)) {
+      const userRatingContainer = currentContainer.labels[0];
+      deleteErrorBackground(userRatingContainer);
+    }
+  }
+
+  /**
+   * Return paste state for control type (input).
+   * @param {HTMLElement} activeControl
+   */
+  returnPastStateControlType(activeControl) {
+    activeControl.checked = !activeControl.checked;
+
+    const ratingContainer =
+      document.querySelector(`.form-details__middle-container`);
+    const watchedContainer = document.getElementById(`watched`);
+    if (!watchedContainer.checked) {
+      ratingContainer.classList.add(`visually-hidden`);
+    } else {
+      ratingContainer.classList.remove(`visually-hidden`);
+    }
   }
 
   /**
@@ -309,73 +332,6 @@ class FilmDetails extends AbstractComponent {
   }
 
   /**
-   * Call the fuction for close details of film.
-   * @param {event} evt
-   */
-  _onCloseForm(evt) {
-    if ((evt.keyCode === KEYS.ESC || evt.type === `click`)
-      && typeof this._onClose === `function`) {
-      this._onClose(evt);
-    }
-  }
-
-  /**
-   * Call the function for open/close rating.
-   * @param {event} evt
-   */
-  _onOpenCloseRating(evt) {
-    if ((evt.keyCode === KEYS.ENTER || evt.type === `click`)
-      && (typeof this._openCloseRating === `function`)) {
-      this._openCloseRating();
-    }
-  }
-
-  /**
-   * Call the function for undo of user rating.
-   * @param {event} evt
-   */
-  _onUndoUserRating(evt) {
-    if (evt.keyCode === KEYS.ENTER || evt.type === `click`) {
-      const newData = FilmDetails.getEmptyNewData();
-      newData.isSendingForm = true;
-      newData.id = this._id;
-      newData.userRating = 0;
-
-      this._onDataChange(newData);
-    }
-  }
-
-  /**
-   * Call the fuction for send form.
-   * @param {event} evt
-   */
-  _onSendForm(evt) {
-    if (((evt.keyCode === KEYS.ENTER && !evt.ctrlKey && !evt.metaKey)
-      || evt.type === `change`)
-      && typeof this._addEmoji === `function`
-      && this._isImageSelection(evt)) {
-      this._addEmoji(evt);
-      return;
-    }
-
-    if (this._isLeavingTexarea(evt)) {
-      return;
-    }
-
-    if ((evt.keyCode === KEYS.ENTER && (evt.ctrlKey || evt.metaKey))
-      || evt.type === `change`) {
-      const newData = this._getNewDataForm();
-
-      if (!this._isNecessarySendingDataToServer(evt, newData)) {
-        return;
-      }
-      this._resetUserRating(newData);
-      this._resetComment(evt, newData);
-      this._onDataChange(newData);
-    }
-  }
-
-  /**
    * Return fact of selecting a image.
    * @param {event} evt
    * @return {boolean}
@@ -458,7 +414,8 @@ class FilmDetails extends AbstractComponent {
    * @return {object}
    */
   _getNewDataForm() {
-    const formData = new FormData(document.querySelector(`.film-details__inner`));
+    const formData =
+      new FormData(document.querySelector(`.film-details__inner`));
     return this._processForm(formData, this._id);
   }
 
@@ -517,6 +474,75 @@ class FilmDetails extends AbstractComponent {
         newData.comment.type = value;
       }
     };
+  }
+
+  /**
+   * Call the fuction for close details of film.
+   * @param {event} evt
+   */
+  _onCloseForm(evt) {
+    if ((evt.keyCode === KEYS.ESC || evt.type === `click`)
+      && typeof this._onClose === `function`) {
+      this._onClose(evt);
+    }
+  }
+
+  /**
+   * Call the function for open/close rating.
+   * @param {event} evt
+   */
+  _onOpenCloseRating(evt) {
+    if ((evt.keyCode === KEYS.ENTER || evt.type === `click`)
+      && (typeof this._openCloseRating === `function`)) {
+      this._openCloseRating();
+    }
+  }
+
+  /**
+   * Call the function for undo of user rating.
+   * @param {event} evt
+   */
+  _onUndoUserRating(evt) {
+    if (evt.keyCode === KEYS.ENTER || evt.type === `click`) {
+      const newData = FilmDetails.getEmptyNewData();
+      newData.isSendingForm = true;
+      newData.id = this._id;
+      newData.userRating = 0;
+      newData.controlsTypes =
+        this._data.getControlTypesFromFilmsCardsCurrent(this._id);
+
+      this._onDataChange(newData, this, evt);
+    }
+  }
+
+  /**
+   * Call the fuction for send form.
+   * @param {event} evt
+   */
+  _onSendForm(evt) {
+    if (((evt.keyCode === KEYS.ENTER && !evt.ctrlKey && !evt.metaKey)
+      || evt.type === `change`)
+      && typeof this._addEmoji === `function`
+      && this._isImageSelection(evt)) {
+      this._addEmoji(evt);
+      return;
+    }
+
+    if (this._isLeavingTexarea(evt)) {
+      return;
+    }
+
+    if ((evt.keyCode === KEYS.ENTER && (evt.ctrlKey || evt.metaKey))
+      || evt.type === `change`) {
+      const newData = this._getNewDataForm();
+
+      if (!this._isNecessarySendingDataToServer(evt, newData)) {
+        return;
+      }
+      this._resetUserRating(newData);
+      this._resetComment(evt, newData);
+      this._onDataChange(newData, this, evt);
+    }
   }
 
   /**

@@ -1,7 +1,12 @@
 import AbstractComponent from './abstract-component.js';
+import FilmDetails from './film-details.js';
 import {
   KEYS,
-  ANIMATION_TIMEOUT
+  addErrorBorder,
+  deleteErrorBorder,
+  blockContainer,
+  unblockContainer,
+  shake
 } from '../utils.js';
 import {
   getFilmCardTemplate
@@ -57,50 +62,42 @@ class FilmCard extends AbstractComponent {
 
   /**
    * Add error color for border of form.
+   * @param {HTMLElement} currentContainer
    */
-  addErrorBorder() {
-    const formContainer = document.querySelector(`.film-card__controls`);
-    formContainer.style.borderColor = `#ff0000`;
-    formContainer.style.borderWidth = `1px`;
-    formContainer.style.borderStyle = `solid`;
+  addErrorBorder(currentContainer) {
+    addErrorBorder(currentContainer);
   }
 
   /**
    * Delete error color for border of form.
+   * @param {HTMLElement} currentContainer
    */
-  deleteErrorBorder() {
-    const formContainer = document.querySelector(`.film-card__controls`);
-    formContainer.style.borderColor = ``;
-    formContainer.style.borderWidth = `0px`;
-    formContainer.style.borderStyle = ``;
+  deleteErrorBorder(currentContainer) {
+    deleteErrorBorder(currentContainer);
   }
 
   /**
    * Draw animation for error from server.
+   * @param {HTMLElement} currentContainer
    */
-  shake() {
-    const formContainer = document.querySelector(`.film-card__controls`);
-    formContainer.style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`;
-
-    setTimeout(() => {
-      formContainer.style.animation = ``;
-    }, ANIMATION_TIMEOUT);
+  shake(currentContainer) {
+    shake(currentContainer);
   }
 
   /**
-   * Block container for posting to server.
+   * Block form for posting to server.
+   * @param {HTMLElement} currentContainer
    */
-  blockPosting() {
-    const formContainer = document.querySelector(`.film-card__controls`);
-    formContainer.disabled = true;
+  blockContainer(currentContainer) {
+    blockContainer(currentContainer);
   }
 
   /**
-   * Unblock container for posting to server.
+   * Unblock form for posting to server.
+   * @param {HTMLElement} currentContainer
    */
-  unblockPosting() {
-    const formContainer = document.querySelector(`.film-card__controls`);
-    formContainer.disabled = false;
+  unblockContainer(currentContainer) {
+    unblockContainer(currentContainer);
   }
 
   /**
@@ -206,41 +203,24 @@ class FilmCard extends AbstractComponent {
   }
 
   /**
-   * Call the fuction for open details about film.
-   * @param {event} evt
-   */
-  _onOpenDetails(evt) {
-    if ((evt.keyCode === KEYS.ENTER || evt.type === `click`)
-      && (typeof this._onOpen === `function`)) {
-      this._onOpen();
-    }
-  }
-
-  /**
-   * Call the fuction for send form.
-   * @param {event} evt
-   */
-  _onSendForm(evt) {
-    if (evt.keyCode === KEYS.ENTER || evt.type === `click`) {
-      this._onDataChange(this._processForm(evt.target, this._id));
-    }
-  }
-
-  /**
    * Return new data object.
    * @param {event} target
-   * @param {number} filmCardId
    * @return {object}
    */
-  _processForm(target, filmCardId) {
-    const newData = {
-      isSendingForm: true,
-      id: filmCardId,
-      controlsTypes: []
-    };
+  _processForm(target) {
+    const newData = FilmDetails.getEmptyNewData();
+    newData.isSendingForm = true;
+    newData.id = this._id;
+
+    newData.controlsTypes.forEach((controlType) => {
+      if (controlType === this._data.filmControlsTypesId.watched) {
+        newData.userRating = this._data.getCurrentUserRating(this._id);
+      }
+    });
+
 
     const filmCardMapper = this._createMapper(newData);
-    const formContainer = document.getElementById(`form-film-card-controls-${filmCardId}`);
+    const formContainer = document.getElementById(`form-film-card-controls-${this._id}`);
     const childs = formContainer.children;
     for (const buttonItem of childs) {
       const isActive =
@@ -276,6 +256,29 @@ class FilmCard extends AbstractComponent {
         newData.controlsTypes.push(value);
       }
     };
+  }
+
+  /**
+   * Call the fuction for open details about film.
+   * @param {event} evt
+   */
+  _onOpenDetails(evt) {
+    if ((evt.keyCode === KEYS.ENTER || evt.type === `click`)
+      && (typeof this._onOpen === `function`)) {
+      this._onOpen();
+    }
+  }
+
+  /**
+   * Call the fuction for send form.
+   * @param {event} evt
+   */
+  _onSendForm(evt) {
+    if (evt.keyCode === KEYS.ENTER || evt.type === `click`) {
+      evt.preventDefault();
+      const newData = this._processForm(evt.target);
+      this._onDataChange(newData, this, evt);
+    }
   }
 }
 

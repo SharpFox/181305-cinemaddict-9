@@ -60,11 +60,15 @@ class PageController {
     if (!filmsCards.length) {
       return;
     }
-    const filmsListComponent = new FilmList(this._data.filmLists[filmCategory]);
+    const filmsListComponent =
+      new FilmList(this._data.filmLists[filmCategory]);
     this._filmsListsComponents.push(filmsListComponent);
     addElementDOM(this._filmsContainer, filmsListComponent);
     const filmsListContainer =
       this._getFilmsListContainer(filmsListComponent.element);
+    if (filmsListContainer === null) {
+      return;
+    }
     const needButton = filmsCards !== undefined ? true : false;
     this._addFilmsCards(filmsCards, filmsListContainer,
         this._getFilmsListFilmsContainer(filmsListContainer));
@@ -79,9 +83,14 @@ class PageController {
   sortFilmsCards(currentSortType) {
     const filmCategory = this._data.filmsCategoriesId.AllMoviesUpcoming;
     const filmsListContainer = document.getElementById(filmCategory);
-    const filmsListFilmsContainer = this._getFilmsListFilmsContainer(filmsListContainer);
+    if (filmsListContainer === null) {
+      return;
+    }
+    const filmsListFilmsContainer =
+      this._getFilmsListFilmsContainer(filmsListContainer);
     const currentCountFilmsCards = filmsListFilmsContainer.children.length;
-    const filmsCardsForSort = this._getFilmsCardsForSort(currentCountFilmsCards);
+    const filmsCardsForSort =
+      this._getFilmsCardsForSort(currentCountFilmsCards);
 
     removeContainerChildren(filmsListFilmsContainer);
     this._chooseSortFilmsCards(filmsCardsForSort, currentSortType);
@@ -262,9 +271,10 @@ class PageController {
    */
   _addFilmCard(filmsListContainer, filmsListFilmsContainer,
       filmCard) {
-    const movieController = new MovieController(this._data, filmCard, filmsListContainer,
-        filmsListFilmsContainer, this._filmDetailsContainer,
-        this._onDataChange, this._onCommentsLoad);
+    const movieController =
+      new MovieController(this._data, filmCard, filmsListContainer,
+          filmsListFilmsContainer, this._filmDetailsContainer,
+          this._onDataChange, this._onCommentsLoad);
     movieController.init();
     this._movieControllers.push(movieController);
   }
@@ -275,7 +285,8 @@ class PageController {
     * @return {HTMLElement}
     */
   _getFilmsListContainer(filmsListElement) {
-    return document.getElementById(filmsListElement.firstElementChild.dataset.id);
+    return document.getElementById(
+        filmsListElement.firstElementChild.dataset.id);
   }
 
   /**
@@ -295,7 +306,8 @@ class PageController {
    */
   _createButtonForFilmsList(filmsListElement, filmsListContainer, needButton) {
     if ((filmsListElement.firstElementChild.dataset.isbutton)
-      && this._data.totalDownloadedFilmsCards < this._data.filmsCardsCurrent.length
+      && this._data.totalDownloadedFilmsCards <
+        this._data.filmsCardsCurrent.length
       && needButton) {
       this._createButtonShowMore(filmsListContainer);
     }
@@ -312,7 +324,8 @@ class PageController {
     buttonShowMoreComponent.onOpen = () => {
       this._data.setNumberDownloadedFilmsCards();
       this._addMoreCards();
-      if (this._totalFilmPortionNumber === this._data.getMaxFilmPortionNumber()) {
+      if (this._totalFilmPortionNumber ===
+          this._data.getMaxFilmPortionNumber()) {
         document.querySelector(`.films-list__show-more`).remove();
         buttonShowMoreComponent.unrender();
       }
@@ -326,10 +339,13 @@ class PageController {
     const filmsCardsPortion = this._getFilmsCards();
     this._totalFilmPortionNumber += 1;
     filmsCardsPortion.forEach((filmCardPortion) => {
-      const filmsListContainer = document.getElementById(this._data.filmsCategoriesId.AllMoviesUpcoming);
+      const filmsListContainer =
+        document.getElementById(
+            this._data.filmsCategoriesId.AllMoviesUpcoming);
       const filmsListFilmsContainer =
         filmsListContainer.querySelector(`.films-list__container`);
-      this._addFilmCard(filmsListContainer, filmsListFilmsContainer, filmCardPortion);
+      this._addFilmCard(filmsListContainer, filmsListFilmsContainer,
+          filmCardPortion);
     });
   }
 }

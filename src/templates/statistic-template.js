@@ -4,10 +4,10 @@
  * @param {number} statisticParams
  * @return {string}
  */
-const getStatList = (data, {totalWatchedFilms, totalDuration,
-  topGenre}) => {
+const getStatList = (data, {totalWatchedFilms, totalDuration, topGenre}) => {
   const statisticList =
   data.getStatisticList(totalWatchedFilms, totalDuration, topGenre);
+
   return `${statisticList.map(({title, texts}) => (`
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">
@@ -29,6 +29,7 @@ const getStatList = (data, {totalWatchedFilms, totalDuration,
  */
 const getStatFilters = (data, filter) => {
   const statisticFilters = data.getStatisticFilters(filter);
+
   return `${statisticFilters.map(({id, isChecked, title}) => (`<input
       type="radio"
       class="statistic__filters-input visually-hidden"

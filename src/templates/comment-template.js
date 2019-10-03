@@ -26,7 +26,7 @@ const getCommentTemplate = ({_data, _type, _text, _author, _date}) => {
           ${moment(_date).fromNow()}
         </span>
         <button class="film-details__comment-delete"
-          tabindex="4">
+          tabindex="4" name="">
           Delete
         </button>
       </p>

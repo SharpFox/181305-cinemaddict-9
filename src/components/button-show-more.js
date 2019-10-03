@@ -30,7 +30,7 @@ class ButtonShowMore extends AbstractComponent {
   }
 
   /**
-   * Save the function.
+   * Save the function for showing cards of film.
    * @param {function} fn
    */
   set onOpen(fn) {

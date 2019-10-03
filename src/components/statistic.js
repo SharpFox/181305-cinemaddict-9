@@ -30,7 +30,6 @@ class Statistic extends AbstractComponent {
     this._statisticParams = this._getStatisticParams(filter);
     this._onUpdateStatistic = onUpdateStatistic;
     this._filter = filter;
-    this._barHeight = BAR_HEIGHT;
     this._statisticContainer = statisticContainer;
 
     this._filterStatistic = null;
@@ -59,12 +58,12 @@ class Statistic extends AbstractComponent {
    */
   renderChart() {
     const boundaryUserDate = this._getBoundaryUserDate(this._filter);
-    let uniqueGenres = Object.entries(this._data.getUniqueGenres(boundaryUserDate));
+    let uniqueGenres =
+      Object.entries(this._data.getUniqueGenres(boundaryUserDate));
     const statisticChartContainer =
       this._statisticContainer
       .querySelector(`.statistic__chart`);
-    statisticChartContainer.height =
-      this._barHeight * uniqueGenres.length;
+    statisticChartContainer.height = BAR_HEIGHT * uniqueGenres.length;
     uniqueGenres = uniqueGenres.sort(([, b], [, d]) => d - b);
     const mainData = {
       genres: uniqueGenres.map((genre) => `${genre[0]}  ${genre[1]} `),
@@ -124,16 +123,6 @@ class Statistic extends AbstractComponent {
     if (formContainer !== null) {
       formContainer.removeEventListener(`change`, this._onFilterStatistic);
       formContainer.removeEventListener(`keydown`, this._onFilterStatistic);
-    }
-  }
-
-  /**
-   * Call the function for selecting films.
-   * @param {event} evt
-   */
-  _onFilterStatistic(evt) {
-    if (evt.keyCode === KEYS.ENTER || evt.type === `change`) {
-      this._onUpdateStatistic(this._getNewFilterForm());
     }
   }
 
@@ -238,7 +227,8 @@ class Statistic extends AbstractComponent {
    * @return {object}
    */
   _getNewFilterForm() {
-    const formData = new FormData(document.querySelector(`.statistic__filters`));
+    const formData =
+      new FormData(document.querySelector(`.statistic__filters`));
     return this._processForm(formData);
   }
 
@@ -273,6 +263,16 @@ class Statistic extends AbstractComponent {
         newFilter.type = value;
       }
     };
+  }
+
+  /**
+   * Call the function for selecting films.
+   * @param {event} evt
+   */
+  _onFilterStatistic(evt) {
+    if (evt.keyCode === KEYS.ENTER || evt.type === `change`) {
+      this._onUpdateStatistic(this._getNewFilterForm());
+    }
   }
 }
 

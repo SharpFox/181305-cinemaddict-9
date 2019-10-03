@@ -34,35 +34,19 @@ class API {
 
   /**
    * Return result of putting film by server.
-   * @param {object} data
+   * @param {object} clientData
    * @param {number} filmId
    * @return {object}
    */
-  updateFilm(data, filmId) {
+  updateFilm(clientData, filmId) {
     return this._load({
       url: `movies/${filmId}`,
       method: METHODS.PUT,
-      body: JSON.stringify(data),
+      body: JSON.stringify(clientData),
       headers: new Headers({'Content-Type': `application/json`})
     })
       .then(toJSON)
       .then((filmCard) => ModelFilm.parseFilm(this._data, filmCard));
-  }
-
-  /**
-   * Return result of posting film by server.
-   * @param {object} data
-   * @return {object}
-   */
-  syncFilm(data) {
-    return this._load({
-      url: `movies/sync`,
-      method: METHODS.POST,
-      body: JSON.stringify(data),
-      headers: new Headers({'Content-Type': `application/json`})
-    })
-      .then(toJSON)
-      .then((filmsCards) => ModelFilm.parseFilms(this._data, filmsCards));
   }
 
   /**
@@ -73,24 +57,26 @@ class API {
   getComments(filmId) {
     return this._load({url: `comments/${filmId}`})
       .then(toJSON)
-      .then((filmsCards) => ModelComment.parseComments(this._data, filmsCards));
+      .then((filmsCards) =>
+        ModelComment.parseComments(this._data, filmsCards));
   }
 
   /**
    * Return result of posting comment by server.
-   * @param {object} data
+   * @param {object} clientData
    * @param {number} filmId
    * @return {object}
    */
-  postComment(data, filmId) {
+  postComment(clientData, filmId) {
     return this._load({
       url: `comments/${filmId}`,
       method: METHODS.POST,
-      body: JSON.stringify(data),
+      body: JSON.stringify(clientData),
       headers: new Headers({'Content-Type': `application/json`})
     })
       .then(toJSON)
-      .then((serverData) => ModelComment.parseComments(this._data, serverData));
+      .then((serverData) =>
+        ModelComment.parseComments(this._data, serverData));
   }
 
   /**

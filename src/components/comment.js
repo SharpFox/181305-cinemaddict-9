@@ -1,7 +1,8 @@
 import AbstractComponent from './abstract-component.js';
 import FilmDetails from './film-details.js';
 import {
-  KEYS
+  KEYS,
+  shake
 } from '../utils.js';
 import {
   getCommentTemplate
@@ -43,22 +44,30 @@ class Comment extends AbstractComponent {
 
   /**
    * Block container for deleting from server.
+   * @param {HTMLElement} currentContainer
    */
-  blockDeleting() {
-    const commentDeleteContainer =
-      document.querySelector(`.film-details__comment-delete`);
-    commentDeleteContainer.disabled = true;
-    commentDeleteContainer.value = `Deleting...`;
+  blockDeleting(currentContainer) {
+    currentContainer.disabled = true;
+    currentContainer.innerText = `Deleting...`;
   }
 
   /**
    * Unblock container for deleting from server.
+   * @param {HTMLElement} currentContainer
    */
-  unblockDeleting() {
-    const commentDeleteContainer =
-      document.querySelector(`.film-details__comment-delete`);
-    commentDeleteContainer.disabled = false;
-    commentDeleteContainer.value = `Delete`;
+  unblockDeleting(currentContainer) {
+    if (currentContainer !== null) {
+      currentContainer.disabled = false;
+      currentContainer.innerText = `Delete`;
+    }
+  }
+
+  /**
+   * Draw animation for error from server.
+   * @param {HTMLElement} currentContainer
+   */
+  shake(currentContainer) {
+    shake(currentContainer);
   }
 
   /**
@@ -126,9 +135,8 @@ class Comment extends AbstractComponent {
   _onDeleteComment(evt) {
     if (evt.keyCode === KEYS.ENTER || evt.type === `click`) {
       evt.preventDefault();
-      this._onDataChange(
-          FilmDetails.
-          getNewComment(this._id, this._filmId));
+      const newData = FilmDetails.getNewComment(this._id, this._filmId);
+      this._onDataChange(newData, this, evt);
     }
   }
 }

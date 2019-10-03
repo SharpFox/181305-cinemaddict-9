@@ -29,17 +29,6 @@ class StatisticController {
   }
 
   /**
-   * Add statistic to DOM and fill handlers.
-   * @param {string} filter
-   */
-  _addStatistic(filter) {
-    this._statisticComponent = new Statistic(this._data, this._statisticContainer,
-        filter, this.onUpdateStatistic);
-    addElementDOM(this._statisticContainer, this._statisticComponent);
-    this._statisticComponent.renderChart();
-  }
-
-  /**
    * Filter statistic.
    * @param {string} newFilter
    */
@@ -47,6 +36,27 @@ class StatisticController {
     removeContainerChildren(this._statisticContainer);
     this._statisticComponent.unrender();
     this._addStatistic(newFilter);
+  }
+
+  /**
+   * Update data of statistic.
+   */
+  rerender() {
+    this._statisticComponent.unrender();
+    removeContainerChildren(this._statisticContainer);
+    this.init();
+  }
+
+  /**
+   * Add statistic to DOM and fill handlers.
+   * @param {string} filter
+   */
+  _addStatistic(filter) {
+    this._statisticComponent =
+      new Statistic(this._data, this._statisticContainer,
+          filter, this.onUpdateStatistic);
+    addElementDOM(this._statisticContainer, this._statisticComponent);
+    this._statisticComponent.renderChart();
   }
 }
 

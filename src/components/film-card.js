@@ -1,10 +1,16 @@
 import AbstractComponent from './abstract-component.js';
+import FilmDetails from './film-details.js';
 import {
-  KEYS
+  KEYS,
+  addErrorBorder,
+  deleteErrorBorder,
+  blockContainer,
+  unblockContainer,
+  shake
 } from '../utils.js';
 import {
   getFilmCardTemplate
-} from './film-card-template.js';
+} from '../templates/film-card-template.js';
 
 /**
  * Class representaing film card.
@@ -52,6 +58,46 @@ class FilmCard extends AbstractComponent {
    */
   set onOpen(fn) {
     this._onOpen = fn;
+  }
+
+  /**
+   * Add error color for border of form.
+   * @param {HTMLElement} currentContainer
+   */
+  addErrorBorder(currentContainer) {
+    addErrorBorder(currentContainer);
+  }
+
+  /**
+   * Delete error color for border of form.
+   * @param {HTMLElement} currentContainer
+   */
+  deleteErrorBorder(currentContainer) {
+    deleteErrorBorder(currentContainer);
+  }
+
+  /**
+   * Draw animation for error from server.
+   * @param {HTMLElement} currentContainer
+   */
+  shake(currentContainer) {
+    shake(currentContainer);
+  }
+
+  /**
+   * Block form for posting to server.
+   * @param {HTMLElement} currentContainer
+   */
+  blockContainer(currentContainer) {
+    blockContainer(currentContainer);
+  }
+
+  /**
+   * Unblock form for posting to server.
+   * @param {HTMLElement} currentContainer
+   */
+  unblockContainer(currentContainer) {
+    unblockContainer(currentContainer);
   }
 
   /**
@@ -157,41 +203,24 @@ class FilmCard extends AbstractComponent {
   }
 
   /**
-   * Call the fuction for open details about film.
-   * @param {event} evt
-   */
-  _onOpenDetails(evt) {
-    if ((evt.keyCode === KEYS.ENTER || evt.type === `click`)
-      && (typeof this._onOpen === `function`)) {
-      this._onOpen();
-    }
-  }
-
-  /**
-   * Call the fuction for send form.
-   * @param {event} evt
-   */
-  _onSendForm(evt) {
-    if (evt.keyCode === KEYS.ENTER || evt.type === `click`) {
-      this._onDataChange(this._processForm(evt.target, this._id));
-    }
-  }
-
-  /**
    * Return new data object.
    * @param {event} target
-   * @param {number} filmCardId
    * @return {object}
    */
-  _processForm(target, filmCardId) {
-    const newData = {
-      isSendingForm: true,
-      id: filmCardId,
-      controlsTypes: []
-    };
+  _processForm(target) {
+    const newData = FilmDetails.getEmptyNewData();
+    newData.isSendingForm = true;
+    newData.id = this._id;
+
+    newData.controlsTypes.forEach((controlType) => {
+      if (controlType === this._data.filmControlsTypesId.watched) {
+        newData.userRating = this._data.getCurrentUserRating(this._id);
+      }
+    });
+
 
     const filmCardMapper = this._createMapper(newData);
-    const formContainer = document.getElementById(`form-film-card-controls-${filmCardId}`);
+    const formContainer = document.getElementById(`form-film-card-controls-${this._id}`);
     const childs = formContainer.children;
     for (const buttonItem of childs) {
       const isActive =
@@ -227,6 +256,29 @@ class FilmCard extends AbstractComponent {
         newData.controlsTypes.push(value);
       }
     };
+  }
+
+  /**
+   * Call the fuction for open details about film.
+   * @param {event} evt
+   */
+  _onOpenDetails(evt) {
+    if ((evt.keyCode === KEYS.ENTER || evt.type === `click`)
+      && (typeof this._onOpen === `function`)) {
+      this._onOpen();
+    }
+  }
+
+  /**
+   * Call the fuction for send form.
+   * @param {event} evt
+   */
+  _onSendForm(evt) {
+    if (evt.keyCode === KEYS.ENTER || evt.type === `click`) {
+      evt.preventDefault();
+      const newData = this._processForm(evt.target);
+      this._onDataChange(newData, this, evt);
+    }
   }
 }
 

@@ -17,8 +17,8 @@ class MainNavigationController {
    * @param {HTMLElement} sortContainer
    * @param {HTMLElement} statisticContainer
    */
-  constructor(data, pageController, mainNavigationContainer, filmsContainer, sortContainer,
-      statisticContainer) {
+  constructor(data, pageController, mainNavigationContainer, filmsContainer,
+      sortContainer, statisticContainer) {
     this._data = data;
     this._pageController = pageController;
     this._mainNavigationContainer = mainNavigationContainer;
@@ -45,7 +45,8 @@ class MainNavigationController {
     let currentType = null;
     for (const itemContainer of mainNavigationItems) {
       if ((itemContainer.dataset.id !== this._data.menuTypesId.stats)
-        && (itemContainer.classList.contains(`main-navigation__item--active`))) {
+        && (itemContainer.classList
+          .contains(`main-navigation__item--active`))) {
         currentType = itemContainer.dataset.id;
         break;
       }
@@ -72,7 +73,8 @@ class MainNavigationController {
    * Rerender all films lists.
    */
   _rerenderFilmsLists() {
-    this._data.changefilmsCardsPortionCount(this._data.totalDownloadedFilmsCards);
+    this._data.changefilmsCardsPortionCount(
+        this._data.totalDownloadedFilmsCards);
     removeContainerChildren(this._filmsContainer);
     removeContainerChildren(this._sortContainer);
     this._pageController.unrenderFilmsListsComponents();
@@ -97,8 +99,10 @@ class MainNavigationController {
       const sortButtonActiveContainer =
         document.querySelector(`.sort__button--active`);
       this.selectFilms();
-      this._pageController
-        .sortFilmsCards(sortButtonActiveContainer.dataset.sorttype);
+      if (sortButtonActiveContainer !== null) {
+        this._pageController
+          .sortFilmsCards(sortButtonActiveContainer.dataset.sorttype);
+      }
       this._filmsContainer.classList.remove(`visually-hidden`);
       this._sortContainer.classList.remove(`visually-hidden`);
       this._statisticContainer.classList.add(`visually-hidden`);
@@ -137,7 +141,8 @@ class MainNavigationController {
       mainNavigationItems.forEach((itemContainer) => {
         itemContainer.classList.remove(`main-navigation__item--active`);
       });
-      mainNavigationItemContainer.classList.add(`main-navigation__item--active`);
+      mainNavigationItemContainer.classList
+        .add(`main-navigation__item--active`);
     }
   }
 }

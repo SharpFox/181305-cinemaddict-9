@@ -5,7 +5,7 @@ import {
 } from '../utils.js';
 import {
   getButtonShowMoreTemplate
-} from './button-show-more-template.js';
+} from '../templates/button-show-more-template.js';
 
 /**
  * Class representaing button "Show more".
@@ -30,7 +30,7 @@ class ButtonShowMore extends AbstractComponent {
   }
 
   /**
-   * Save the function.
+   * Save the function for showing cards of film.
    * @param {function} fn
    */
   set onOpen(fn) {

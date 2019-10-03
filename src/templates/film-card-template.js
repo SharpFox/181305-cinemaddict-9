@@ -29,8 +29,8 @@ const getFilmCardDescription = (description) => {
  * @param {object} filmCard
  * @return {string}
  */
-const getFilmCardTemplate = ({_data, _id, _title, _rating, _year, _duration, _genres, _img,
-  _description, _comments, _controlsTypes}) => {
+const getFilmCardTemplate = ({_data, _id, _title, _rating, _year, _duration,
+  _genres, _img, _description, _comments, _controlsTypes}) => {
   return `
     <article class="film-card">
       <h3 class="film-card__title">
@@ -40,11 +40,15 @@ const getFilmCardTemplate = ({_data, _id, _title, _rating, _year, _duration, _ge
         ${_rating}
       </p>
       <p class="film-card__info">
-        <span class="film-card__year">${moment(_year).format(`YYYY`)}</span>
+        <span class="film-card__year">
+          ${moment(_year).format(`YYYY`)}
+        </span>
         <span class="film-card__duration">
           ${getDuration(_duration)}
         </span>
-        ${_genres.length ? `<span class="film-card__genre">${_genres[0]}</span>` : ``}
+        ${_genres.length ? `<span class="film-card__genre">
+          ${_genres[0]}
+        </span>` : ``}
       </p>
       <img src="${_img}"
         alt="" class="film-card__poster"
@@ -64,7 +68,8 @@ const getFilmCardTemplate = ({_data, _id, _title, _rating, _year, _duration, _ge
           class="film-card__controls-item button
           film-card__controls-item--${_data.filmCardControlsTypes[type]}
           ${_controlsTypes.map((currentType) => (`
-            ${currentType === type ? ` film-card__controls-item--active` : ``}`).trim())
+            ${currentType ===
+              type ? ` film-card__controls-item--active` : ``}`).trim())
             .join(``)}">
           ${_data.filmCardControlsTypes[type]}
         </button>`).trim()).join(``)}

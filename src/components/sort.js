@@ -5,7 +5,7 @@ import {
 } from '../utils.js';
 import {
   getSortTemplate
-} from './sort-template.js';
+} from '../templates/sort-template.js';
 
 /**
  * Class representaing sort.

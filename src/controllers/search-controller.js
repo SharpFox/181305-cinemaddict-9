@@ -19,8 +19,9 @@ class SearchController {
    * @param {HTMLElement} statisticContainer
    * @param {HTMLElement} searchResultContainer
    */
-  constructor(data, pageController, mainNavigationController, mainNavigationContainer,
-      filmsContainer, sortContainer, statisticContainer) {
+  constructor(data, pageController, mainNavigationController,
+      mainNavigationContainer, filmsContainer, sortContainer,
+      statisticContainer) {
     this._data = data;
     this._pageController = pageController;
     this._mainNavigationController = mainNavigationController;
@@ -38,6 +39,15 @@ class SearchController {
    */
   init() {
     this._addSearch();
+  }
+
+  /**
+   * Update data of statistic.
+   */
+  rerender() {
+    this._searchComponent.unrender();
+    removeContainerChildren(this._searchContainer);
+    this.init();
   }
 
   /**
@@ -65,7 +75,8 @@ class SearchController {
         this._addNoResultElement();
         return;
       }
-      this._pageController.addFilmsList(this._data.filmsCategoriesId.AllMoviesUpcoming);
+      this._pageController.addFilmsList(
+          this._data.filmsCategoriesId.AllMoviesUpcoming);
     };
 
     /**
@@ -143,7 +154,6 @@ class SearchController {
     this._filmsContainer
       .appendChild(noResultElement.firstElementChild);
   }
-
 }
 
 export default SearchController;

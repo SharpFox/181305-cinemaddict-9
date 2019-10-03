@@ -29,6 +29,7 @@ class Data {
     this._filmsCategoriesId = this._getFilmsCategoriesId();
     this._filmsCardsMain = [];
     this._filmsCardsCurrent = [];
+    this._filmCardCommentsCurrent = [];
     this._totalDownloadedFilmsCards = FILMS_CARDS_STEP;
     this._startCountfilmsCardsPortion = 0;
     this._stepFilmsCardsPortion = FILMS_CARDS_STEP;
@@ -155,6 +156,13 @@ class Data {
    */
   get statisticFiltersId() {
     return this._statisticFiltersId;
+  }
+
+  /**
+   * Return filmCardCommentsCurrent.
+   */
+  get filmCardCommentsCurrent() {
+    return this._filmCardCommentsCurrent;
   }
 
   /**
@@ -296,7 +304,8 @@ class Data {
    */
   getExtraFilmsTopRated() {
     let filmsCards =
-      cloneDeep(this._filmsCardsCurrent).sort(this.getSortFunctionForFilmByRating);
+      cloneDeep(this._filmsCardsCurrent)
+      .sort(this.getSortFunctionForFilmByRating);
     return this._getExtraFilms(filmsCards, `rating`);
   }
 
@@ -306,7 +315,8 @@ class Data {
    */
   getExtraFilmsMostCommented() {
     let filmsCards =
-      cloneDeep(this._filmsCardsCurrent).sort(this.getSortFunctionForFilmByComments);
+      cloneDeep(this._filmsCardsCurrent)
+      .sort(this.getSortFunctionForFilmByComments);
     return this._getExtraFilms(filmsCards, `comments`);
   }
 
@@ -328,8 +338,9 @@ class Data {
      * @return {array}
      */
     return () => {
-      const filmCardsPortion = this._filmsCardsCurrent.slice(this._startCountfilmsCardsPortion,
-          this._startCountfilmsCardsPortion + this._stepFilmsCardsPortion);
+      const filmCardsPortion =
+        this._filmsCardsCurrent.slice(this._startCountfilmsCardsPortion,
+            this._startCountfilmsCardsPortion + this._stepFilmsCardsPortion);
 
       this._startCountfilmsCardsPortion += this._stepFilmsCardsPortion;
       this._stepFilmsCardsPortion = FILMS_CARDS_STEP;
@@ -455,21 +466,27 @@ class Data {
         'title': `Watchlist`,
         'id': this._menuTypesId.watchlist,
         'isActive': false,
-        'filmsCount': this._getFilmsAmountByCategories(this._filmControlsTypesId.watchlist),
+        'filmsCount':
+          this._getFilmsAmountByCategories(
+              this._filmControlsTypesId.watchlist),
         'modifiers': []
       },
       {
         'title': `History`,
         'id': this._menuTypesId.history,
         'isActive': false,
-        'filmsCount': this._getFilmsAmountByCategories(this._filmControlsTypesId.watched),
+        'filmsCount':
+          this._getFilmsAmountByCategories(
+              this._filmControlsTypesId.watched),
         'modifiers': []
       },
       {
         'title': `Favorites`,
         'id': this._menuTypesId.favorites,
         'isActive': false,
-        'filmsCount': this._getFilmsAmountByCategories(this._filmControlsTypesId.favorite),
+        'filmsCount':
+          this._getFilmsAmountByCategories(
+              this._filmControlsTypesId.favorite),
         'modifiers': []
       },
       {
@@ -495,31 +512,36 @@ class Data {
         id: this._statisticFiltersId.allTime,
         title: `All time`,
         isChecked:
-          isCheckedCategory === this._statisticFiltersId.allTime ? true : false
+          isCheckedCategory ===
+            this._statisticFiltersId.allTime ? true : false
       },
       {
         id: this._statisticFiltersId.today,
         title: `Today`,
         isChecked:
-          isCheckedCategory === this._statisticFiltersId.today ? true : false
+          isCheckedCategory ===
+            this._statisticFiltersId.today ? true : false
       },
       {
         id: this._statisticFiltersId.week,
         title: `Week`,
         isChecked:
-          isCheckedCategory === this._statisticFiltersId.week ? true : false
+          isCheckedCategory ===
+            this._statisticFiltersId.week ? true : false
       },
       {
         id: this._statisticFiltersId.month,
         title: `Month`,
         isChecked:
-          isCheckedCategory === this._statisticFiltersId.month ? true : false
+          isCheckedCategory ===
+            this._statisticFiltersId.month ? true : false
       },
       {
         id: this._statisticFiltersId.year,
         title: `Year`,
         isChecked:
-          isCheckedCategory === this._statisticFiltersId.year ? true : false
+          isCheckedCategory ===
+            this._statisticFiltersId.year ? true : false
       }
     ];
   }
@@ -605,6 +627,88 @@ class Data {
   updateFilmCardsCurrent() {
     this.clearFilmCardsCurrent();
     this.fillFilmsCardsCurrent();
+  }
+
+  /**
+   * Update filmsCardsMain.
+   * @param {object} modifedFilmCard
+   */
+  updateFilmsCardsMain(modifedFilmCard) {
+    const lengthFilmsCardsMain = this._filmsCardsMain.length;
+    for (let i = 0; i < lengthFilmsCardsMain; i++) {
+      if (this._filmsCardsMain[i].id === modifedFilmCard.id) {
+        this._filmsCardsMain[i] = modifedFilmCard;
+        break;
+      }
+    }
+  }
+
+  /**
+   * Fill filmCardCommentsCurrent current loading comments.
+   * @param {array} comments
+   */
+  fillFilmCardCommentsCurrent(comments) {
+    if (!this._filmCardCommentsCurrent.length) {
+      this._filmCardCommentsCurrent = comments;
+    }
+  }
+
+  /**
+   * Clear filmCardCommentsCurrent.
+   */
+  clearFilmCardCommentsCurrent() {
+    this._filmCardCommentsCurrent = [];
+  }
+
+  /**
+   * Return current user rating.
+   * @param {number} filmCardId
+   * @return {number}
+   */
+  getCurrentUserRating(filmCardId) {
+    let currentUserRating = 0;
+    for (let filmCard of this._filmsCardsCurrent) {
+      if (filmCard.id === filmCardId) {
+        currentUserRating = filmCard.userRating;
+        break;
+      }
+    }
+
+    return currentUserRating;
+  }
+
+  /**
+   * Delete comment from filmsCardsMain.
+   * @param {number} commentId
+   * @param {number} filmCardId
+   */
+  deleteCommentByFilmsCardsMain(commentId, filmCardId) {
+    for (let filmCard of this._filmsCardsMain) {
+      if (filmCard.id === filmCardId) {
+        filmCard.comments =
+          filmCard.comments.filter((id) => {
+            return Number(id) !== commentId;
+          });
+        break;
+      }
+    }
+  }
+
+  /**
+   * Return controls types.
+   * @param {number} filmCardId
+   * @return {array}
+   */
+  getControlTypesFromFilmsCardsCurrent(filmCardId) {
+    let controlsTypes = [];
+    for (let filmCard of this._filmsCardsCurrent) {
+      if (filmCard.id === filmCardId) {
+        controlsTypes = filmCard.controlsTypes;
+        break;
+      }
+    }
+
+    return controlsTypes;
   }
 
   /**
@@ -826,7 +930,8 @@ class Data {
     const maxNumberFilms = 2;
     filmsCards = filmsCards.slice(0, maxNumberFilms);
 
-    return this._checkFilmsCardsByZero(filmsCards, filmCardKey, maxNumberFilms);
+    return this._checkFilmsCardsByZero(
+        filmsCards, filmCardKey, maxNumberFilms);
   }
 
   /**
@@ -836,7 +941,8 @@ class Data {
    * @return {boolean}
    */
   _filmsCardsHaveSameValues(filmsCards, filmCardKey) {
-    let maxNumber = this._getValueOfFieldForFilmCard(filmsCards[0], filmCardKey);
+    let maxNumber =
+      this._getValueOfFieldForFilmCard(filmsCards[0], filmCardKey);
     const filmsCardsFilter = filmsCards.filter((filmCard) =>
       maxNumber === this._getValueOfFieldForFilmCard(filmCard, filmCardKey));
 
@@ -938,7 +1044,6 @@ class Data {
 
     return Math.ceil(duration / MINUTE_MS);
   }
-
 }
 
 export default Data;

@@ -1,29 +1,34 @@
 import AbstractComponent from './abstract-component.js';
 import FilmDetails from './film-details.js';
 import {
-  KEYS
+  KEYS,
+  shake
 } from '../utils.js';
 import {
-  getCommentsTemplate
-} from './comments-template.js';
+  getCommentTemplate
+} from '../templates/comment-template.js';
 
 /**
- * Class representaing comments component.
+ * Class representaing comment component.
  * @extends AbstractComponent
  */
-class Comments extends AbstractComponent {
+class Comment extends AbstractComponent {
   /**
-   * Create comments component.
+   * Create comment component.
    * @param {object} data
-   * @param {array} comments
+   * @param {array} comment
    * @param {number} filmId
    * @param {function} onDataChange
    */
-  constructor(data, comments, filmId, onDataChange) {
+  constructor(data, comment, filmId, onDataChange) {
     super();
     this._data = data;
-    this._comments = comments;
     this._filmId = filmId;
+    this._id = comment.id;
+    this._type = comment.type;
+    this._text = comment.text;
+    this._date = comment.date;
+    this._author = comment.author;
 
     this._onDataChange = onDataChange;
     this._onDeleteComment = this._onDeleteComment.bind(this);
@@ -34,7 +39,35 @@ class Comments extends AbstractComponent {
    * @return {string}
    */
   get template() {
-    return getCommentsTemplate(this);
+    return getCommentTemplate(this);
+  }
+
+  /**
+   * Block container for deleting from server.
+   * @param {HTMLElement} currentContainer
+   */
+  blockDeleting(currentContainer) {
+    currentContainer.disabled = true;
+    currentContainer.innerText = `Deleting...`;
+  }
+
+  /**
+   * Unblock container for deleting from server.
+   * @param {HTMLElement} currentContainer
+   */
+  unblockDeleting(currentContainer) {
+    if (currentContainer !== null) {
+      currentContainer.disabled = false;
+      currentContainer.innerText = `Delete`;
+    }
+  }
+
+  /**
+   * Draw animation for error from server.
+   * @param {HTMLElement} currentContainer
+   */
+  shake(currentContainer) {
+    shake(currentContainer);
   }
 
   /**
@@ -102,11 +135,10 @@ class Comments extends AbstractComponent {
   _onDeleteComment(evt) {
     if (evt.keyCode === KEYS.ENTER || evt.type === `click`) {
       evt.preventDefault();
-      this._onDataChange(
-          FilmDetails.
-          getNewComment(Number(evt.target.dataset.id), this._filmId));
+      const newData = FilmDetails.getNewComment(this._id, this._filmId);
+      this._onDataChange(newData, this, evt);
     }
   }
 }
 
-export default Comments;
+export default Comment;

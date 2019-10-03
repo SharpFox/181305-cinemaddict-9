@@ -62,7 +62,8 @@ const getFilmRatingTemplate = (data, img, title, userRating) => {
                 ${Math.ceil(userRating) === scale ? `checked` : ``}
               >
               <label class="film-details__user-rating-label"
-                for="rating-${scale}">
+                for="rating-${scale}"
+                data-id="${scale}">
                 ${scale}
               </label>`).trim()).join(``)}       
           </div>
@@ -103,9 +104,9 @@ const getEmojiListTemplate = (data) => {
  * @param {object} filmDetails
  * @return {string}
  */
-const getFilmDetailsTemplate = ({_data, _img, _age, _title, _alternativeTitle, _rating,
-  _userRating, _director, _writers, _actors, _year, _duration, _country,
-  _genres, _description, _comments, _controlsTypes}) => {
+const getFilmDetailsTemplate = ({_data, _img, _age, _title, _alternativeTitle,
+  _rating, _userRating, _director, _writers, _actors, _year, _duration,
+  _country, _genres, _description, _controlsTypes}) => {
   return `
     <form class="film-details__inner"
       tabindex="1"
@@ -138,7 +139,9 @@ const getFilmDetailsTemplate = ({_data, _img, _age, _title, _alternativeTitle, _
               </div>
               <div class="film-details__rating">
                 <p class="film-details__total-rating">${_rating}</p>
-                <p class="film-details__user-rating">Your rate ${_userRating}</p>
+                <p class="film-details__user-rating">
+                  Your rate ${_userRating}
+                </p>
               </div>
             </div>
             <table class="film-details__table">
@@ -202,14 +205,17 @@ const getFilmDetailsTemplate = ({_data, _img, _age, _title, _alternativeTitle, _
           </div>
         </div>
         <section class="film-details__controls">
-          ${Object.keys(_data.filmDetailsControlsTypes).map((type) => (`<input type="checkbox"
+          ${Object.keys(_data.filmDetailsControlsTypes)
+              .map((type) => (`<input type="checkbox"
             class="film-details__control-input visually-hidden"
             tabindex="3"
             value="${type}"
             id="${type}"
             name="${type}"            
-            ${_controlsTypes.map((currentType) => (`${currentType === type ? `checked` : ``}`).trim())
-            .join(``)}
+            ${_controlsTypes
+                .map((currentType) => (
+                  `${currentType === type ? `checked` : ``}`).trim())
+                .join(``)}
           >
           <label for="${type}"
             class="film-details__control-label

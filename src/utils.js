@@ -1,8 +1,8 @@
 import moment from 'moment';
 
 const KEYS = {
-  'ESC': 27,
-  'ENTER': 13
+  ESC: 27,
+  ENTER: 13
 };
 
 const METHODS = {
@@ -13,12 +13,14 @@ const METHODS = {
 };
 
 const END_POINT = `https://htmlacademy-es-9.appspot.com/cinemaddict`;
-const DEFAULT_FILM_ID = -1;
+const DEFAULT_ID = -1;
 const MIN_SEARCH_LENGTH = 3;
 const BAR_HEIGHT = 55;
 const HOUR_MS = 3600000;
 const MINUTE_MS = 60000;
 const FILMS_CARDS_STEP = 5;
+const ANIMATION_TIMEOUT = 600;
+const AUTHORIZATION_VALUE_LENGTH = 15;
 
 /**
  * Add cloned of component element to DOM.
@@ -173,12 +175,13 @@ const toJSON = (response) => {
  */
 const getAuthorizationValue = () => {
   let result = ``;
-  const words = `0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM`;
-  const maxPosition = words.length - 1;
+  const symbols =
+    `0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM`;
+  const maxPosition = symbols.length - 1;
   let position = 0;
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < AUTHORIZATION_VALUE_LENGTH; i++) {
     position = Math.floor(Math.random() * maxPosition);
-    result += words.substring(position, position + 1);
+    result += symbols.substring(position, position + 1);
   }
 
   return `Basic ${result}`;
@@ -196,11 +199,76 @@ const doEscapeHTML = (HTMLString) => {
   return newElement.appendChild(newTextNode).parentNode.innerHTML;
 };
 
+
+/**
+ * Add error color for background of container.
+ * @param {HTMLElement} container
+ */
+const addErrorBackground = (container) => {
+  container.style.backgroundColor = `#ff0000`;
+};
+
+/**
+ * Delete error color for background of container.
+ * @param {HTMLElement} container
+ */
+const deleteErrorBackground = (container) => {
+  container.style.backgroundColor = ``;
+};
+
+/**
+ * Add error color for border of container.
+ * @param {HTMLElement} currentContainer
+ */
+const addErrorBorder = (currentContainer) => {
+  currentContainer.style.borderColor = `#ff0000`;
+  currentContainer.style.borderWidth = `1px`;
+  currentContainer.style.borderStyle = `solid`;
+};
+
+/**
+ * Delete error color for border of container.
+ * @param {HTMLElement} currentContainer
+ */
+const deleteErrorBorder = (currentContainer) => {
+  currentContainer.style.borderColor = ``;
+  currentContainer.style.borderWidth = `0px`;
+  currentContainer.style.borderStyle = ``;
+};
+
+/**
+ * Block container for posting to server.
+ * @param {HTMLElement} currentContainer
+ */
+const blockContainer = (currentContainer) => {
+  currentContainer.disabled = true;
+};
+
+/**
+ * Unblock container for posting to server.
+ * @param {HTMLElement} currentContainer
+ */
+const unblockContainer = (currentContainer) => {
+  currentContainer.disabled = false;
+};
+
+/**
+ * Draw animation for error from server.
+ * @param {string} currentContainer
+ */
+const shake = (currentContainer) => {
+  currentContainer.style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`;
+
+  setTimeout(() => {
+    currentContainer.style.animation = ``;
+  }, ANIMATION_TIMEOUT);
+};
+
 export {
   KEYS,
   METHODS,
   END_POINT,
-  DEFAULT_FILM_ID,
+  DEFAULT_ID,
   MIN_SEARCH_LENGTH,
   BAR_HEIGHT,
   HOUR_MS,
@@ -218,5 +286,12 @@ export {
   checkStatus,
   toJSON,
   getAuthorizationValue,
-  doEscapeHTML
+  doEscapeHTML,
+  addErrorBackground,
+  deleteErrorBackground,
+  addErrorBorder,
+  deleteErrorBorder,
+  blockContainer,
+  unblockContainer,
+  shake
 };

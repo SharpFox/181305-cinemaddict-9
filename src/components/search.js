@@ -6,7 +6,7 @@ import {
 } from '../utils.js';
 import {
   getSearchTemplate
-} from './search-template.js';
+} from '../templates/search-template.js';
 
 /**
  * Class representaing profile.
@@ -132,6 +132,31 @@ class Search extends AbstractComponent {
   }
 
   /**
+   * Return prepare line of seach.
+   * @param {event} evt
+   * @return {string}
+   */
+  _getSearchLine(evt) {
+    const searchLine = evt.target.value;
+    if (searchLine === undefined) {
+      return ``;
+    }
+    const regExpTemplate = /[.,\/#!$%\^&\*;:{}=\-_`~()]/g;
+
+    return doEscapeHTML(searchLine.trim().replace(regExpTemplate, ``));
+  }
+
+  /**
+   * Set form "Search" adter closing.
+   */
+  _setFormSearchAfterClosing() {
+    const formSearch = document.querySelector(`.header__search`);
+    formSearch.reset();
+    formSearch.querySelector(`.search__field`).blur();
+    formSearch.querySelector(`.search__submit`).focus();
+  }
+
+  /**
    * Call the function for searching of film.
    * @param {event} evt
    */
@@ -166,30 +191,6 @@ class Search extends AbstractComponent {
         this._setFormSearchAfterClosing();
       }
     }
-  }
-
-  /**
-   * Return prepare line of seach.
-   * @param {event} evt
-   * @return {string}
-   */
-  _getSearchLine(evt) {
-    const searchLine = evt.target.value;
-    if (searchLine === undefined) {
-      return ``;
-    }
-    const regExpTemplate = /[.,\/#!$%\^&\*;:{}=\-_`~()]/g;
-    return doEscapeHTML(searchLine.trim().replace(regExpTemplate, ``));
-  }
-
-  /**
-   * Set form "Search" adter closing.
-   */
-  _setFormSearchAfterClosing() {
-    const formSearch = document.querySelector(`.header__search`);
-    formSearch.reset();
-    formSearch.querySelector(`.search__field`).blur();
-    formSearch.querySelector(`.search__submit`).focus();
   }
 }
 

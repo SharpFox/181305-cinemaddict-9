@@ -1,6 +1,6 @@
 import moment from 'moment';
 import {
-  DEFAULT_FILM_ID
+  DEFAULT_ID
 } from '../utils.js';
 
 /**
@@ -24,15 +24,17 @@ class ModelFilm {
     this.director = serverDataPart.film_info.director;
     this.writers = serverDataPart.film_info.writers;
     this.actors = serverDataPart.film_info.actors;
-    this.year = moment(serverDataPart.film_info.release.date).toDate();
+    this.year = this._getDate(serverDataPart.film_info.release.date);
     this.country = serverDataPart.film_info.release.release_country;
     this.duration = Number(serverDataPart.film_info.runtime) * 60 * 1000;
     this.genres = serverDataPart.film_info.genre;
     this.description = serverDataPart.film_info.description;
     this.userRating = Number(serverDataPart.user_details.personal_rating);
-    this.userWatchingDate = moment(serverDataPart.user_details.watching_date).toDate();
+    this.userWatchingDate =
+      this._getDate(serverDataPart.user_details.watching_date);
     this.categoriesId = [data.filmControlsTypesId.watchlist];
-    this.controlsTypes = this._getFilmControlsTypes(serverDataPart.user_details);
+    this.controlsTypes =
+      this._getFilmControlsTypes(serverDataPart.user_details);
   }
 
   /**
@@ -61,14 +63,30 @@ class ModelFilm {
       },
       'user_details': {
         'personal_rating': this.userRating,
-        'watchlist': this._getFilmControlType(this._filmControlsTypesId.watchlist),
+        'watchlist':
+          this._getFilmControlType(this._filmControlsTypesId.watchlist),
         'already_watched':
           this._getFilmControlType(this._filmControlsTypesId.watched),
         'watching_date':
           moment(this.userWatchingDate).format(`YYYY-MM-DDTHH:mm:ss.SSSZ`),
-        'favorite': this._getFilmControlType(this._filmControlsTypesId.favorite),
+        'favorite':
+          this._getFilmControlType(this._filmControlsTypesId.favorite),
       }
     };
+  }
+
+  /**
+   * Return user watching date.
+   * @param {string | null} serverDate
+   * @return {date}
+   */
+  _getDate(serverDate) {
+    let clientDate = `0001-01-01T00:00:00.231+04:00`;
+    if (serverDate !== null) {
+      clientDate = serverDate;
+    }
+
+    return moment(clientDate).toDate();
   }
 
   /**
@@ -110,7 +128,7 @@ class ModelFilm {
    */
   static getTemplateData() {
     return {
-      'id': DEFAULT_FILM_ID,
+      'id': DEFAULT_ID,
       'comments': [],
       'film_info': {
         'title': ``,
@@ -122,7 +140,7 @@ class ModelFilm {
         'writers': [],
         'actors': [],
         'release': {
-          'date': null,
+          'date': `0001-01-01T00:00:00.231+04:00`,
           'release_country': ``
         },
         'runtime': 0,
@@ -133,20 +151,9 @@ class ModelFilm {
         'personal_rating': 0,
         'watchlist': false,
         'already_watched': false,
-        'watching_date': null,
+        'watching_date': `0001-01-01T00:00:00.231+04:00`,
         'favorite': false
       }
-    };
-  }
-
-  /**
-   * Get template for method of synchronization.
-   * @param {array} filmsCards
-   * @return {object}
-   */
-  static getTemplateDataAsync(filmsCards) {
-    return {
-      'updated': [filmsCards]
     };
   }
 

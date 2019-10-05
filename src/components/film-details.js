@@ -178,10 +178,12 @@ class FilmDetails extends AbstractComponent {
     const ratingContainer =
       document.querySelector(`.form-details__middle-container`);
     const watchedContainer = document.getElementById(`watched`);
-    if (!watchedContainer.checked) {
-      ratingContainer.classList.add(`visually-hidden`);
-    } else {
-      ratingContainer.classList.remove(`visually-hidden`);
+    if (watchedContainer !== null) {
+      if (!watchedContainer.checked) {
+        ratingContainer.classList.add(`visually-hidden`);
+      } else {
+        ratingContainer.classList.remove(`visually-hidden`);
+      }
     }
   }
 

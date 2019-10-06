@@ -94,6 +94,19 @@ class AbstractComponent {
 
     return fragment;
   }
+
+  /**
+   * Return element for binding events.
+   * @param {HTMLElement} element
+   * @return {element | null}
+   */
+  _getElementForBinding(element) {
+    if (element === null) {
+      element = this._element;
+    }
+
+    return element;
+  }
 }
 
 export default AbstractComponent;

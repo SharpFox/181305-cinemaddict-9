@@ -1,6 +1,7 @@
 import moment from 'moment';
 import {
-  DEFAULT_ID
+  DEFAULT_ID,
+  doEscapeHTML
 } from '../utils.js';
 
 /**
@@ -14,22 +15,30 @@ class ModelFilm {
    */
   constructor(data, serverDataPart) {
     this._filmControlsTypesId = data.filmControlsTypesId;
-    this.id = Number(serverDataPart.id);
-    this.comments = serverDataPart.comments;
-    this.title = serverDataPart.film_info.title;
-    this.alternativeTitle = serverDataPart.film_info.alternative_title;
-    this.rating = Number(serverDataPart.film_info.total_rating);
-    this.img = serverDataPart.film_info.poster;
-    this.age = Number(serverDataPart.film_info.age_rating);
-    this.director = serverDataPart.film_info.director;
-    this.writers = serverDataPart.film_info.writers;
-    this.actors = serverDataPart.film_info.actors;
-    this.year = this._getDate(serverDataPart.film_info.release.date);
-    this.country = serverDataPart.film_info.release.release_country;
-    this.duration = Number(serverDataPart.film_info.runtime) * 60 * 1000;
-    this.genres = serverDataPart.film_info.genre;
-    this.description = serverDataPart.film_info.description;
-    this.userRating = Number(serverDataPart.user_details.personal_rating);
+    this.id = Number(doEscapeHTML(serverDataPart.id));
+    this.comments = this._getEscapeHTMLValues(serverDataPart.comments);
+    this.title = doEscapeHTML(serverDataPart.film_info.title);
+    this.alternativeTitle =
+      doEscapeHTML(serverDataPart.film_info.alternative_title);
+    this.rating = Number(doEscapeHTML(serverDataPart.film_info.total_rating));
+    this.img = doEscapeHTML(serverDataPart.film_info.poster);
+    this.age = Number(doEscapeHTML(serverDataPart.film_info.age_rating));
+    this.director = doEscapeHTML(serverDataPart.film_info.director);
+    this.writers =
+      this._getEscapeHTMLValues(serverDataPart.film_info.writers);
+    this.actors =
+      this._getEscapeHTMLValues(serverDataPart.film_info.actors);
+    this.year =
+      this._getDate(doEscapeHTML(serverDataPart.film_info.release.date));
+    this.country =
+      doEscapeHTML(serverDataPart.film_info.release.release_country);
+    this.duration =
+      Number(doEscapeHTML(serverDataPart.film_info.runtime)) * 60 * 1000;
+    this.genres =
+      this._getEscapeHTMLValues(serverDataPart.film_info.genre);
+    this.description = doEscapeHTML(serverDataPart.film_info.description);
+    this.userRating =
+      Number(doEscapeHTML(serverDataPart.user_details.personal_rating));
     this.userWatchingDate =
       this._getDate(serverDataPart.user_details.watching_date);
     this.categoriesId = [data.filmControlsTypesId.watchlist];
@@ -76,6 +85,20 @@ class ModelFilm {
   }
 
   /**
+   * Return server data without HTML.
+   * @param {array} serverData
+   * @return {array}
+   */
+  _getEscapeHTMLValues(serverData) {
+    let escapeServerData = [];
+    serverData.forEach((serverDataElement) => {
+      escapeServerData.push(doEscapeHTML(serverDataElement));
+    });
+
+    return escapeServerData;
+  }
+
+  /**
    * Return user watching date.
    * @param {string | null} serverDate
    * @return {date}
@@ -84,6 +107,9 @@ class ModelFilm {
     let clientDate = `0001-01-01T00:00:00.231+04:00`;
     if (serverDate !== null) {
       clientDate = serverDate;
+    }
+    if (typeof clientDate === `number`) {
+      clientDate = Number(doEscapeHTML(clientDate));
     }
 
     return moment(clientDate).toDate();

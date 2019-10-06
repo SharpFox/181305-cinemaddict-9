@@ -1,5 +1,8 @@
 import moment from 'moment';
 import ModelFilm from './model-film.js';
+import {
+  doEscapeHTML
+} from '../utils.js';
 
 /**
  * Class representing model of comment.
@@ -12,11 +15,11 @@ class ModelComment {
    */
   constructor(data, serverDataPart) {
     this._data = data;
-    this.id = Number(serverDataPart.id);
-    this.type = serverDataPart.emotion;
-    this.text = serverDataPart.comment;
-    this.date = moment(serverDataPart.date).toDate();
-    this.author = serverDataPart.author;
+    this.id = Number(doEscapeHTML(serverDataPart.id));
+    this.type = doEscapeHTML(serverDataPart.emotion);
+    this.text = doEscapeHTML(serverDataPart.comment);
+    this.date = moment(doEscapeHTML(serverDataPart.date)).toDate();
+    this.author = doEscapeHTML(serverDataPart.author);
     this.movie =
       serverDataPart.movie === undefined
         ? null : new ModelFilm(this._data, serverDataPart.movie);
@@ -47,7 +50,7 @@ class ModelComment {
       return comments;
     }
     serverComments.forEach((comment) => {
-      comments.push(new ModelComment(comment));
+      comments.push(new ModelComment(doEscapeHTML(comment)));
     });
 
     return comments;

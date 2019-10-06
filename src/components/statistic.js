@@ -79,13 +79,10 @@ class Statistic extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   bind(element = null) {
-    if (element === null) {
-      element = this._element;
+    element = this._getElementForBinding(element);
+    if (element !== null) {
+      this._bindOnFilterStatistic(element);
     }
-    if (element === null) {
-      return;
-    }
-    this._bindOnFilterStatistic(element);
   }
 
   /**
@@ -93,13 +90,10 @@ class Statistic extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   unbind(element = null) {
-    if (element === null) {
-      element = this._element;
+    element = this._getElementForBinding(element);
+    if (element !== null) {
+      this._unbindOnFilterStatistic(element);
     }
-    if (element === null) {
-      return;
-    }
-    this._unbindOnFilterStatistic(element);
   }
 
   /**

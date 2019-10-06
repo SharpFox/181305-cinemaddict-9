@@ -50,17 +50,22 @@ class Sort extends AbstractComponent {
   }
 
   /**
+   * Return active button of sorting.
+   * @return {HTMLElement}
+   */
+  getActiveSortButton() {
+    return document.querySelector(`.sort__button--active`);
+  }
+
+  /**
    * Add events for elements.
    * @param {DocumentFragment} element
    */
   bind(element = null) {
-    if (element === null) {
-      element = this._element;
+    element = this._getElementForBinding(element);
+    if (element !== null) {
+      this._bindOnSortButton(element);
     }
-    if (element === null) {
-      return;
-    }
-    this._bindOnSortButton(element);
   }
 
   /**
@@ -68,13 +73,10 @@ class Sort extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   unbind(element = null) {
-    if (element === null) {
-      element = this._element;
+    element = this._getElementForBinding(element);
+    if (element !== null) {
+      this._unbindOnSortButton(element);
     }
-    if (element === null) {
-      return;
-    }
-    this._unbindOnSortButton(element);
   }
 
   /**

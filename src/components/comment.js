@@ -75,13 +75,10 @@ class Comment extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   bind(element = null) {
-    if (element === null) {
-      element = this._element;
+    element = this._getElementForBinding(element);
+    if (element !== null) {
+      this._bindOnDeleteComment(element);
     }
-    if (element === null) {
-      return;
-    }
-    this._bindOnDeleteComment(element);
   }
 
   /**
@@ -89,13 +86,10 @@ class Comment extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   unbind(element = null) {
-    if (element === null) {
-      element = this._element;
+    element = this._getElementForBinding(element);
+    if (element !== null) {
+      this._unbindOnDeleteComment(element);
     }
-    if (element === null) {
-      return;
-    }
-    this._unbindOnDeleteComment(element);
   }
 
   /**

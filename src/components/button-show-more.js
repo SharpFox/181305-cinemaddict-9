@@ -42,13 +42,10 @@ class ButtonShowMore extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   bind(element = null) {
-    if (element === null) {
-      element = this._element;
+    element = this._getElementForBinding(element);
+    if (element !== null) {
+      this._bindOnOpenButton(element);
     }
-    if (element === null) {
-      return;
-    }
-    this._bindOnOpenButton(element);
   }
 
   /**
@@ -56,13 +53,10 @@ class ButtonShowMore extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   unbind(element = null) {
-    if (element === null) {
-      element = this._element;
+    element = this._getElementForBinding(element);
+    if (element !== null) {
+      this._unbindOnOpenButton(element);
     }
-    if (element === null) {
-      return;
-    }
-    this._unbindOnOpenButton(element);
   }
 
   /**

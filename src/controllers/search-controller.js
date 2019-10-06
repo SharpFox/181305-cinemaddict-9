@@ -1,7 +1,8 @@
 import Search from '../components/search.js';
 import {
   addElementDOM,
-  removeContainerChildren
+  removeContainerChildren,
+  doEscapeHTML
 } from '../utils.js';
 
 /**
@@ -91,7 +92,7 @@ class SearchController {
       this._sortContainer.classList.remove(`visually-hidden`);
       this._data.doDefaultFilmCardsCurrent();
       const sortButtonActiveContainer =
-        document.querySelector(`.sort__button--active`);
+        this._pageController.getActiveSortButton();
       this._mainNavigationController.selectFilms();
       this._pageController
         .sortFilmsCards(sortButtonActiveContainer.dataset.sorttype);
@@ -113,8 +114,8 @@ class SearchController {
    */
   _openStatistic() {
     const mainNavigationElement =
-      this._mainNavigationContainer
-      .querySelector(`.main-navigation__item--active`);
+      this._mainNavigationController.mainNavigationComponent
+      .getActiveMainNavigationItem();
 
     if (mainNavigationElement.dataset.id === this._data.menuTypesId.stats) {
       this._statisticContainer.classList.remove(`visually-hidden`);
@@ -145,7 +146,7 @@ class SearchController {
     noResultElement.innerHTML = `<section
         class="films-list">
         <h2 class="films-list__title visually-hidden">
-          ${this._data.filmsCategories.AllMoviesUpcoming}
+          ${doEscapeHTML(this._data.filmsCategories.AllMoviesUpcoming)}
         </h2>
         <div class="no-result">
           There is no movies for your request.

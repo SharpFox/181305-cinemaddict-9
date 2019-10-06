@@ -25,7 +25,16 @@ class MainNavigationController {
     this._filmsContainer = filmsContainer;
     this._sortContainer = sortContainer;
     this._statisticContainer = statisticContainer;
-    this._mainNavigationComponent = new MainNavigation(this._data);
+    this._mainNavigationComponent =
+      new MainNavigation(this._data, this._mainNavigationContainer);
+  }
+
+  /**
+   * Return mainNavigationComponent.
+   * @return {object}
+   */
+  get mainNavigationComponent() {
+    return this._mainNavigationComponent;
   }
 
   /**

@@ -31,6 +31,7 @@ class PageController {
     this._movieControllers = [];
     this._filmsListsComponents = [];
     this._getFilmsCards = this._data.getFilmsCardsPortion();
+    this._firstSortComponent = null;
 
     this._onDataChange = onDataChange;
     this._onCommentsLoad = onCommentsLoad;
@@ -170,6 +171,14 @@ class PageController {
   }
 
   /**
+   * Return active element of sorting.
+   * @return {HTMLElement}
+   */
+  getActiveSortButton() {
+    return this._firstSortComponent.getActiveSortButton();
+  }
+
+  /**
    * Add films lists.
    */
   _addFilmsLists() {
@@ -197,6 +206,7 @@ class PageController {
    * Render sort component.
    */
   _renderSortComponent() {
+    this._firstSortComponent = null;
     Object.entries(this._data.sortTypes).map((sortType) => {
       const sortComponent = new Sort(sortType);
       addElementDOM(this._sortContainer, sortComponent);
@@ -204,6 +214,10 @@ class PageController {
       sortComponent.onSort = () => {
         this.sortFilmsCards(sortComponent.getSortType());
       };
+
+      if (this._firstSortComponent === null) {
+        this._firstSortComponent = sortComponent;
+      }
     });
   }
 

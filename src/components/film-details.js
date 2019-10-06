@@ -192,16 +192,13 @@ class FilmDetails extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   bind(element = null) {
-    if (element === null) {
-      element = this._element;
+    element = this._getElementForBinding(element);
+    if (element !== null) {
+      this._bindOnCloseForm(element);
+      this._bindOnSendForm(element);
+      this._bindOnOpenCloseRating(element);
+      this._bindOnUndoUserRating(element);
     }
-    if (element === null) {
-      return;
-    }
-    this._bindOnCloseForm(element);
-    this._bindOnSendForm(element);
-    this._bindOnOpenCloseRating(element);
-    this._bindOnUndoUserRating(element);
   }
 
   /**
@@ -209,16 +206,13 @@ class FilmDetails extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   unbind(element = null) {
-    if (element === null) {
-      element = this._element;
+    element = this._getElementForBinding(element);
+    if (element !== null) {
+      this._unbindOnCloseForm(element);
+      this._unbindOnSendForm(element);
+      this._unbindOnOpenCloseRating(element);
+      this._unbindOnUndoUserRating(element);
     }
-    if (element === null) {
-      return;
-    }
-    this._unbindOnCloseForm(element);
-    this._unbindOnSendForm(element);
-    this._unbindOnOpenCloseRating(element);
-    this._unbindOnUndoUserRating(element);
   }
 
   /**

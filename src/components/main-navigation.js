@@ -15,10 +15,12 @@ class MainNavigation extends AbstractComponent {
   /**
    * Create main navigation.
    * @param {object} data
+   * @param {HTMLElement} mainNavigationContainer
    */
-  constructor(data) {
+  constructor(data, mainNavigationContainer) {
     super();
     this._data = data;
+    this._mainNavigationContainer = mainNavigationContainer;
 
     this._selectFilms = null;
     this._openCloseState = null;
@@ -51,18 +53,24 @@ class MainNavigation extends AbstractComponent {
   }
 
   /**
+   * Return active item of main navigation.
+   * @return {HTMLElement}
+   */
+  getActiveMainNavigationItem() {
+    return this._mainNavigationContainer
+      .querySelector(`.main-navigation__item--active`);
+  }
+
+  /**
    * Add events for elements.
    * @param {DocumentFragment} element
    */
   bind(element = null) {
-    if (element === null) {
-      element = this._element;
+    element = this._getElementForBinding(element);
+    if (element !== null) {
+      this._bindOnSelectFilms(element);
+      this._bindOnOpenCloseState(element);
     }
-    if (element === null) {
-      return;
-    }
-    this._bindOnSelectFilms(element);
-    this._bindOnOpenCloseState(element);
   }
 
   /**
@@ -70,14 +78,11 @@ class MainNavigation extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   unbind(element = null) {
-    if (element === null) {
-      element = this._element;
+    element = this._getElementForBinding(element);
+    if (element !== null) {
+      this._unbindOnSelectFilms(element);
+      this._unbindOnOpenCloseState(element);
     }
-    if (element === null) {
-      return;
-    }
-    this._unbindOnSelectFilms(element);
-    this._unbindOnOpenCloseState(element);
   }
 
   /**

@@ -54,14 +54,11 @@ class Search extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   bind(element = null) {
-    if (element === null) {
-      element = this._element;
+    element = this._getElementForBinding(element);
+    if (element !== null) {
+      this._bindOnSearchFilm(element);
+      this._bindOnCloseSearch(element);
     }
-    if (element === null) {
-      return;
-    }
-    this._bindOnSearchFilm(element);
-    this._bindOnCloseSearch(element);
   }
 
   /**
@@ -69,14 +66,11 @@ class Search extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   unbind(element = null) {
-    if (element === null) {
-      element = this._element;
+    element = this._getElementForBinding(element);
+    if (element !== null) {
+      this._unbindOnSearchFilm(element);
+      this._unbindOnCloseSearch(element);
     }
-    if (element === null) {
-      return;
-    }
-    this._unbindOnSearchFilm(element);
-    this._unbindOnCloseSearch(element);
   }
 
   /**

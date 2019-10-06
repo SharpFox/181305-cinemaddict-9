@@ -105,14 +105,11 @@ class FilmCard extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   bind(element = null) {
-    if (element === null) {
-      element = this._element;
+    element = this._getElementForBinding(element);
+    if (element !== null) {
+      this._bindOnOpenDetails(element);
+      this._bindOnSendForm(element);
     }
-    if (element === null) {
-      return;
-    }
-    this._bindOnOpenDetails(element);
-    this._bindOnSendForm(element);
   }
 
   /**
@@ -120,14 +117,11 @@ class FilmCard extends AbstractComponent {
    * @param {DocumentFragment} element
    */
   unbind(element = null) {
-    if (element === null) {
-      element = this._element;
+    element = this._getElementForBinding(element);
+    if (element !== null) {
+      this._unbindOnOpenDetails(element);
+      this._unbindOnSendForm(element);
     }
-    if (element === null) {
-      return;
-    }
-    this._unbindOnOpenDetails(element);
-    this._unbindOnSendForm(element);
   }
 
   /**

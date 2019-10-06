@@ -57,7 +57,7 @@ class ModelComment {
   }
 
   /**
-   * Return template of model comment.
+   * Return template of comment model.
    * @return {object}
    */
   static getTemplateData() {

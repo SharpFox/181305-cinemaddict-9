@@ -47,7 +47,7 @@ class ModelFilm {
   }
 
   /**
-   * Return RAW object for server.
+   * Return object RAW for server.
     * @return {object}
    */
   toRAW() {
